@@ -8,9 +8,8 @@ have any questions, please reach out to the #gen-argocd channel in Slack.
 ## Installation
 
 Assuming you have followed the [Getting Started](https://kartverket.atlassian.net/wiki/spaces/SKIPDOK/pages/554827836/Komme+i+gang+med+Argo+CD)
-guide, you can use ArgoKit to deploy ArgoCD applications on SKIP. The first step
-is to include the ArgoKit library in your apps-repo by running the following
-command:
+guide, you can use ArgoKit in your apps-repo. The first step is to include the
+ArgoKit library by running the following command:
 
 ```bash
 $ git submodule add https://github.com/kartverket/argokit.git
@@ -19,7 +18,7 @@ $ git submodule add https://github.com/kartverket/argokit.git
 Note that this may not be required if you use kustomize. See the section on
 [Usage with kustomize](#usage-with-kustomize) for more information.
 
-## Automatic version updates
+### Automatic version updates
 
 It is highly recommended to use dependabot to automatically update the ArgoKit
 version when a new version is released. To do this, add the following to your
@@ -46,9 +45,57 @@ application, you can use the following jsonnet file:
 
 ```jsonnet
 local argokit = import 'argokit/jsonnet/argokit.libsonnet';
+
+local Probe = {
+    path: "/healthz",
+    port: 8080,
+    failureThreshold: 3,
+    timeout: 1,
+    initialDelay: 0,
+};
+
+local BaseApp = {
+    spec: {
+        port: 8080,
+        replicas: {
+            min: 2,
+            max: 5,
+            targetCPUUtilization: 80,
+        },
+        liveness: Probe,
+        readiness: Probe,
+    },
+};
+
+[
+    BaseApp + argokit.Application("foo-backend") {
+        spec+: {
+            image: "hello-world",
+            ingresses: ["foo.bar.com"],
+            accessPolicy: {
+                inbound: {
+                    rules: [{
+                        application: "foo-frontend",
+                    }],
+                },
+            },
+        },
+    },
+]
 ```
 
-TODO: Add examples
+### jsonnet API
+
+The following templates are available for use in the `argokit.libsonnet` file:
+
+| Template                   | Description                                                    | Example                                                                                  |
+| -------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `argokit.Application`      | Creates a Skiperator application                               |                                                                                          |
+| `argokit.GSMSecretStore`   | Creates a Google Secret Manager External Secrets `SecretStore` | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)     |
+| `argokit.GSMSecret`        | Creates a Google Secret Manager External Secrets `Secret`      | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)     |
+| `argokit.VaultSecretStore` | Creates a Vault External Secrets `SecretStore`                 | [examples/jsonnet/secretstore-vault.jsonnet](examples/jsonnet/secretstore-vault.jsonnet) |
+| `argokit.VaultSecret`      | Creates a Vault External Secrets `Secret`                      | [examples/jsonnet/secretstore-vault.jsonnet](examples/jsonnet/secretstore-vault.jsonnet) |
+| `argokit.Roles`            | Creates a set of RBAC roles for this namespace                 | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                         |
 
 ## Usage with kustomize
 
