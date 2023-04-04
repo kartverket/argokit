@@ -1,5 +1,9 @@
 # ArgoKit
 
+<p align="center">
+<img src="logo.png" alt="ArgoKit Logo" width="300px" />
+</p>
+
 ArgoKit is a set of reusable manifests and jsonnet templates that makes it
 easier to deploy ArgoCD applications on SKIP. It is a work in progress and will
 be updated as we learn more about how to best deploy with ArgoCD on SKIP. If you
