@@ -65,21 +65,29 @@
     },
   },
   VaultSecret(name): {
+    local input = self,
+    secrets:: null,
+    allKeysFrom:: null,
+
     apiVersion: 'external-secrets.io/v1beta1',
     kind: 'ExternalSecret',
     metadata: {
       name: name,
     },
     spec: {
-      data: [
-        {
-          remoteRef: {
-            key: 'teamname/teamname-db/dev',
-            property: 'spring.datasource.password',
-            secretKey: 'DB_PASSWORD',
-          },
+      [if input.secrets != null then 'data']: [{
+        secretKey: secret.toKey,
+        remoteRef: {
+          key: secret.fromSecret,
+          property: secret.fromProperty.
         },
-      ],
+      } for secret in input.secrets],
+      [if input.allKeysFrom != null then 'dataFrom']: [{
+        extract: {
+          key: secret.fromSecret,
+          property: secret.fromProperty.
+        },
+      } for secret in input.allKeysFrom],
       refreshInterval: '1h',
       secretStoreRef: {
         kind: 'SecretStore',

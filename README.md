@@ -94,7 +94,7 @@ The following templates are available for use in the `argokit.libsonnet` file:
 
 | Template                   | Description                                                    | Example                                                                                  |
 | -------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `argokit.Application`      | Creates a Skiperator application                               |                                                                                          |
+| `argokit.Application`      | Creates a Skiperator application                               | See above                                                                                |
 | `argokit.GSMSecretStore`   | Creates a Google Secret Manager External Secrets `SecretStore` | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)     |
 | `argokit.GSMSecret`        | Creates a Google Secret Manager External Secrets `Secret`      | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)     |
 | `argokit.VaultSecretStore` | Creates a Vault External Secrets `SecretStore`                 | [examples/jsonnet/secretstore-vault.jsonnet](examples/jsonnet/secretstore-vault.jsonnet) |
