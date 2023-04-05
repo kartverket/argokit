@@ -19,8 +19,17 @@ ArgoKit library by running the following command:
 $ git submodule add https://github.com/kartverket/argokit.git
 ```
 
-Note that this may not be required if you use kustomize. See the section on
-[Usage with kustomize](#usage-with-kustomize) for more information.
+Alternatively you can use jsonnet-bundler if prefer package managers over
+submodules. To do this, install the CLI by following the instructions in the
+[jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler) repo and
+run the following command:
+
+```bash
+$ jb install https://github.com/kartverket/argokit@main
+```
+
+Note that installation may not be required if you use kustomize. See the section
+on [Usage with kustomize](#usage-with-kustomize) for more information.
 
 ### Automatic version updates
 
