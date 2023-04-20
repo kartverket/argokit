@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  # This image value will be updated by an external commit, see examples > workflows > patch-and-deploy-image.yaml
+  image: ghcr.io/kartverket/application@sha256:fd462bda19e3d10233b66d8c280943178804bb0aae020dde725487995725647d
+kind: ConfigMap
+metadata:
+  name: application-kustomize-replacements

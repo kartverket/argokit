@@ -1,0 +1,49 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # Builds and Pushes Image to Registry
+  # Should output the image digest of the new image
+  build: ...
+
+  deploy-argo:
+    needs: [build]
+    runs-on: ubuntu-latest
+    env:
+      BASE_DIR: ./dev/skip
+    steps:
+      - name: Checkout apps repo
+        uses: actions/checkout@v3
+        with:
+          repository: kartverket/skip-apps
+          # The following secret is added under Settings > Secrets and variables > Actions > Repository Secrets
+          # The secret needs to have the following permissions:
+          # Repository access to the -apps repo
+          # Read/Write Content
+          # Read Metadata
+          token: ${{ secrets.SKIP_DEPLOY_SECRET }}
+
+      # The examples folder 'image_replacement' contains the structure for this image digest patch.
+
+      # The first patch command uses the existing variable.yaml file, and patches the image data value with the newly created digest from the build stage above
+      # We then remove the old variables file and then rename the new temporary tmp_var.yaml to variables.yaml.
+      - name: Patch Image Digest
+        run: |
+          kubectl patch --type=merge --local \
+            -f $BASE_DIR/variables.yaml \
+            -p '{"data":{"image":"ghcr.io/kartverket/application@${{ needs.build.outputs.image_digest }}"}}' \
+            -o yaml > $BASE_DIR/tmp_var.yaml
+
+          rm $BASE_DIR/variables.yaml
+          mv $BASE_DIR/tmp_var.yaml $BASE_DIR/variables.yaml
+
+      - name: Commit Changes to Repo
+        run: |
+          git config --global user.email "noreply@kartverket.no"
+          git config --global user.name "GitHub Actions"
+          git commit -am "Deploy new application image, commit: ${{ github.event.head_commit.message }}"
+          git push
