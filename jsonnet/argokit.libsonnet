@@ -79,13 +79,13 @@
         secretKey: secret.toKey,
         remoteRef: {
           key: secret.fromSecret,
-          property: secret.fromProperty.
+          property: secret.fromProperty
         },
       } for secret in input.secrets],
       [if input.allKeysFrom != null then 'dataFrom']: [{
         extract: {
           key: secret.fromSecret,
-          property: secret.fromProperty.
+          property: secret.fromProperty
         },
       } for secret in input.allKeysFrom],
       refreshInterval: '1h',
