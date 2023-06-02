@@ -58,8 +58,8 @@
     },
     spec: {
       provider: {
-        gcpSecretsManager: {
-          project: gcpProject,
+        gcpsm: {
+          projectID: gcpProject,
         },
       },
     },
