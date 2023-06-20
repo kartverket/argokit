@@ -1,0 +1,8 @@
+apiVersion: skiperator.kartverket.no/v1alpha1
+kind: Application
+metadata:
+  name: application-name
+  namespace: application-namespace
+spec:
+  image: ghcr.io/kartverket/application@sha256:123abc # replaced by kustomize
+  port: 6969

@@ -1,0 +1,11 @@
+source:
+  version: v1
+  kind: ConfigMap
+  name: application-kustomize-replacements
+  fieldPath: data.image
+targets:
+  - select:
+      kind: Application
+      name: application-test-app
+    fieldPaths:
+      - spec.image

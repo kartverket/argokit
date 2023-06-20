@@ -4,7 +4,7 @@
 <img src="logo.png" alt="ArgoKit Logo" width="300px" />
 </p>
 
-ArgoKit is a set of reusable manifests and jsonnet templates that makes it
+ArgoKit is a set of reusable manifests, jsonnet templates and parts of GitHub workflows, that makes it
 easier to deploy ArgoCD applications on SKIP. It is a work in progress and will
 be updated as we learn more about how to best deploy with ArgoCD on SKIP. If you
 have any questions, please reach out to the #gen-argocd channel in Slack.
@@ -121,14 +121,14 @@ following kustomization file:
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-- https://github.com/kartverket/argokit.git/manifests/application.yaml?ref=v0.1.0
+  - https://github.com/kartverket/argokit.git/manifests/application.yaml?ref=v0.1.0
 
 patches:
-- path: patches/application.yaml
+  - path: patches/application.yaml
 
 images:
-- name: hello-world
-  newTag: "1.2.3"
+  - name: hello-world
+    newTag: "1.2.3"
 ```
 
 Note that Kustomize is pulling directly from ArgoKit's GitHub repo, so setting
@@ -146,11 +146,11 @@ spec:
   image: hello-world
   port: 8080
   ingresses:
-  - foo.bar.com
+    - foo.bar.com
   accessPolicy:
     inbound:
       rules:
-      - application: foo-frontend
+        - application: foo-frontend
 ```
 
 ## Usage with plain kubernetes manifests
@@ -179,7 +179,6 @@ If more intricate patches are required a json patch may be more convenient.
 Using this kind of patch a list of operations can be specified to modify the
 manifest. See the [RFC 6902](https://www.rfc-editor.org/rfc/rfc6902) (JSON
 Patch) documentation for more information on how to use this kind of patch.
-
 
 ```bash
 $ kubectl patch --local --type=json -f argokit/manifests/secretstore-gsm.yaml -p '[
