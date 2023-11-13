@@ -80,12 +80,14 @@
         remoteRef: {
           key: secret.fromSecret,
           property: secret.fromProperty,
+          metadataPolicy: 'None',
         },
       } for secret in input.secrets],
       [if input.allKeysFrom != null then 'dataFrom']: [{
         extract: {
           key: secret.fromSecret,
           property: secret.fromProperty,
+          metadataPolicy: 'None',
         },
       } for secret in input.allKeysFrom],
       refreshInterval: '1h',
@@ -113,11 +115,13 @@
         secretKey: secret.toKey,
         remoteRef: {
           key: secret.fromSecret,
+          metadataPolicy: 'None',
         },
       } for secret in input.secrets],
       [if input.allKeysFrom != null then 'dataFrom']: [{
         extract: {
           key: secret.fromSecret,
+          metadataPolicy: 'None',
         },
       } for secret in input.allKeysFrom],
       refreshInterval: '1h',
