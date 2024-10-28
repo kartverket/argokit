@@ -10,29 +10,3 @@ spec:
   lifecycle: "production"
   owner: "skip"
   system: "skip"
----
-apiVersion: "backstage.io/v1alpha1"
-kind: "Group"
-metadata:
-  name: "security_champion_argokit"
-  title: "Security Champion argokit"
-spec:
-  type: "security_champion"
-  parent: "it_security_champions"
-  members:
-  - "omaen"
-  children:
-  - "resource:argokit"
----
-apiVersion: "backstage.io/v1alpha1"
-kind: "Resource"
-metadata:
-  name: "argokit"
-  links:
-  - url: "https://github.com/kartverket/argokit"
-    title: "argokit på GitHub"
-spec:
-  type: "repo"
-  owner: "security_champion_argokit"
-  dependencyOf:
-  - "component:argokit"
