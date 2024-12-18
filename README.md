@@ -4,10 +4,10 @@
 <img src="logo.png" alt="ArgoKit Logo" width="300px" />
 </p>
 
-ArgoKit is a set of reusable manifests and jsonnet templates that makes it
-easier to deploy ArgoCD applications on SKIP. It is a work in progress and will
-be updated as we learn more about how to best deploy with ArgoCD on SKIP. If you
-have any questions, please reach out to the #gen-argocd channel in Slack.
+ArgoKit is a set of reusable jsonnet templates that makes it easier to deploy
+ArgoCD applications on SKIP. It is a work in progress and will be updated as we
+learn more about how to best deploy with ArgoCD on SKIP. If you have any
+questions, please reach out to the #gen-argocd channel in Slack.
 
 ## Installation
 
@@ -27,9 +27,6 @@ run the following command:
 ```bash
 $ jb install https://github.com/kartverket/argokit@main
 ```
-
-Note that installation may not be required if you use kustomize. See the section
-on [Usage with kustomize](#usage-with-kustomize) for more information.
 
 ### Automatic version updates
 
@@ -110,83 +107,6 @@ The following templates are available for use in the `argokit.libsonnet` file:
 | `argokit.VaultSecret`      | Creates a Vault External Secrets `Secret`                      | [examples/jsonnet/secretstore-vault.jsonnet](examples/jsonnet/secretstore-vault.jsonnet) |
 | `argokit.Roles`            | Creates a set of RBAC roles for this namespace                 | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                         |
 
-## Usage with kustomize
-
-If you use kustomize in your apps-repo, you can use the ArgoKit library to
-deploy ArgoCD applications by including the `argokit` directory in your
-kustomization file. For example, to deploy an application, you can use the
-following kustomization file:
-
-```yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-- https://github.com/kartverket/argokit.git/manifests/application.yaml?ref=v0.1.0
-
-patches:
-- path: patches/application.yaml
-
-images:
-- name: hello-world
-  newTag: "1.2.3"
-```
-
-Note that Kustomize is pulling directly from ArgoKit's GitHub repo, so setting
-up the submodule is not necessary for this approach.
-
-Your patch file could look something like this, which would be merged into the
-result:
-
-```yaml
-apiVersion: skiperator.kartverket.no/v1alpha1
-kind: Application
-metadata:
-  name: foo-backend
-spec:
-  image: hello-world
-  port: 8080
-  ingresses:
-  - foo.bar.com
-  accessPolicy:
-    inbound:
-      rules:
-      - application: foo-frontend
-```
-
-## Usage with plain kubernetes manifests
-
-ArgoKit also includes a set of kubernetes manifests that can be used as a
-starting point for deploying ArgoCD applications on SKIP. The manifests are
-located in the `manifests` directory and can be used as is or as a starting
-point for your own manifests.
-
-If you choose to use the manifests with no other tooling it is probably best to
-copy them over to your apps-repo and modify them there as they will require a
-decent amount of modification. This way you can easily change the manifests to
-include your own changes.
-
-Some of the manifests are however usable with minor changes. For example, the
-secretstores can easily be patched to meet most teams' needs. To do this, you
-can use the following command to run a merge patch and output a new manifest:
-
-```bash
-$ kubectl patch --local --type=merge -f argokit/manifests/secretstore-gsm.yaml \
-  -p '{"spec": {"provider": {"gcpSecretsManager": {"project": "my-project"}}}}' \
-  -o yaml > my-gsm-secretstore.yaml
-```
-
-If more intricate patches are required a json patch may be more convenient.
-Using this kind of patch a list of operations can be specified to modify the
-manifest. See the [RFC 6902](https://www.rfc-editor.org/rfc/rfc6902) (JSON
-Patch) documentation for more information on how to use this kind of patch.
-
-
-```bash
-$ kubectl patch --local --type=json -f argokit/manifests/secretstore-gsm.yaml -p '[
-    {"op": "add", "path": "/spec/provider/gcpSecretsManager/project", "value": "my-project"}
-  ]' \
-  -o yaml > my-gsm-secretstore.yaml
-```
 
 ## Contributing
 
