@@ -50,7 +50,7 @@ ArgoKit version once a day provided that a new version has been released.
 
 If you use jsonnet in your apps-repo, you can use the ArgoKit library to deploy
 ArgoCD applications by including the `argokit.libsonnet` file in your jsonnet
-file and calling the `argokit.application` function. For example, to deploy an
+file and calling the `argokit.Application` function. For example, to deploy an
 application, you can use the following jsonnet file:
 
 ```jsonnet
@@ -103,8 +103,6 @@ The following templates are available for use in the `argokit.libsonnet` file:
 | `argokit.Application`      | Creates a Skiperator application                               | See above                                                                                |
 | `argokit.GSMSecretStore`   | Creates a Google Secret Manager External Secrets `SecretStore` | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)     |
 | `argokit.GSMSecret`        | Creates a Google Secret Manager External Secrets `Secret`      | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)     |
-| `argokit.VaultSecretStore` | Creates a Vault External Secrets `SecretStore`                 | [examples/jsonnet/secretstore-vault.jsonnet](examples/jsonnet/secretstore-vault.jsonnet) |
-| `argokit.VaultSecret`      | Creates a Vault External Secrets `Secret`                      | [examples/jsonnet/secretstore-vault.jsonnet](examples/jsonnet/secretstore-vault.jsonnet) |
 | `argokit.Roles`            | Creates a set of RBAC roles for this namespace                 | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                         |
 
 
