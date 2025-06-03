@@ -25,6 +25,28 @@
       apiGroup: 'rbac.authorization.k8s.io',
     },
   },
+  NamespaceAdminGroup(groupName): {
+    apiVersion: 'rbac.authorization.k8s.io/v1',
+    kind: 'RoleBinding',
+    metadata: {
+      name: 'namespace-admin',
+      annotations: {
+        description: 'Binds cluster-admin to the team AD/Google Group. Allows all subjects to have full rights within their namespace. Reserved for dev/sandbox.',
+      },
+    },
+    subjects: [
+      {
+        apiGroup: 'rbac.authorization.k8s.io',
+        kind: 'Group',
+        name: groupName,
+      },
+    ],
+    roleRef: {
+      kind: 'ClusterRole',
+      name: 'cluster-admin',
+      apiGroup: 'rbac.authorization.k8s.io',
+    },
+  },
   GSMSecretStore(gcpProject): {
     apiVersion: 'external-secrets.io/v1',
     kind: 'SecretStore',
