@@ -4,18 +4,29 @@ local argokit = import "./argokit.libsonnet";
         name,
         schedule,
         databaseIP,
-        gcpDatabasePasswordSecret,
+        gsmSecretPrefix,
         gcpS3CredentialsSecret,
         databaseName,
         databaseUser='postgres',
         serviceAccount,
         cloudsqlInstanceConnectionName,
-        port='5432',
+        port=5432,
         S3Host='s3-rin.statkart.no',
         S3DestinationPath,
     ):
     local this = self;
+    
+    local dbCertsSecretName = name + '-db-certs';
     local dbPasswordSecretName = name + '-db-password';
+    local s3CredentialsSecretName = name + '-s3-credentials';
+
+    local databaseUserPassword = gsmSecretPrefix +"-"+ databaseUser + '-password';
+    local databaseUserClientCert = gsmSecretPrefix +"-"+ databaseUser + '-client-certificate';
+    local databaseCACert = gsmSecretPrefix + '-ca-certificate';
+    local databaseUserKey = gsmSecretPrefix +"-"+ databaseUser + '-client-key';
+    local databaseCerts = gsmSecretPrefix + '-db-password';
+
+    
     local s3CredentialsSecretName = name + '-s3-credentials';
     [
         {
@@ -120,7 +131,7 @@ local argokit = import "./argokit.libsonnet";
                 },
                 {
                 name: 'PGPORT',
-                value: port,
+                value: std.toString(port),
                 },
                 {
                 name: 'S3_DESTINATION_PATH',
@@ -134,7 +145,7 @@ local argokit = import "./argokit.libsonnet";
             filesFrom: [
                 {
                 mountPath: '/app/certs',
-                secret: 'database-certs',
+                secret: dbCertsSecretName,
                 defaultMode: 384,
                 },
             ],
@@ -146,16 +157,31 @@ local argokit = import "./argokit.libsonnet";
             },
         },
         },
-        // 2. The new ExternalSecret for the database password.
+        argokit.GSMSecret(dbCertsSecretName) {
+        secrets: [
+            {
+            fromSecret: databaseUserClientCert,
+            toKey: 'client.crt',
+            },
+            {
+            fromSecret: databaseUserKey,
+            toKey: 'client.key',
+            },
+            {
+            fromSecret: databaseCACert,
+            toKey: 'server.crt',
+            },
+            ],
+        },
         argokit.GSMSecret(dbPasswordSecretName) {
         secrets: [
             {
-            fromSecret: gcpDatabasePasswordSecret,
+            fromSecret: databaseUserPassword,
             toKey: 'PGPASSWORD',
             },
-        ],
+            ],
+
         },
-        // 3. The new ExternalSecret for the S3 credentials.
         argokit.GSMSecret(s3CredentialsSecretName) {
         allKeysFrom: [
             {

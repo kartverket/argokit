@@ -102,4 +102,10 @@
       name: name,
     },
   },
+  ManifestsFrom: function(elements) {
+    apiVersion: 'v1',
+    kind: 'List',
+    items: std.flattenArrays(elements),
+  },
 }
+
