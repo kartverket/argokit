@@ -139,7 +139,7 @@ local argokit = import "./argokit.libsonnet";
                 },
                 {
                 name: 'S3_ENDPOINT_URL',
-                value: S3Host,
+                value: "https://"+ S3Host,
                 },
             ],
             filesFrom: [
