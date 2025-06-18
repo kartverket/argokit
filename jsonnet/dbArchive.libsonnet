@@ -143,7 +143,7 @@ local argokit = import "./argokit.libsonnet";
             ],
             filesFrom: [
                 {
-                mountPath: '/app/certs',
+                mountPath: '/app/db-certs',
                 secret: dbCertsSecretName,
                 defaultMode: 384,
                 },
