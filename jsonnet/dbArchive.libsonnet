@@ -26,7 +26,6 @@ local argokit = import "./argokit.libsonnet";
     local databaseUserKey = gsmSecretPrefix +"-"+ databaseUser + '-client-key';
     local databaseCerts = gsmSecretPrefix + '-db-password';
 
-    
     local s3CredentialsSecretName = name + '-s3-credentials';
     [
         {
@@ -50,7 +49,7 @@ local argokit = import "./argokit.libsonnet";
                 outbound: {
                 external: [
                     {
-                    host: 'dba-arkiv-test',
+                    host: gsmSecretPrefix,
                     ip: databaseIP,
                     ports: [
                         {
