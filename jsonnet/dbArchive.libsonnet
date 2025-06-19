@@ -41,7 +41,7 @@ local argokit = import "./argokit.libsonnet";
             startingDeadlineSeconds: 10,
             },
             container: {
-            image: 'ghcr.io/kartverket/database-arkiv:0965c18bcdabebcbfea020718cd50c007dee0860',
+            image: 'ghcr.io/kartverket/database-arkiv:8547bf0036608110fdab91454b1e908d53680728',
             command: [
                 '/entrypoint.sh',
             ],
