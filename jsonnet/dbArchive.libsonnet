@@ -13,6 +13,7 @@ local argokit = import "./argokit.libsonnet";
         port=5432,
         S3Host='s3-rin.statkart.no',
         S3DestinationPath,
+        fullDump=false,
     ):
     local this = self;
     
@@ -41,7 +42,7 @@ local argokit = import "./argokit.libsonnet";
             startingDeadlineSeconds: 10,
             },
             container: {
-            image: 'ghcr.io/kartverket/database-arkiv:8547bf0036608110fdab91454b1e908d53680728',
+            image: 'ghcr.io/kartverket/database-arkiv:4b1bfd6cdb29e74a0adc6ab2e5d0e8e24ffe8cd1',
             command: [
                 '/entrypoint.sh',
             ],
@@ -140,6 +141,10 @@ local argokit = import "./argokit.libsonnet";
                 name: 'S3_ENDPOINT_URL',
                 value: "https://"+ S3Host,
                 },
+                {
+                name: 'PG_DUMP_ROLES',
+                value: if fullDump then 'true' else 'false',
+                }
             ],
             filesFrom: [
                 {
