@@ -1,13 +1,12 @@
 local argokit = import './argokit.libsonnet';
 {
   dbArchiveJob(
-    name,
+    instanceName,
     schedule,
     databaseIP,
-    gsmSecretPrefix,
     gcpS3CredentialsSecret,
     databaseName,
-    databaseUser='postgres',
+    archiveUser='postgres',
     serviceAccount,
     cloudsqlInstanceConnectionName,
     port=5432,
@@ -17,15 +16,14 @@ local argokit = import './argokit.libsonnet';
   ):
     local this = self;
 
-    local instanceSecretName = name + '-instance';
-    local archiveUserSecretName = name + '-' + databaseUser;
-    local s3CredentialsSecretName = name + '-s3-credentials';
+    local instanceSecretName = instanceName + '-instance';
+    local archiveUserSecretName = instanceName + '-' + archiveUser;
     [
       {
         apiVersion: 'skiperator.kartverket.no/v1alpha1',
         kind: 'SKIPJob',
         metadata: {
-          name: name,
+          name: instanceName,
         },
         spec: {
           cron: {
@@ -42,7 +40,7 @@ local argokit = import './argokit.libsonnet';
               outbound: {
                 external: [
                   {
-                    host: gsmSecretPrefix,
+                    host: instanceName,
                     ip: databaseIP,
                     ports: [
                       {
@@ -72,7 +70,7 @@ local argokit = import './argokit.libsonnet';
               },
               {
                 name: 'PGUSER',
-                value: databaseUser,
+                value: archiveUser,
               },
               {
                 name: 'PGPASSWORD',
@@ -87,7 +85,7 @@ local argokit = import './argokit.libsonnet';
                 name: 'AWS_ACCESS_KEY_ID',
                 valueFrom: {
                   secretKeyRef: {
-                    name: s3CredentialsSecretName,
+                    name: gcpS3CredentialsSecret,
                     key: 'AWS_ACCESS_KEY_ID',
                   },
                 },
@@ -96,22 +94,22 @@ local argokit = import './argokit.libsonnet';
                 name: 'AWS_SECRET_ACCESS_KEY',
                 valueFrom: {
                   secretKeyRef: {
-                    name: s3CredentialsSecretName,
+                    name: gcpS3CredentialsSecret,
                     key: 'AWS_SECRET_ACCESS_KEY',
                   },
                 },
               },
               {
                 name: 'PGSSLCA',
-                value: '/app/db-certs/server.crt',
+                value: '/app/db-certs/server/cert',
               },
               {
                 name: 'PGSSLKEY',
-                value: '/app/db-certs/client.key',
+                value: '/app/db-certs/client/private_key',
               },
               {
                 name: 'PGSSLCERT',
-                value: '/app/db-certs/client.crt',
+                value: '/app/db-certs/client/cert',
               },
               {
                 name: 'CLOUDSQL_INSTANCE_CONNECTION_NAME',
@@ -140,8 +138,13 @@ local argokit = import './argokit.libsonnet';
             ],
             filesFrom: [
               {
-                mountPath: '/app/db-certs',
+                mountPath: '/app/db-certs/client',
                 secret: archiveUserSecretName,
+                defaultMode: 384,
+              },
+              {
+                mountPath: '/app/db-certs/server',
+                secret: instanceSecretName,
                 defaultMode: 384,
               },
             ],
@@ -167,7 +170,7 @@ local argokit = import './argokit.libsonnet';
           },
         ],
       },
-      argokit.GSMSecret(s3CredentialsSecretName) {
+      argokit.GSMSecret(gcpS3CredentialsSecret) {
         allKeysFrom: [
           {
             fromSecret: gcpS3CredentialsSecret,
