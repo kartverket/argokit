@@ -7,7 +7,7 @@ local argokit = import './argokit.libsonnet';
     gcpS3CredentialsSecret,
     databaseName,
     archiveUser='postgres',
-    serviceAccount,
+    serviceAccount='dummyaccount@iam.gserviceaccount.com',
     cloudsqlInstanceConnectionName,
     port=5432,
     S3Host='s3-rin.statkart.no',
@@ -15,9 +15,10 @@ local argokit = import './argokit.libsonnet';
     fullDump=false,
   ):
     local this = self;
+    local secretPrefix = 'cloudsql-';
 
-    local instanceSecretName = instanceName + '-instance';
-    local archiveUserSecretName = instanceName + '-' + archiveUser;
+    local instanceSecretName = secretPrefix + instanceName + '-instance';
+    local archiveUserSecretName = secretPrefix + instanceName + '-' + archiveUser;
     [
       {
         apiVersion: 'skiperator.kartverket.no/v1alpha1',

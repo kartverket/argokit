@@ -94,17 +94,41 @@ local BaseApp = {
 ]
 ```
 
-### jsonnet API
+### jsonnet argokit API
 
 The following templates are available for use in the `argokit.libsonnet` file:
 
-| Template                   | Description                                                    | Example                                                                                  |
-| -------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `argokit.Application`      | Creates a Skiperator application                               | See above                                                                                |
-| `argokit.GSMSecretStore`   | Creates a Google Secret Manager External Secrets `SecretStore` | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)     |
-| `argokit.GSMSecret`        | Creates a Google Secret Manager External Secrets `Secret`      | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)     |
-| `argokit.Roles`            | Creates a set of RBAC roles for this namespace                 | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                         |
+| Template                 | Description                                                    | Example                                                                              |
+|--------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| `argokit.Application`    | Creates a Skiperator application                               | See above                                                                            |
+| `argokit.GSMSecretStore` | Creates a Google Secret Manager External Secrets `SecretStore` | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet) |
+| `argokit.GSMSecret`      | Creates a Google Secret Manager External Secrets `Secret`      | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet) |
+| `argokit.Roles`          | Creates a set of RBAC roles for this namespace                 | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                     |
 
+The following templates are available for use in the `dbArchive.libsonnet` file:
+
+| Template                 | Description                                                   | Example                                                                  |
+|--------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------|
+| `dbArchive.dbArchiveJob` | Creates a SKIPJob that creates a sql dump and stores it in S3 | [examples/jsonnet/dbArchive.jsonnet](examples/jsonnet/dbArchive.jsonnet) |
+
+### Input parameters 
+
+#### dbArchiveJob
+
+| Parameter                            | Type    | Default Value            | Description                                                                                                                       |
+|:-------------------------------------|:--------|:-------------------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| **`instanceName`**                   | String  | -                        | **Required.** A unique name for the job and related resources. This name is used as a base for `SKIPJob` and secrets.             |
+| **`schedule`**                       | String  | -                        | **Required.** A cron string defining when the job should run (e.g., `"0 2 * * *"` to run at 02:00 every night).                   |
+| **`databaseIP`**                     | String  | -                        | **Required.** The IP address of the PostgreSQL database to be archived.                                                           |
+| **`gcpS3CredentialsSecret`**         | String  | -                        | **Required.** Name of the secret in GSM containing S3 credentials (`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`).              |
+| **`databaseName`**                   | String  | -                        | **Required.** Name of the database to be archived.                                                                                |
+| **`archiveUser`**                    | String  | `'postgres'`             | The database user the job should use to connect.                                                                                  |
+| **`serviceAccount`**                 | String  | `'dummyaccount@gcp.iam'` | GCP Service Account used by the Kubernetes job to authenticate against Google Cloud (e.g., to fetch secrets from GSM).            |
+| **`cloudsqlInstanceConnectionName`** | String  | -                        | **Required.** The connection name of the Cloud SQL instance (format: `project:region:instance`). Needed for Cloud SQL Auth Proxy. |
+| **`port`**                           | Integer | `5432`                   | The port number of the PostgreSQL database.                                                                                       |
+| **`S3Host`**                         | String  | `'s3-rin.statkart.no'`   | The hostname of the S3 endpoint where the archive should be stored.                                                               |
+| **`S3DestinationPath`**              | String  | -                        | **Required.** Full S3 path where the database archive should be placed (e.g., `s3://my-bucket/archive/database/`).                |
+| **`fullDump`**                       | Bool    | false                    | Flag to include database roles `without passwords` in the dump.                                                                   |
 
 ## Contributing
 
