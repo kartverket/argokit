@@ -73,20 +73,6 @@
         },
       },
     },
-    ldap(host, ip): {
-      spec+: {
-        accessPolicy+: {
-          outbound+: {
-            external+: [
-              {
-                host: host,
-                ip: ip,
-              } + ports('ldap', 389, 'TCP'),
-            ],
-          },
-        },
-      },
-    },
     http(host, portname='', port=443, protocol=''): {
       spec+: {
         accessPolicy+: {
