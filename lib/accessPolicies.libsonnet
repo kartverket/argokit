@@ -67,7 +67,7 @@
               {
                 host: host,
                 ip: ip,
-              } + ports('ldap', 636, 'TCP'),
+              } + ports('ldaps', 636, 'TCP'),
             ],
           },
         },
