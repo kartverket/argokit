@@ -1,6 +1,8 @@
 local environment = import '../lib/environment.libsonnet';
+local accessPolicies = import '../lib/accessPolicies.libsonnet';
 {
   Environment: environment,
+  AccessPolicies: accessPolicies,
   Roles: {
     local this = self,
     members:: error 'members required',
@@ -110,4 +112,3 @@ local environment = import '../lib/environment.libsonnet';
     items: std.flattenArrays(elements),
   },
 }
-
