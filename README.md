@@ -105,14 +105,14 @@ The following templates are available for use in the `argokit.libsonnet` file:
 | `argokit.GSMSecret`      | Creates a Google Secret Manager External Secrets `Secret`      | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet) |
 | `argokit.Roles`          | Creates a set of RBAC roles for this namespace                 | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                     |
 
-### argoKit's AppAndObjects API
+### argoKit's Environment API
 
 | Template                                         | Description                                                                 | Example                                                                  |
 |--------------------------------------------------|-----------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| `argokit.AppAndObjects.envVariable`              | Creates environment variables for an app                                    | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
-| `argokit.AppAndObjects.envVariableSecret`        | Creates environment variable from a Kubernetes Secret                       | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
-| `argokit.AppAndObjects.envVariableSecretJob`     | Creates environment variable from a Secret for a Job container              | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
-| `argokit.AppAndObjects.envVariableSecretCustomKey` | Creates environment variable from a Secret with a custom key                | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
+| `argokit.Environment.envVariable`              | Creates environment variables for an app                                    | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
+| `argokit.Environment.envVariableSecret`        | Creates environment variable from a Kubernetes Secret                       | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
+| `argokit.Environment.envVariableSecretJob`     | Creates environment variable from a Secret for a Job container              | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
+| `argokit.Environment.envVariableSecretCustomKey` | Creates environment variable from a Secret with a custom key                | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
 
 
 The following templates are available for use in the `dbArchive.libsonnet` file:

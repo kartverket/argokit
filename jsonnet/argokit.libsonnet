@@ -1,6 +1,6 @@
-local appAndObjects = import '../lib/appAndObjects.libsonnet';
+local environment = import '../lib/environment.libsonnet';
 {
-  AppAndObjects: appAndObjects,
+  Environment: environment,
   Roles: {
     local this = self,
     members:: error 'members required',
