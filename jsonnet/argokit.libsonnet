@@ -1,4 +1,7 @@
+local accessPolicies = import '../lib/accessPolicies.libsonnet';
+
 {
+  AccessPolicies: accessPolicies,
   Roles: {
     local this = self,
     members:: error 'members required',
@@ -108,4 +111,3 @@
     items: std.flattenArrays(elements),
   },
 }
-

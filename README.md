@@ -98,12 +98,13 @@ local BaseApp = {
 
 The following templates are available for use in the `argokit.libsonnet` file:
 
-| Template                 | Description                                                    | Example                                                                              |
-|--------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| `argokit.Application`    | Creates a Skiperator application                               | See above                                                                            |
-| `argokit.GSMSecretStore` | Creates a Google Secret Manager External Secrets `SecretStore` | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet) |
-| `argokit.GSMSecret`      | Creates a Google Secret Manager External Secrets `Secret`      | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet) |
-| `argokit.Roles`          | Creates a set of RBAC roles for this namespace                 | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                     |
+| Template                 | Description                                                           | Example                                                                              |
+|--------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| `argokit.Application`    | Creates a Skiperator application                                      | See above                                                                            |
+| `argokit.GSMSecretStore` | Creates a Google Secret Manager External Secrets `SecretStore`        | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet) |
+| `argokit.GSMSecret`      | Creates a Google Secret Manager External Secrets `Secret`             | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet) |
+| `argokit.Roles`          | Creates a set of RBAC roles for this namespace                        | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                     |
+| `argokit.AccessPolicies` | Configures inbound and outbound access policies for services and jobs | [examples/jsonnet/accessPolicies.jsonnet](examples/jsonnet/accessPolicies.jsonnet)   |
 
 The following templates are available for use in the `dbArchive.libsonnet` file:
 
