@@ -111,26 +111,4 @@ local accessPolicies = import '../lib/accessPolicies.libsonnet';
     kind: 'List',
     items: std.flattenArrays(elements),
   },
-  HashedConfigMapAsEnv(name, data):: {
-    local cm = k8s.HashedConfigMap(name, data),
-    application+: {
-      spec+: {
-        envFrom+: [
-          { configMap: cm.metadata.name },
-        ],
-      },
-    },
-    objects+:: [cm],
-  },
-  HashedConfigMapAsMount(name, mountPath, data):: {
-    local cm = k8s.HashedConfigMap(name, data),
-    application+: {
-      spec+: {
-        filesFrom+: [
-          { configMap: cm.metadata.name, mountPath: mountPath },
-        ],
-      },
-    },
-    objects+:: [cm],
-  },
 }
