@@ -105,6 +105,7 @@ The following templates are available for use in the `argokit.libsonnet` file:
 | `argokit.GSMSecret`      | Creates a Google Secret Manager External Secrets `Secret`             | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet) |
 | `argokit.Roles`          | Creates a set of RBAC roles for this namespace                        | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                     |
 | `argokit.AccessPolicies` | Configures inbound and outbound access policies for services and jobs | [examples/jsonnet/accessPolicies.jsonnet](examples/jsonnet/accessPolicies.jsonnet)   |
+| `argokit.Ingress`        | Creates ingresses                                                     | [examples/jsonnet/ingress.jsonnet](examples/jsonnet/ingress.jsonnet)                 |
 
 The following templates are available for use in the `dbArchive.libsonnet` file:
 

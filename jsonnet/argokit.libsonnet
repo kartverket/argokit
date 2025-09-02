@@ -1,7 +1,9 @@
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
+local ingress = import '../lib/ingress.libsonnet';
 
 {
   AccessPolicies: accessPolicies,
+  Ingress: ingress,
   Roles: {
     local this = self,
     members:: error 'members required',
