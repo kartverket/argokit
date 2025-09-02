@@ -1,4 +1,6 @@
+local appAndObjects = import '../lib/appAndObjects.libsonnet';
 {
+  AppAndObjects: appAndObjects,
   Roles: {
     local this = self,
     members:: error 'members required',
