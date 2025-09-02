@@ -1,4 +1,3 @@
-local k8s = import '../lib/k8s.libsonnet';
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
 
 {
