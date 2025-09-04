@@ -113,9 +113,8 @@ The following templates are available for use in the `argokit.libsonnet` file:
 | `argokit.Environment.envVariable`              | Creates environment variables for an app                                    | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
 | `argokit.Environment.envVariableSecret`        | Creates environment variable from a secret                       | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
 | `argokit.Environment.envVariableSecretJob`     | Creates environment variable from a secret for a Job container              | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
-| `argokit.Environment.envVariableSecretCustomKey` | Creates environment variable from a secret with a custom key                | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
 
-
+---
 The following templates are available for use in the `dbArchive.libsonnet` file:
 
 | Template                 | Description                                                   | Example                                                                  |
