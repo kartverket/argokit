@@ -42,8 +42,9 @@
   Parameters:
     - name: string - The name of the environment variable.
     - secretRef: string - The name of the secret resource. The key used in the secret is the same as the environment variable name.
+    - key string (optional) - The key in the secret to use for the value. Defaults to the name of the environment variable
   */
-  variableSecretJob(name, secretRef): {
+  variableSecretJob(name, secretRef, key=name): {
     spec+: {
       container+: {
         env+: [
@@ -52,7 +53,7 @@
             valueFrom: {
               secretKeyRef: {
                 name: secretRef,
-                key: name,
+                key: key,
               },
             },
           },
