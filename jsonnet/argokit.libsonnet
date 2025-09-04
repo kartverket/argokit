@@ -1,7 +1,7 @@
 local environment = import '../lib/environment.libsonnet';
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
 {
-  Environment: environment,
+  Env: environment,
   AccessPolicies: accessPolicies,
   Roles: {
     local this = self,

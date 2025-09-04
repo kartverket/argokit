@@ -5,7 +5,7 @@
     - name: string - The name of the environment variable.
     - value: string - The value to assign to the environment variable.
   */
-  envVariable(name, value): {
+  variable(name, value): {
     spec+: {
       env+: [
         {
@@ -20,8 +20,9 @@
   Parameters:
     - name: string - The name of the environment variable.
     - secretRef: string - The name of the secret resource. The key used in the secret is the same as the environment variable name.
+    - key string (optional) - The key in the secret to use for the value. Defaults to the name of the environment variable.  
   */
-  envVariableSecret(name, secretRef): {
+  variableSecret(name, secretRef, key=name): {
     spec+: {
       env+: [
         {
@@ -29,7 +30,7 @@
           valueFrom: {
             secretKeyRef: {
               name: secretRef,
-              key: name,
+              key: key,
             },
           },
         },
@@ -42,7 +43,7 @@
     - name: string - The name of the environment variable.
     - secretRef: string - The name of the secret resource. The key used in the secret is the same as the environment variable name.
   */
-  envVariableSecretJob(name, secretRef): {
+  variableSecretJob(name, secretRef): {
     spec+: {
       container+: {
         env+: [
@@ -57,28 +58,6 @@
           },
         ],
       },
-    },
-  },
-  /*
-    Creates an environment variable from a secret using a custom key.
-    Parameters:
-      - name: string - The name of the environment variable.
-      - key: string - The key in the Secret to use for the value.
-      - secretRef: string - The name of the secret resource.
-  */
-  envVariableSecretCustomKey(name, key, secretRef): {
-    spec+: {
-      env+: [
-        {
-          name: name,
-          valueFrom: {
-            secretKeyRef: {
-              name: secretRef,
-              key: key,
-            },
-          },
-        },
-      ],
     },
   },
 }
