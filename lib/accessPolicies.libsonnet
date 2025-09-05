@@ -105,7 +105,7 @@
       spec+: {
         accessPolicy+: {
           outbound+: {
-          },
+          } + rules(appname, namespace),
         },
       },
     },
