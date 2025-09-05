@@ -1,8 +1,10 @@
 local environment = import '../lib/environment.libsonnet';
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
+local replicasets = import '../lib/replicaSets.libsonnet';
 {
   Env: environment,
   AccessPolicies: accessPolicies,
+  ReplicaSets: replicasets,
   Roles: {
     local this = self,
     members:: error 'members required',
