@@ -1,5 +1,5 @@
 {
-  local rules (appname, namespace) = {
+  local rules(appname, namespace) = {
     rules+: [
       {
         application: appname,
@@ -105,7 +105,7 @@
       spec+: {
         accessPolicy+: {
           outbound+: {
-          }
+          },
         },
       },
     },

@@ -1,7 +1,9 @@
+local environment = import '../lib/environment.libsonnet';
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
 local ingress = import '../lib/ingress.libsonnet';
 
 {
+  Env: environment,
   AccessPolicies: accessPolicies,
   Ingress: ingress,
   Roles: {
