@@ -1,9 +1,7 @@
 {
   ingress(ingress): {
     spec+: {
-      ingresses+: [
-        ingress,
-      ],
+      ingresses+: if std.type(ingress) == 'array' then ingress else [ingress],
     },
   },
 }
