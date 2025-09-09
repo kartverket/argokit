@@ -1,12 +1,12 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 
-local jobAccessPolicies = argokit.accessPolicies.new({ kind: 'SKIPJob' });
+local accessPolicies = argokit.accessPolicies;
 
 argokit.SKIPJob('a-cool-app')
-+ jobAccessPolicies.withOutboundSkipApp( 'appJob', 'mynamespace2')
-+ jobAccessPolicies.withOutboundHttp('service.kartverket.no')
-+ jobAccessPolicies.withOutboundPostgres('postgres.kartverket.no', '192.168.1.1')
-+ jobAccessPolicies.withOutboundOracle('oracle.kartverket.no', '192.168.1.2')
-+ jobAccessPolicies.withOutboundSsh('ssh.kartverket.no', '192.168.1.3')
-+ jobAccessPolicies.withOutboundLdaps('ldaps.kartverket.no', '192.168.1.4')
-+ jobAccessPolicies.withInboundSkipApp('theOtherApp', 'mynamespace')
++ accessPolicies.withOutboundSkipApp( 'appJob', 'mynamespace2')
++ accessPolicies.withOutboundHttp('service.kartverket.no')
++ accessPolicies.withOutboundPostgres('postgres.kartverket.no', '192.168.1.1')
++ accessPolicies.withOutboundOracle('oracle.kartverket.no', '192.168.1.2')
++ accessPolicies.withOutboundSsh('ssh.kartverket.no', '192.168.1.3')
++ accessPolicies.withOutboundLdaps('ldaps.kartverket.no', '192.168.1.4')
++ accessPolicies.withInboundSkipApp('theOtherApp', 'mynamespace')
