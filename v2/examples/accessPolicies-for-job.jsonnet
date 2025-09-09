@@ -2,7 +2,7 @@ local argokit = import '../jsonnet/argokit.libsonnet';
 
 local jobAccessPolicies = argokit.accessPolicies.new({ kind: 'SKIPJob' });
 
-argokit.Application('a-cool-app')
+argokit.SKIPJob('a-cool-app')
 + jobAccessPolicies.withOutboundSkipApp( 'appJob', 'mynamespace2')
 + jobAccessPolicies.withOutboundHttp('service.kartverket.no')
 + jobAccessPolicies.withOutboundPostgres('postgres.kartverket.no', '192.168.1.1')

@@ -11,4 +11,11 @@ local accessPolicies = import '../lib/accessPolicies.libsonnet';
         name: name,
       },
     },
+  SKIPJob(name): {
+      apiVersion: 'skiperator.kartverket.no/v1alpha1',
+      kind: 'SKIPJob',
+      metadata: {
+        name: name,
+      },
+    },
 }
