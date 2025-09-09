@@ -1,0 +1,3 @@
+{
+  isSKIPJob(kindOfParent):: kindOfParent == 'SKIPJob'
+}
