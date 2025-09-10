@@ -25,7 +25,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='Standard Secret Variable for job',
   test=test.expect.eqDiff(
-    actual=(argokit.SKIPJob('a-job') + environment.withVariableSecret('variableName', 'secretRef', 'key')).spec,
+    actual=(argokit.skipJob.new('a-job') + environment.withVariableSecret('variableName', 'secretRef', 'key')).spec,
     expected={
       container: {
         env: [
@@ -46,7 +46,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='Standard Secret Variable for job',
   test=test.expect.eqDiff(
-    actual=(argokit.Application('a-job') + environment.withVariableSecret('variableName', 'secretRef', 'key')).spec,
+    actual=(argokit.application.new('a-job') + environment.withVariableSecret('variableName', 'secretRef', 'key')).spec,
     expected={
       env: [
         {

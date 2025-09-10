@@ -1,1 +1,3 @@
-v2/vendor
+v2/vendor/
+.DS_Store
+.idea/
