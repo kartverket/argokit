@@ -105,6 +105,16 @@ The following templates are available for use in the `argokit.libsonnet` file:
 | `argokit.GSMSecret`      | Creates a Google Secret Manager External Secrets `Secret`             | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)       |
 | `argokit.Roles`          | Creates a set of RBAC roles for this namespace                        | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                           |
 | `argokit.AccessPolicies` | Configures inbound and outbound access policies for services and jobs | [examples/jsonnet/accessPolicies.jsonnet](examples/jsonnet/accessPolicies.jsonnet)         |
+| `argokit.replicaSets`    | Configures replica sets for the application                           | |
+
+### argoKit's Replica Sets API
+
+| Template                                | Description                                                     | Example                                                                                    |
+|-----------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `argokit.replicaSets.withReplicaSets`   | Creates replica sets for an application with sensible defaults  | [examples/jsonnet/replicasets.jsonnet](v2/examples/replicasets.jsonnet)               |
+| `argokit.replicaSets.withReplicaSets`   | Creates replica sets for an application with memory monitoring  | [examples/jsonnet/replicasets-with-memory.jsonnet](v2/examples/replicasets-with-memory.jsonnet)   |
+| `argokit.ReplicaSets.withReplicaSets`   | Creates a static replica set without cpu- and memory monitoring | [examples/jsonnet/replicasets-static.jsonnet](v2/examples/replicasets-static.jsonnet) |
+
 
 ### argoKit's Environment API
 
@@ -121,7 +131,7 @@ The following templates are available for use in the `dbArchive.libsonnet` file:
 |--------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------|
 | `dbArchive.dbArchiveJob` | Creates a SKIPJob that creates a sql dump and stores it in S3 | [examples/jsonnet/dbArchive.jsonnet](examples/jsonnet/dbArchive.jsonnet) |
 
-### Input parameters
+### Input parameters 
 
 #### dbArchiveJob
 
