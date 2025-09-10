@@ -82,7 +82,7 @@ local util = import 'util.libsonnet';
 
   withOutboundHttp(host, portname='', port=443, protocol='')::
     {
-      local httpPolicy (portname, port, protocol) = {
+      local httpPolicy(portname, port, protocol) = {
         accessPolicy+: {
           outbound+: {
             external+: [
@@ -93,18 +93,18 @@ local util = import 'util.libsonnet';
           },
         },
       },
-      spec+: if util.isSKIPJob(self.kind) then { container+: httpPolicy(portname, port, protocol) } else httpPolicy(portname, port, protocol)
+      spec+: if util.isSKIPJob(self.kind) then { container+: httpPolicy(portname, port, protocol) } else httpPolicy(portname, port, protocol),
     },
 
   withOutboundSkipApp(appname, namespace='')::
     {
-      local policy (appname, namespace) = {
+      local policy(appname, namespace) = {
         accessPolicy+: {
           outbound+: {
           } + rules(appname, namespace),
         },
       },
-      spec+: if util.isSKIPJob(self.kind) then { container+: policy(appname, namespace) } else policy(appname, namespace)
+      spec+: if util.isSKIPJob(self.kind) then { container+: policy(appname, namespace) } else policy(appname, namespace),
     },
 
   withInboundSkipApp(appname, namespace=''):: {
