@@ -20,6 +20,12 @@ local util = import 'util.libsonnet';
     ],
   },
 
+  /**
+  Defines that this application should be able access a postgres instance at host and ip
+  Variables:
+   - host: string - the hostname of the postgres instance
+   - ip: string - the ip address of the postgres instance
+  */
   withOutboundPostgres(host, ip):: {
     spec+: {
       accessPolicy+: {
@@ -35,6 +41,12 @@ local util = import 'util.libsonnet';
     },
   },
 
+  /**
+  Defines that this application should be able access a oracle instance at host and ip
+  Variables:
+   - host: string - the hostname of the oracle instance
+   - ip: string - the ip address of the oracle instance
+  */
   withOutboundOracle(host, ip):: {
     spec+: {
       accessPolicy+: {
@@ -50,6 +62,12 @@ local util = import 'util.libsonnet';
     },
   },
 
+  /**
+  Defines that this application should be able access a ssh server at host and ip
+  Variables:
+   - host: string - the hostname of the ssh server
+   - ip: string - the ip address of the ssh server
+  */
   withOutboundSsh(host, ip):: {
     spec+: {
       accessPolicy+: {
@@ -65,6 +83,12 @@ local util = import 'util.libsonnet';
     },
   },
 
+  /**
+  Defines that this application should be able access a secure ldap server at host and ip
+  Variables:
+   - host: string - the hostname of the ldaps server
+   - ip: string - the ip address of the ldaps server
+  */
   withOutboundLdaps(host, ip):: {
     spec+: {
       accessPolicy+: {
@@ -80,6 +104,14 @@ local util = import 'util.libsonnet';
     },
   },
 
+  /**
+  Defines that this application should be able access a http server at host and ip
+  Variables:
+   - host: string - the hostname of the ssh server
+   - postname: string (optional) - the name of the post
+   - port: int (default 443) - port of the server
+   - protocol: string (optional) - the protocol of the connection
+  */
   withOutboundHttp(host, portname='', port=443, protocol='')::
     {
       local httpPolicy(portname, port, protocol) = {
@@ -96,6 +128,12 @@ local util = import 'util.libsonnet';
       spec+: if util.isSKIPJob(self.kind) then { container+: httpPolicy(portname, port, protocol) } else httpPolicy(portname, port, protocol),
     },
 
+  /**
+  Defines that this application should be able another app in this or a specified namespace
+  Variables:
+   - appname: string - the name of the application
+   - namespace: string (optional) - the namespace of the application
+  */
   withOutboundSkipApp(appname, namespace='')::
     {
       local policy(appname, namespace) = {
@@ -107,6 +145,12 @@ local util = import 'util.libsonnet';
       spec+: if util.isSKIPJob(self.kind) then { container+: policy(appname, namespace) } else policy(appname, namespace),
     },
 
+/**
+  Defines that this application should availabe to another app in this or a specified namespace
+  Variables:
+   - appname: string - the name of the application
+   - namespace: string (optional) - the namespace of the application
+  */
   withInboundSkipApp(appname, namespace=''):: {
     spec+: {
       accessPolicy+: {
