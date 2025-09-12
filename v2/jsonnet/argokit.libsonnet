@@ -1,11 +1,11 @@
 local environment = import '../lib/environment.libsonnet';
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
-local replicaSets = import '../lib/replicaSets.libsonnet';
+local replicas = import '../lib/replicas.libsonnet';
 
 {
   accessPolicies: accessPolicies,
   environment: environment,
-  replicaSets: replicaSets,
+  replicas: replicas,
   application: {
     new (name): {
       apiVersion: 'skiperator.kartverket.no/v1alpha1',

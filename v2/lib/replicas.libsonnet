@@ -1,5 +1,5 @@
 {
-  withReplicaSets(initial, max='', targetCpuUtilization=80, targetMemoryUtilization=''): {
+  withReplicas(initial, max='', targetCpuUtilization=80, targetMemoryUtilization=''): {
     spec+:
       if max != '' && initial != max then
         {

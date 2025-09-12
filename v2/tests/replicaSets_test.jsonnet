@@ -1,13 +1,13 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
 
-local replicaSets = argokit.replicaSets;
+local replicas= argokit.replicas;
 
 test.new(std.thisFile)
 + test.case.new(
   name='Setup complete replica set',
   test=test.expect.eqDiff(
-    actual=replicaSets.withReplicaSets(2, 4, 80, 90).spec,
+    actual=replicas.withReplicas(2, 4, 80, 90).spec,
     expected={
       replicas: {
         max: 4,
@@ -19,9 +19,9 @@ test.new(std.thisFile)
   ),
 )
 + test.case.new(
-  name='Setup replica set without targetMemoryUtilization',
+  name='Setup replica without targetMemoryUtilization',
   test=test.expect.eqDiff(
-    actual=replicaSets.withReplicaSets(2, 4, 50).spec,
+    actual=replicas.withReplicas(2, 4, 50).spec,
     expected={
       replicas: {
         max: 4,
@@ -34,7 +34,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='Setup static replica set',
   test=test.expect.eqDiff(
-    actual=replicaSets.withReplicaSets(2).spec,
+    actual=replicas.withReplicas(2).spec,
     expected={
       replicas: 2,
     },

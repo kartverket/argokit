@@ -108,12 +108,12 @@ The following templates are available for use in the `argokit.libsonnet` file:
 | `argokit.replicaSets`    | Configures replica sets for the application                           | |
 
 ### argoKit's Replica Sets API
-
+**NOTE!** It is not recommended to run with less than 2 replicas... 
 | Template                                | Description                                                     | Example                                                                                    |
 |-----------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| `argokit.replicaSets.withReplicaSets`   | Creates replica sets for an application with sensible defaults  | [examples/jsonnet/replicasets.jsonnet](v2/examples/replicasets.jsonnet)               |
-| `argokit.replicaSets.withReplicaSets`   | Creates replica sets for an application with memory monitoring  | [examples/jsonnet/replicasets-with-memory.jsonnet](v2/examples/replicasets-with-memory.jsonnet)   |
-| `argokit.ReplicaSets.withReplicaSets`   | Creates a static replica set without cpu- and memory monitoring | [examples/jsonnet/replicasets-static.jsonnet](v2/examples/replicasets-static.jsonnet) |
+| `argokit.replicas.withReplicas`   | Creates replica sets for an application with sensible defaults  | [examples/jsonnet/replicasets.jsonnet](v2/examples/replicasets.jsonnet)               |
+| `argokit.replicas.withReplicas`   | Creates replica sets for an application with memory monitoring  | [examples/jsonnet/replicasets-with-memory.jsonnet](v2/examples/replicasets-with-memory.jsonnet)   |
+| `argokit.replicas.withReplicas`   | Creates a static replica set without cpu- and memory monitoring | [examples/jsonnet/replicasets-static.jsonnet](v2/examples/replicasets-static.jsonnet) |
 
 
 ### argoKit's Environment API
