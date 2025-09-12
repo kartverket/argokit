@@ -105,14 +105,24 @@ The following templates are available for use in the `argokit.libsonnet` file:
 | `argokit.GSMSecret`      | Creates a Google Secret Manager External Secrets `Secret`             | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)       |
 | `argokit.Roles`          | Creates a set of RBAC roles for this namespace                        | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                           |
 | `argokit.AccessPolicies` | Configures inbound and outbound access policies for services and jobs | [examples/jsonnet/accessPolicies.jsonnet](examples/jsonnet/accessPolicies.jsonnet)         |
+| `argokit.replicas`    | Configures replicasfor the application                           | |
+
+### argoKit's Replicas API
+**NOTE!** It is not recommended to run with less than 2 replicas... 
+| Template                                | Description                                                     | Example                                                                                    |
+|-----------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `argokit.replicas.withReplicas`   | Create replicas for an application with sensible defaults  | [examples/jsonnet/replicasets.jsonnet](v2/examples/replicasets.jsonnet)               |
+| `argokit.replicas.withReplicas`   | Create replicas for an application with memory monitoring  | [examples/jsonnet/replicasets-with-memory.jsonnet](v2/examples/replicasets-with-memory.jsonnet)   |
+| `argokit.replicas.withReplicas`   | Creates a static replica without cpu- and memory monitoring | [examples/jsonnet/replicasets-static.jsonnet](v2/examples/replicasets-static.jsonnet) |
+
 
 ### argoKit's Environment API
 
 | Template                                         | Description                                                                 | Example                                                                  |
 |--------------------------------------------------|-----------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| `argokit.Env.variable`              | Creates environment variables for an app                                    | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
-| `argokit.Env.variableSecret`        | Creates environment variable from a secret                       | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
-| `argokit.Env.variableSecretJob`     | Creates environment variable from a secret for a Job container              | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
+| `argokit.Env.withVariable`              | Creates environment variables for an app                                    | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
+| `argokit.Env.withVariableSecret`        | Creates environment variable from a secret                       | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
+| `argokit.Env.withVariablSecret`     | Creates environment variable from a secret for a Job container              | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
 
 ---
 The following templates are available for use in the `dbArchive.libsonnet` file:
@@ -121,7 +131,7 @@ The following templates are available for use in the `dbArchive.libsonnet` file:
 |--------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------|
 | `dbArchive.dbArchiveJob` | Creates a SKIPJob that creates a sql dump and stores it in S3 | [examples/jsonnet/dbArchive.jsonnet](examples/jsonnet/dbArchive.jsonnet) |
 
-### Input parameters
+### Input parameters 
 
 #### dbArchiveJob
 

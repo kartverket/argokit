@@ -1,10 +1,12 @@
 local environment = import '../lib/environment.libsonnet';
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
+local replicas = import '../lib/replicas.libsonnet';
 local ingress = import '../lib/ingress.libsonnet';
 
 {
   accessPolicies: accessPolicies,
   environment: environment,
+  replicas: replicas,
   ingress: ingress,
   application: {
     new (name): {
