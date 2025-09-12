@@ -6,3 +6,12 @@ argokit.application.new('testapp')
   import 'ingress/api-ingress',
   "argokit-frontend-dev.devserver.kartverket-intern.cloud"]
 )
++argokit.ingress.forHostnames(
+  [
+    "grunnbok.atkv3-prod.kartverket-intern.cloud",
+    {
+       "hostname":  "api.grunnbok.no",
+       "customCert": "grunbok-star-cert"
+    }
+  ]
+)
