@@ -28,13 +28,23 @@ test.new(std.thisFile)
   ),
 )
 + test.case.new(
-  name='Multiple ingresses',
+  name='Multiple ingresses with objects',
   test=test.expect.eqDiff(
-    actual=ingress.forHostnames(['hostName.kartverket.no', {hostname: 'hostNameWithCustomCert.kartverket.no', customCert: 'grunnbok-star-cert']).spec,
+    actual=ingress.forHostnames([
+      'hostName.kartverket.no',
+      {
+        hostname: 'hostNameWithCustomCert.kartverket.no',
+        customCert: 'grunnbok-star-cert'
+      },
+      {
+        hostname: 'hostNameWithoutCustomCert.kartverket.no',
+      }
+      ]).spec,
     expected={
       ingresses: [
         'hostName.kartverket.no',
         'hostNameWithCustomCert.kartverket.no+grunnbok-star-cert',
+        'hostNameWithoutCustomCert.kartverket.no'
       ],
     }
   ),
