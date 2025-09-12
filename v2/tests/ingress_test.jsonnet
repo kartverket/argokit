@@ -27,3 +27,15 @@ test.new(std.thisFile)
     }
   ),
 )
++ test.case.new(
+  name='Multiple ingresses',
+  test=test.expect.eqDiff(
+    actual=ingress.forHostnames(['hostName.kartverket.no', {hostname: 'hostNameWithCustomCert.kartverket.no', customCert: 'grunnbok-star-cert']).spec,
+    expected={
+      ingresses: [
+        'hostName.kartverket.no',
+        'hostNameWithCustomCert.kartverket.no+grunnbok-star-cert',
+      ],
+    }
+  ),
+)
