@@ -108,7 +108,7 @@ local util = import 'util.libsonnet';
   Defines that this application should be able access a http server at a given hostname
   Variables:
    - host: string - the hostname of the ssh server
-   - postname: string (optional) - the name of the post
+   - portname: string (optional) - the name of the port
    - port: int (default 443) - port of the server
    - protocol: string (optional) - the protocol of the connection
   */
