@@ -2,7 +2,7 @@
   /**
   Creates ingresses.
   Parameters:
-  - ingress [string|object{hostname, customCert?}]: Ingress may be a string containing the hostname, an import statement for a file containing the hostname or an object with this structure: {hostname: 'hostname', customCert: 'certificate filename'}
+  - ingress: [string|object{hostname, customCert?}] - Ingress may be a string containing the hostname, an import statement for a file containing the hostname or an object with this structure: {hostname: 'hostname', customCert: 'certificate filename'}
   See examples or tests to understand how to use this function.
   */
   forHostnames(ingress): {
