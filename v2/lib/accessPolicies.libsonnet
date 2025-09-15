@@ -129,7 +129,7 @@ local util = import 'util.libsonnet';
     },
 
   /**
-  Defines that this application should be able another app in this or a specified namespace
+  Defines that this application should be able to send traffic to another app in this or a specified namespace
   Variables:
    - appname: string - the name of the application
    - namespace: string (optional) - the namespace of the application
