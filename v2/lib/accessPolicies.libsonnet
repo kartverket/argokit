@@ -145,12 +145,12 @@ local util = import 'util.libsonnet';
       spec+: if util.isSKIPJob(self.kind) then { container+: policy(appname, namespace) } else policy(appname, namespace),
     },
 
-/**
-  Defines that this application should availabe to another app in this or a specified namespace
-  Variables:
-   - appname: string - the name of the application
-   - namespace: string (optional) - the namespace of the application
-  */
+  /**
+    Defines that this application should availabe to another app in this or a specified namespace
+    Variables:
+     - appname: string - the name of the application
+     - namespace: string (optional) - the namespace of the application
+    */
   withInboundSkipApp(appname, namespace=''):: {
     spec+: {
       accessPolicy+: {

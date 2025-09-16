@@ -1,7 +1,7 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
 
-local replicas= argokit.replicas;
+local replicas = argokit.replicas;
 
 test.new(std.thisFile)
 + test.case.new(

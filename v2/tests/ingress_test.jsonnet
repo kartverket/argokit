@@ -34,17 +34,17 @@ test.new(std.thisFile)
       'hostName.kartverket.no',
       {
         hostname: 'hostNameWithCustomCert.kartverket.no',
-        customCert: 'grunnbok-star-cert'
+        customCert: 'grunnbok-star-cert',
       },
       {
         hostname: 'hostNameWithoutCustomCert.kartverket.no',
-      }
-      ]).spec,
+      },
+    ]).spec,
     expected={
       ingresses: [
         'hostName.kartverket.no',
         'hostNameWithCustomCert.kartverket.no+grunnbok-star-cert',
-        'hostNameWithoutCustomCert.kartverket.no'
+        'hostNameWithoutCustomCert.kartverket.no',
       ],
     }
   ),
