@@ -12,20 +12,20 @@ questions, please reach out to the #gen-argocd channel in Slack.
 ## Installation
 
 Assuming you have followed the [Getting Started](https://kartverket.atlassian.net/wiki/spaces/SKIPDOK/pages/554827836/Komme+i+gang+med+Argo+CD)
-guide, you can use ArgoKit in your apps-repo. The first step is to include the
-ArgoKit library by running the following command:
+guide, you can use ArgoKit in your apps-repo. 
+
+First you need to install jsonnet bundler. This is done by running `brew install jsonnet-bundler`.
+Next run `jb init`, and finally run `jb install github.com/kartverket/argokit@main`. If you want 
+to stay on a specific version use `jb install github.com/kartverket/argokit@2.0.0`
+
+Remember to add `vendor/` to .gitignore
+
+### Git submodules 
+Alternatively you can use submodules if you prefer it over package managers.
+Include the ArgoKit library by running the following command:
 
 ```bash
 $ git submodule add https://github.com/kartverket/argokit.git
-```
-
-Alternatively you can use jsonnet-bundler if prefer package managers over
-submodules. To do this, install the CLI by following the instructions in the
-[jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler) repo and
-run the following command:
-
-```bash
-$ jb install https://github.com/kartverket/argokit@main
 ```
 
 ### Automatic version updates
@@ -34,10 +34,11 @@ It is highly recommended to use dependabot to automatically update the ArgoKit
 version when a new version is released. To do this, add the following to your
 `.github/dependabot.yml` file:
 
+
 ```yaml
 version: 2
 updates:
-  - package-ecosystem: git-submodules
+  - package-ecosystem: git-submodules or jsonnet-bundler
     directory: /
     schedule:
       interval: daily
@@ -46,7 +47,7 @@ updates:
 With this configuration, dependabot will automatically create a PR to update the
 ArgoKit version once a day provided that a new version has been released.
 
-## Usage with jsonnet
+## Usage
 
 If you use jsonnet in your apps-repo, you can use the ArgoKit library to deploy
 ArgoCD applications by including the `argokit.libsonnet` file in your jsonnet
@@ -54,49 +55,17 @@ file and calling the `argokit.Application` function. For example, to deploy an
 application, you can use the following jsonnet file:
 
 ```jsonnet
-local argokit = import 'argokit/jsonnet/argokit.libsonnet';
+local argokit = import 'github.com/kartverket/argokit/v2/jsonnet/argokit.libsonnet';
 
-local Probe = {
-    path: "/healthz",
-    port: 8080,
-    failureThreshold: 3,
-    timeout: 1,
-    initialDelay: 0,
-};
-
-local BaseApp = {
-    spec: {
-        port: 8080,
-        replicas: {
-            min: 2,
-            max: 5,
-            targetCPUUtilization: 80,
-        },
-        liveness: Probe,
-        readiness: Probe,
-    },
-};
-
-[
-    BaseApp + argokit.Application("foo-backend") {
-        spec+: {
-            image: "hello-world",
-            ingresses: ["foo.bar.com"],
-            accessPolicy: {
-                inbound: {
-                    rules: [{
-                        application: "foo-frontend",
-                    }],
-                },
-            },
-        },
-    },
-]
+argokit.application.new('foo-backend')
++argokit.application.withReplicas(initial=2, max=5, targetCpuUtilization=80)
++argokit.application.forHostnames('foo.bar.com')
++argokit.application.withInboundSkipApp('foo-frontend')
 ```
 
 ### jsonnet argokit API
 
-The following templates are available for use in the `argokit.libsonnet` file:
+The following examples are available at [our github](https://github.com/kartverket/argokit/v2/examples)
 
 
 TODO: Rewrite this section
