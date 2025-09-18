@@ -5,14 +5,16 @@ test.new(std.thisFile)
 + test.case.new(
   name='readiness probe',
   test=test.expect.eqDiff(
-    actual=argokit.application.withLiveness(argokit.application.probe(path='/health', port=8080, failureThreshold=5, timeout=0, initialDelay=5)).spec,
+    actual=(argokit.skipJob.new('a-job') + argokit.application.withLiveness(argokit.application.probe(path='/health', port=8080, failureThreshold=5, timeout=0, initialDelay=5))).spec,
     expected={
-      liveness: {
-        failureThreshold: 5,
-        initialDelay: 5,
-        path: '/health',
-        port: 8080,
-        timeout: 0,
+      container: {
+        liveness: {
+          failureThreshold: 5,
+          initialDelay: 5,
+          path: '/health',
+          port: 8080,
+          timeout: 0,
+        },
       },
     }
   ),
@@ -20,7 +22,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='liveness probe',
   test=test.expect.eqDiff(
-    actual=argokit.application.withReadiness(argokit.application.probe(path='/health', port=8080)).spec,
+    actual=(argokit.application.new('application') + argokit.application.withReadiness(argokit.application.probe(path='/health', port=8080))).spec,
     expected={
       readiness: {
         failureThreshold: 3,
@@ -35,7 +37,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='startup probe',
   test=test.expect.eqDiff(
-    actual=argokit.application.withStartup(argokit.application.probe(path='/health', port=8080)).spec,
+    actual=(argokit.application.new('application') + argokit.application.withStartup(argokit.application.probe(path='/health', port=8080))).spec,
     expected={
       startup: {
         failureThreshold: 3,
