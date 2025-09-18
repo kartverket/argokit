@@ -19,11 +19,9 @@ local util = import 'util.libsonnet';
 
   withSecret(secretName):: {
     local variableSecret(secretName) = {
-      spec+: {
-        envFrom+: [
-          { secret: secretName },
-        ],
-      },
+      envFrom+: [
+        { secret: secretName },
+      ],
     },
     spec+: if util.isSKIPJob(self.kind) then { container+: variableSecret(secretName) } else variableSecret(secretName),
   },
