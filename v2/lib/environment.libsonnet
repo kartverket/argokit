@@ -17,6 +17,15 @@ local util = import 'util.libsonnet';
     },
   },
 
+  withSecret(secretName):: {
+    local variableSecret(secretName) = {
+      envFrom+: [
+        { secret: secretName },
+      ],
+    },
+    spec+: if util.isSKIPJob(self.kind) then { container+: variableSecret(secretName) } else variableSecret(secretName),
+  },
+
   /**
   Creates an environment variable for a job or application whose value is sourced from a secret.
   Parameters:
