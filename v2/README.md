@@ -14,14 +14,15 @@ questions, please reach out to the #gen-argocd channel in Slack.
 Assuming you have followed the [Getting Started](https://kartverket.atlassian.net/wiki/spaces/SKIPDOK/pages/554827836/Komme+i+gang+med+Argo+CD)
 guide, you can use ArgoKit in your apps-repo. 
 
-First you need to install jsonnet bundler. This is done by running `brew install jsonnet-bundler`.
+First you need to install jsonnet bundler. This is done by running `brew install jsonnet-bundler` or download the 
+[binary release](https://github.com/jsonnet-bundler/jsonnet-bundler).
 Next run `jb init`, and finally run `jb install github.com/kartverket/argokit@main`. If you want 
 to stay on a specific version use `jb install github.com/kartverket/argokit@2.0.0`
 
 Remember to add `vendor/` to .gitignore
 
 ### Git submodules 
-Alternatively you can use submodules if you prefer it over package managers.
+Alternatively you can use submodules if you prefer it over jsonnet bundler (We recommend jsonnet bundler).
 Include the ArgoKit library by running the following command:
 
 ```bash
