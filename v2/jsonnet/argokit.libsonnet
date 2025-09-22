@@ -2,10 +2,11 @@ local accessPolicies = import '../lib/accessPolicies.libsonnet';
 local environment = import '../lib/environment.libsonnet';
 local ingress = import '../lib/ingress.libsonnet';
 local replicas = import '../lib/replicas.libsonnet';
+local probes = import '../lib/probes.libsonnet';
 
 {
   application: {
-                 new(name): {
+                 new (name): {
                    apiVersion: 'skiperator.kartverket.no/v1alpha1',
                    kind: 'Application',
                    metadata: {
@@ -16,9 +17,11 @@ local replicas = import '../lib/replicas.libsonnet';
                + ingress
                + replicas
                + environment
-               + accessPolicies,
+               + accessPolicies
+               + probes,
+
   skipJob: {
-             new(name): {
+             new (name): {
                apiVersion: 'skiperator.kartverket.no/v1alpha1',
                kind: 'SKIPJob',
                metadata: {
@@ -27,5 +30,6 @@ local replicas = import '../lib/replicas.libsonnet';
              },
            }
            + accessPolicies
-           + environment,
+           + environment
+           + probes
 }
