@@ -32,7 +32,7 @@ test.new(std.thisFile)
             pathPrefix: '/api',
             rewriteUri: false,
             targetApp: 'myapp-api',
-            port: 8080
+            port: 8080,
           },
         ],
       },
