@@ -1,19 +1,26 @@
-local skipJobHook(a, conf) =
-  if conf.isSkipJob then
-    {
-      application+: {
-        container+: {
-          spec: a.application.spec,
-        },
-        spec:: '',
-      },
-    }
-  else
-    {
-      application+: {
-        spec: a.application.spec,
-      },
-    };
+{
+  /*
+  * if the given application is a skip job,
+  * wrap the spec object in a container object
+  */
 
-
-[skipJobHook]
+  specHook(conf)::
+    if conf.isAppAndObjects then
+      {
+        application+:
+          local s = self.spec;
+          if conf.isSkipJob then
+            { container+: { spec+: s } }
+          else
+            { spec+: s },
+        spec:: {},
+      }
+    else
+      if conf.isSkipJob then
+        {
+          local s = self.spec,
+          container+: { spec+: s },
+          spec:: {},
+        }
+      else {},
+}
