@@ -14,7 +14,7 @@ local hooks = {
         application+:
           local s = self.spec;
           if conf.isSkipJob then
-            { container+: { spec+: s }, spec:: {} }
+            { spec+: { container+: s } }
           else
             { spec+: s },
       }
@@ -22,8 +22,9 @@ local hooks = {
       if conf.isSkipJob then
         {
           local s = self.spec,
-          container+: { spec+: s },
-          spec:: {},
+          shouldBeCalledSpec+: {
+            container: s,
+          },
         }
       else {},
 };
@@ -156,8 +157,7 @@ local skipJob = {
 // constructors.skipJob.newAppAndObjects('test-job')
 
 /* [2] Non-AppAndObjects app with constructors */
-// constructors.skipJob.new('test-job')
+constructors.skipJob.new('test-job')
 
 /* [3] Using bare bones app definition */
-
-constructors + argokit
++ argokit.application.withOutboundPostgres('test', '10.0.0.1')
