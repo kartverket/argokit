@@ -160,9 +160,4 @@ local skipJob = {
 
 /* [3] Using bare bones app definition */
 
-constructors.skipJob.enableArgokit(skipJob)
-
-
-// add postgres access policies
-+ argokit.application.withOutboundPostgres('localhost', '10.0.0.1')
-+ argokit.application.withVariable('CLIENT_SECRET', 'abc123')
+constructors + argokit

@@ -1,0 +1,63 @@
+{
+  "apiVersion": "skiperator.kartverket.no/v1alpha1",
+  "kind": "Application",
+  "metadata": {
+    "name": "frisk-frontend"
+  },
+  "spec": {
+    "accessPolicy": {
+      "outbound": {
+        "external": [
+          {
+            "host": "graph.microsoft.com"
+          },
+          {
+            "host": "login.microsoftonline.com"
+          }
+        ],
+        "rules": [
+          {
+            "application": "frisk-backend"
+          }
+        ]
+      }
+    },
+    "env": [
+      {
+        "name": "VITE_CLIENT_ID",
+        "value": "some-random-id"
+      },
+      {
+        "name": "VITE_AUTHORITY",
+        "value": "https://login.microsoftonline.com/uri"
+      },
+      {
+        "name": "VITE_LOGIN_REDIRECT_URI",
+        "value": "https://frisk.atgcp1-dev.kartverket-intern.cloud"
+      },
+      {
+        "name": "VITE_BACKEND_URL",
+        "value": "https://api.frisk.atgcp1-dev.kartverket-intern.cloud"
+      },
+      {
+        "name": "VITE_REGELRETT_FRONTEND_URL",
+        "value": "https://regelrett.atgcp1-dev.kartverket-intern.cloud"
+      },
+      {
+        "name": "REGELRETT_CLIENT_ID",
+        "value": "env-dev"
+      }
+    ],
+    "image": "some-image",
+    "ingresses": [
+      "frisk.atgcp1-dev.kartverket-intern.cloud"
+    ],
+    "port": 3000,
+    "replicas": {
+      "max": 5,
+      "min": 2,
+      "targetCpuUtilization": "25m",
+      "targetMemoryUtilization": "128Mi"
+    }
+  }
+}
