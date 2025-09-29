@@ -30,7 +30,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='HTTP for SKIPJob',
   test=test.expect.eqDiff(
-    actual=(argokit.skipJob.new('a-job') + argokit.application.withOutboundHttp('server.kartverket.no', port=444, portname='https', protocol='TCP')).spec,
+    actual=(argokit.skipJob.new('a-job') + argokit.application.withOutboundHttp('server.kartverket.no', port=444, portname='https', protocol='TCP')).items[0].spec,
     expected={
       container: {
         accessPolicy: {
@@ -56,7 +56,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='HTTP for SKIPApp',
   test=test.expect.eqDiff(
-    actual=(argokit.application.new('an-app') + argokit.application.withOutboundHttp('server.kartverket.no', port=444, portname='https', protocol='TCP')).spec,
+    actual=(argokit.application.new('an-app') + argokit.application.withOutboundHttp('server.kartverket.no', port=444, portname='https', protocol='TCP')).items[0].spec,
     expected={
       accessPolicy: {
         outbound: {
