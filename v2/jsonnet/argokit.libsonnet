@@ -1,18 +1,24 @@
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
+local appAndObjects = import '../lib/appAndObjects.libsonnet';
+local hooks = import '../lib/configHooks.libsonnet';
 local environment = import '../lib/environment.libsonnet';
 local ingress = import '../lib/ingress.libsonnet';
-local replicas = import '../lib/replicas.libsonnet';
 local probes = import '../lib/probes.libsonnet';
+local replicas = import '../lib/replicas.libsonnet';
 
 {
   application: {
-                 new (name): {
-                   apiVersion: 'skiperator.kartverket.no/v1alpha1',
-                   kind: 'Application',
-                   metadata: {
-                     name: name,
+                 new(name):
+                   appAndObjects.AppAndObjects {
+                     application: {
+                       apiVersion: 'skiperator.kartverket.no/v1alpha1',
+                       kind: 'Application',
+                       metadata: {
+                         name: name,
+                       },
+                     },
+                     objects:: [],
                    },
-                 },
                }
                + ingress
                + replicas
@@ -21,15 +27,22 @@ local probes = import '../lib/probes.libsonnet';
                + probes,
 
   skipJob: {
-             new (name): {
-               apiVersion: 'skiperator.kartverket.no/v1alpha1',
-               kind: 'SKIPJob',
-               metadata: {
-                 name: name,
+             new(name):
+               appAndObjects.AppAndObjects {
+                 application: {
+                   apiVersion: 'skiperator.kartverket.no/v1alpha1',
+                   kind: 'SKIPJob',
+                   metadata: {
+                     name: name,
+                   },
+                 },
+                 objects:: [],
                },
-             },
+             enableArgokit():
+               hooks.normalizeSkipJob({ isSkipJob: true, isAppAndObjects: false }),
+
            }
            + accessPolicies
            + environment
-           + probes
+           + probes,
 }
