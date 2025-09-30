@@ -1,3 +1,4 @@
+local v = import '../internal/validation.libsonnet';
 {
   withAzureAdApplication(
     name,
@@ -9,6 +10,15 @@
     replyUrls=[],
     preAuthorizedApplications=[]
   )::
+    // input parameter validation
+    v.string(name, 'name', allowEmpty=false) +
+    v.string(namespace, 'namespace') +
+    v.array(groups, 'groups') +
+    v.string(secretPrefix, 'secretPrefix', allowEmpty=false) +
+    v.boolean(allowAllUsers, 'allowAllUsers') +
+    v.string(logoutUrl, 'logoutUrl') +
+    v.array(replyUrls, 'replyUrls') +
+    v.array(preAuthorizedApplications, 'preAuthorizedApplications') +
 
     local azureAdApp = {
       apiVersion: 'nais.io/v1',
