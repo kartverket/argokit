@@ -1,18 +1,17 @@
-name: write updated README to skip.kartverket.no 
+name: Create a pull request to update ArgoKit v2 documentation on skip.kartverket.no 
 
 on: 
   push:
     branches:
       - main 
       - updated-documentation
-    #paths: 
-    #- 'v2/README.md'
+    paths: 
+    - 'v2/README.md'
 jobs: 
   sync-docs:
     name: Update target repository
     permissions: 
       contents: write
-      id-token: write
 
     runs-on: ubuntu-latest
     steps: 
@@ -40,20 +39,14 @@ jobs:
         run: |
           cp source/v2/README.md target/docs/03-applikasjon-utrulling/09-argo-cd/08-argokit/02-argokit-v2.md 
       
-      - name: Commit and push changes
-        env:
-          OCTO_TOKEN: ${{ steps.octo-sts.outputs.token }}
-        run: |
-          cd target
-          set -euo pipefail
-          git config --global user.email "argokit@kartverket.no"
-          git config --global user.name "GithubActions"
-          git remote set-url origin "https://x-access-token:${OCTO_TOKEN}@github.com/kartverket/skip.kartverket.no.git"
-          git add .
-          # Only commit if there are changes
-          if git diff --cached --exit-code &>/dev/null; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update argoKit v2 documentation"
-            git push origin main
-          fi
+      - name: Create PR
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e
+        with:
+          path: target
+          token: ${{ steps.octo-sts.outputs.token }}
+          branch: update-argokitv2-docs-branch
+          commit-message: "📝 Update ArgoKit v2 documentation"
+          title: "Update ArgoKit v2 documentation"
+          body: "Automated updating of ArgoKit v2 README documentation"
+          labels: documentation
+          author: GithubActions <argokit@kartverket.no>
