@@ -95,7 +95,7 @@ The following examples are available at [our github](https://github.com/kartverk
 
 | Template                                              | Description                                                    | Example                                                                  |
 |-------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------|
-| `argokit.[application\|skipJOB].forHostname`         | Creates ingress for an app or a job                       | [examples/ingress.jsonnet](examples/ingress.jsonnet) |
+| `argokit.application.forHostname`         | Creates ingress for an app or a job                       | [examples/ingress.jsonnet](examples/ingress.jsonnet) |
 
 
 ### argoKit's accessPolicies API
