@@ -5,19 +5,20 @@
   ,
 
   // validate string
-  string(value, label='value', allowEmpty=true):
+  string(value, label='value', allowEmpty=false):
     if std.isString(value) then
       if !allowEmpty && value == '' then error label + ' must be non-empty string'
       else {}
     else error label + ' must be type string',
 
   // validate number
-  number(value, label='value'):
-    if std.isNumber(value) then {}
+  number(value, label='value', allowNull=false):
+    if allowNull && value == null then {}
+    else if std.isNumber(value) then {}
     else error label + ' must be a number',
 
   // validate array
-  array(value, label, allowEmpty=true):
+  array(value, label, allowEmpty=false):
     if std.isArray(value)
     then
       if !allowEmpty && std.length(value) == 0

@@ -12,7 +12,7 @@ local routing = import '../lib/routing.libsonnet';
   routing: routing,
   application: {
                  new(name):
-                   v.string(name, 'name', allowEmpty=false) +
+                   v.string(name, 'name') +
                    appAndObjects.AppAndObjects {
                      application:: {
                        apiVersion: 'skiperator.kartverket.no/v1alpha1',
@@ -32,7 +32,7 @@ local routing = import '../lib/routing.libsonnet';
                + azureAdApplication,
   skipJob: {
              new(name):
-               v.string(name, 'name', allowEmpty=false) +
+               v.string(name, 'name') +
                appAndObjects.AppAndObjects {
                  application:: {
                    apiVersion: 'skiperator.kartverket.no/v1alpha1',
