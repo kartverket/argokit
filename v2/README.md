@@ -72,30 +72,30 @@ The following examples are available at [our github](https://github.com/kartverk
 | Template                    | Description                                                           | Example                                                                                    |
 |-----------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
 | `argokit.application.new()` | Creates a Skiperator application, using the appAndObjects convention (this is default).| See above                                                                                  |
-| `argokit.skipJob.new()` | Creates a Skiperator job, using the appAndObjects convention. | [examples/accessPolicies-for-job.jsonnet](examples/accessPolicies-for-job.jsonnet)
+| `argokit.skipJob.new()` | Creates a Skiperator job, using the appAndObjects convention. | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet)|
 ### argoKit's Replicas API
 **NOTE!** It is not recommended to run with less than 2 replicas... 
 | Template                                | Description                                                     | Example                                                                                    |
 |-----------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| `argokit.application.withReplicas`   | Create replicas for an application with sensible defaults  | [examples/replicas.jsonnet](examples/replicas.jsonnet)               |
-| `argokit.application.withReplicas`   | Create replicas for an application with memory monitoring  | [examples/replicasets-with-memory.jsonnet](examples/replicas-with-memory.jsonnet)   |
-| `argokit.application.withReplicas`   | Creates a static replica without cpu- and memory monitoring | [examples/replicasets-static.jsonnet](examples/replicas-static.jsonnet) |
+| `argokit.application.withReplicas`   | Create replicas for an application with sensible defaults  | [examples/replicas.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas.jsonnet)               |
+| `argokit.application.withReplicas`   | Create replicas for an application with memory monitoring  | [examples/replicasets-with-memory.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas-with-memory.jsonnet)   |
+| `argokit.application.withReplicas`   | Creates a static replica without cpu- and memory monitoring | [examples/replicasets-static.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas-static.jsonnet) |
 
 
 ### argoKit's Environment API
 
 | Template                                              | Description                                                    | Example                                                                  |
 |-------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------|
-| `argokit.[application\|skipJOB].withVariable`         | Creates environment variables for an app                       | [examples/envVariables.jsonnet](examples/envVariables.jsonnet) |
-| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret                     | [examples/envVariables.jsonnet](examples/envVariables.jsonnet) |
-| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret for a Job container | [examples/envVariables.jsonnet](examples/envVariables.jsonnet) |
+| `argokit.[application\|skipJOB].withVariable`         | Creates environment variables for an app                       | [examples/envVariables.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/envVariables.jsonnet) |
+| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret                     | [examples/envVariables.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/envVariables.jsonnet) |
+| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret for a Job container | [examples/envVariables.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/envVariables.jsonnet) |
 
 ---
 ### argoKit's Ingress API
 
 | Template                                              | Description                                                    | Example                                                                  |
 |-------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------|
-| `argokit.application.forHostname`         | Creates ingress for an app or a job                       | [examples/ingress.jsonnet](examples/ingress.jsonnet) |
+| `argokit.application.forHostname`         | Creates ingress for an app or a job                       | [examples/ingress.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/ingress.jsonnet) |
 
 
 ### argoKit's accessPolicies API
@@ -105,22 +105,22 @@ All functions work for both applications and skipJobs: `argokit.application.*` o
 
 | Template                                                          | Description                                                                 | Example |
 |-------------------------------------------------------------------|-----------------------------------------------------------------------------|---------|
-| `argokit.[application\|skipJob].withOutboundPostgres(host, ip)`   | Allow outbound traffic to a Postgres instance           | [examples/accessPolicies-for-job.jsonnet](examples/accessPolicies-for-job.jsonnet) |
-| `argokit.[application\|skipJob].withOutboundOracle(host, ip)`     | Allow outbound traffic to an Oracle DB                       | [examples/accessPolicies-for-job.jsonnet](examples/accessPolicies-for-job.jsonnet) |
-| `argokit.[application\|skipJob].withOutboundSsh(host, ip)`        | Allow outbound SSH                                    | [examples/accessPolicies-for-job.jsonnet](examples/accessPolicies-for-job.jsonnet) |
-| `argokit.[application\|skipJob].withOutboundLdaps(host, ip)`      | Allow outbound secure LDAP port                                   | [examples/accessPolicies-for-job.jsonnet](examples/accessPolicies-for-job.jsonnet) |
-| `argokit.[application\|skipJob].withOutboundHttp(host, portname='', port=443, protocol='')` | Allow outbound HTTPS/HTTP to a host | [examples/accessPolicies-for-job.jsonnet](examples/accessPolicies-for-job.jsonnet) |
-| `argokit.[application\|skipJob].withOutboundSkipApp(appname, namespace='')` | Allow outbound traffic to another SKIP application (outbound rule) | [examples/accessPolicies-for-job.jsonnet](examples/accessPolicies-for-job.jsonnet) |
-| `argokit.[application\|skipJob].withInboundSkipApp(appname, namespace='')`  | Allow another SKIP application to reach this one (inbound rule) | [examples/accessPolicies-for-job.jsonnet](examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundPostgres(host, ip)`   | Allow outbound traffic to a Postgres instance           | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundOracle(host, ip)`     | Allow outbound traffic to an Oracle DB                       | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundSsh(host, ip)`        | Allow outbound SSH                                    | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundLdaps(host, ip)`      | Allow outbound secure LDAP port                                   | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundHttp(host, portname='', port=443, protocol='')` | Allow outbound HTTPS/HTTP to a host | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundSkipApp(appname, namespace='')` | Allow outbound traffic to another SKIP application (outbound rule) | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withInboundSkipApp(appname, namespace='')`  | Allow another SKIP application to reach this one (inbound rule) | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
 ### argoKit's Probe API
 Configure health probes for applications and skipJobs.
 
 | Template                                                                 | Description                                                            | Example |
 |--------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
 | `argokit.[application\|skipJob].probe(path, port, failureThreshold=3, timeout=1, initialDelay=0)` | Builds a probe object (path, port, thresholds)                         | - |
-| `argokit.[application\|skipJob].withReadiness(probe)`                    | Adds a readiness probe (controls when traffic is sent to the pod)      |[examples/probes](examples/probes.jsonnet)|
-| `argokit.[application\|skipJob].withLiveness(probe)`                     | Adds a liveness probe (restarts container if failing)                  | [examples/probes](examples/probes.jsonnet) |
-| `argokit.[application\|skipJob].withStartup(probe)`                      | Adds a startup probe (gates other probes until it succeeds)            | [examples/probes](examples/probes.jsonnet) |
+| `argokit.[application\|skipJob].withReadiness(probe)`                    | Adds a readiness probe (controls when traffic is sent to the pod)      |[examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)|
+| `argokit.[application\|skipJob].withLiveness(probe)`                     | Adds a liveness probe (restarts container if failing)                  | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
+| `argokit.[application\|skipJob].withStartup(probe)`                      | Adds a startup probe (gates other probes until it succeeds)            | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
 
 ## Contributing
 
