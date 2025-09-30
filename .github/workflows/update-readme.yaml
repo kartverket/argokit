@@ -19,7 +19,7 @@ jobs:
         id: octo-sts
         with:
           scope: kartverket/skip.kartverket.no
-          identity: skip.kartverket.no 
+          identity: argokit 
 
       - name: Checkout source repo
         uses: actions/checkout@v5 
