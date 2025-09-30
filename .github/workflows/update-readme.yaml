@@ -11,6 +11,7 @@ jobs:
     name: Update target repository
     permissions: 
       contents: write
+      id-token: write
     runs-on: ubuntu-latest
     steps: 
       - uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f # v1.0.0 from https://skip.kartverket.no/docs/applikasjon-utrulling/argo-cd/hva-er-et-apps-repo
