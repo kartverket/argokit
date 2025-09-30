@@ -1,3 +1,4 @@
+local v = import '../internal/validation.libsonnet';
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
 local appAndObjects = import '../lib/appAndObjects.libsonnet';
 local hooks = import '../lib/configHooks.libsonnet';
@@ -5,10 +6,10 @@ local environment = import '../lib/environment.libsonnet';
 local ingress = import '../lib/ingress.libsonnet';
 local probes = import '../lib/probes.libsonnet';
 local replicas = import '../lib/replicas.libsonnet';
-
 {
   application: {
                  new(name):
+                   v.string(name, 'name', allowEmpty=false) +
                    appAndObjects.AppAndObjects {
                      application: {
                        apiVersion: 'skiperator.kartverket.no/v1alpha1',
@@ -28,6 +29,7 @@ local replicas = import '../lib/replicas.libsonnet';
 
   skipJob: {
              new(name):
+               v.string(name, 'name', allowEmpty=false) +
                appAndObjects.AppAndObjects {
                  application: {
                    apiVersion: 'skiperator.kartverket.no/v1alpha1',
