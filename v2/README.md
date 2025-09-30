@@ -129,5 +129,5 @@ see something changed or added.
 
 ## License
 
-ArgoKit is licensed under the MIT License. See [LICENSE](LICENSE) for the full
+ArgoKit is licensed under the MIT License. See [LICENSE](https://github.com/kartverket/argokit/blob/main/LICENSE) for the full
 license text.
