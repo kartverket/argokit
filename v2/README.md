@@ -12,16 +12,16 @@ questions, please reach out to the #gen-argocd or #spire-kartverket-devex-sparri
 ## Installation
 
 Assuming you have followed the [Getting Started](https://kartverket.atlassian.net/wiki/spaces/SKIPDOK/pages/554827836/Komme+i+gang+med+Argo+CD)
-guide, you can use ArgoKit in your apps-repo. 
+guide, you can use ArgoKit in your apps-repo.
 
-First you need to install jsonnet bundler. This is done by running `brew install jsonnet-bundler` or download the 
+First you need to install jsonnet bundler. This is done by running `brew install jsonnet-bundler` or download the
 [binary release](https://github.com/jsonnet-bundler/jsonnet-bundler).
-Next run `jb init`, and finally run `jb install github.com/kartverket/argokit@main`. If you want 
+Next run `jb init`, and finally run `jb install github.com/kartverket/argokit@main`. If you want
 to stay on a specific version use `jb install github.com/kartverket/argokit@2.0.0`
 
 Remember to add `vendor/` to .gitignore
 
-### Git submodules 
+### Git submodules
 Alternatively you can use submodules if you prefer it over jsonnet bundler (We recommend jsonnet bundler).
 Include the ArgoKit library by running the following command:
 
@@ -74,7 +74,7 @@ The following examples are available at [our github](https://github.com/kartverk
 | `argokit.application.new()` | Creates a Skiperator application, using the appAndObjects convention (this is default).| See above                                                                                  |
 | `argokit.skipJob.new()` | Creates a Skiperator job, using the appAndObjects convention. | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet)|
 ### argoKit's Replicas API
-**NOTE!** It is not recommended to run with less than 2 replicas... 
+**NOTE!** It is not recommended to run with less than 2 replicas...
 | Template                                | Description                                                     | Example                                                                                    |
 |-----------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------|
 | `argokit.application.withReplicas`   | Create replicas for an application with sensible defaults  | [examples/replicas.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas.jsonnet)               |
@@ -86,9 +86,9 @@ The following examples are available at [our github](https://github.com/kartverk
 
 | Template                                              | Description                                                    | Example                                                                  |
 |-------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------|
-| `argokit.[application\|skipJOB].withVariable`         | Creates environment variables for an app                       | [examples/envVariables.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/envVariables.jsonnet) |
-| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret                     | [examples/envVariables.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/envVariables.jsonnet) |
-| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret for a Job container | [examples/envVariables.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/envVariables.jsonnet) |
+| `argokit.[application\|skipJOB].withVariable`         | Creates environment variables for an app                       | [examples/environment-for-application.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment-for-application.jsonnet) |
+| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret                     | [examples/environment-for-application.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment-for-application.jsonnet) |
+| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret for a Job container | [examples/environment-for-application.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment-for-application.jsonnet) |
 
 ---
 ### argoKit's Ingress API
@@ -100,7 +100,7 @@ The following examples are available at [our github](https://github.com/kartverk
 
 ### argoKit's accessPolicies API
 
-You can define what external services (hosts/IPs) and internal SKIP applications your app or job may communicate with.  
+You can define what external services (hosts/IPs) and internal SKIP applications your app or job may communicate with.
 All functions work for both applications and skipJobs: `argokit.application.*` or `argokit.skipJob.*`.
 
 | Template                                                          | Description                                                                 | Example |

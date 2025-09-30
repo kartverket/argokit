@@ -1,5 +1,3 @@
-local util = import 'util.libsonnet';
-
 {
   local rules(appname, namespace) = {
     rules+: [
@@ -125,7 +123,7 @@ local util = import 'util.libsonnet';
           },
         },
       },
-      spec+: if util.isSKIPJob(self.kind) then { container+: httpPolicy(portname, port, protocol) } else httpPolicy(portname, port, protocol),
+      spec+: httpPolicy(portname, port, protocol),
     },
 
   /**
@@ -142,7 +140,7 @@ local util = import 'util.libsonnet';
           } + rules(appname, namespace),
         },
       },
-      spec+: if util.isSKIPJob(self.kind) then { container+: policy(appname, namespace) } else policy(appname, namespace),
+      spec+: policy(appname, namespace),
     },
 
   /**

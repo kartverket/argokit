@@ -1,4 +1,3 @@
-local util = import 'util.libsonnet';
 {
   /**
   Creates an environment variable with a static value.
@@ -23,7 +22,7 @@ local util = import 'util.libsonnet';
         { secret: secretName },
       ],
     },
-    spec+: if util.isSKIPJob(self.kind) then { container+: variableSecret(secretName) } else variableSecret(secretName),
+    spec+: variableSecret(secretName),
   },
 
   /**
@@ -47,6 +46,6 @@ local util = import 'util.libsonnet';
         },
       ],
     },
-    spec+: if util.isSKIPJob(self.kind) then { container+: variableSecret(name, secretRef, key) } else variableSecret(name, secretRef, key),
+    spec+: variableSecret(name, secretRef, key),
   },
 }
