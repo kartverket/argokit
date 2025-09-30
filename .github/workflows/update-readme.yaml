@@ -41,15 +41,19 @@ jobs:
           cp source/v2/README.md target/docs/03-applikasjon-utrulling/09-argo-cd/08-argokit/02-argokit-v2.md 
       
       - name: Commit and push changes
+        env:
+          OCTO_TOKEN: ${{ steps.octo-sts.outputs.token }}
         run: |
           cd target
+          set -euo pipefail
           git config --global user.email "argokit@kartverket.no"
           git config --global user.name "GithubActions"
+          git remote set-url origin "https://x-access-token:${OCTO_TOKEN}@github.com/kartverket/skip.kartverket.no.git"
           git add .
           # Only commit if there are changes
           if git diff --cached --exit-code &>/dev/null; then
             echo "No changes to commit"
           else
-            git commit -m "Update Skiperator api-docs"
+            git commit -m "Update argoKit v2 documentation"
             git push origin main
           fi
