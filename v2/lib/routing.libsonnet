@@ -22,15 +22,16 @@ local v = import '../internal/validation.libsonnet';
     v.boolean(rewriteUri, 'rewriteUri') +
     v.number(port, 'port', allowNull=true) +
 
-    local r = std.prune({
-      pathPrefix: pathPrefix,
-      targetApp: targetApp,
-      rewriteUri: rewriteUri,
-      port: port,
-    });
     {
       spec+: {
-        routes+: [r],
+        routes+: std.prune([
+          {
+            pathPrefix: pathPrefix,
+            targetApp: targetApp,
+            rewriteUri: rewriteUri,
+            port: port,
+          },
+        ]),
       },
     },
 }
