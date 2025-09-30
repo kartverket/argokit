@@ -39,7 +39,7 @@ version when a new version is released. To do this, add the following to your
 ```yaml
 version: 2
 updates:
-  - package-ecosystem: git-submodules or jsonnet-bundler
+  - package-ecosystem: gitsubmodule
     directory: /
     schedule:
       interval: daily
