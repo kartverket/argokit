@@ -1,33 +1,13 @@
+local v = import '../internal/validation.libsonnet';
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
+local appAndObjects = import '../lib/appAndObjects.libsonnet';
+local hooks = import '../lib/configHooks.libsonnet';
 local environment = import '../lib/environment.libsonnet';
 local ingress = import '../lib/ingress.libsonnet';
 local probes = import '../lib/probes.libsonnet';
 local replicas = import '../lib/replicas.libsonnet';
-
 {
-  accessPolicies: accessPolicies,
-  environment: environment,
-  replicas: replicas,
-  ingress: ingress,
-  application: {
-    new(name): {
-      apiVersion: 'skiperator.kartverket.no/v1alpha1',
-      kind: 'Application',
-      metadata: {
-        name: name,
-      },
-    },
-  } + probes,
 
-  skipJob: {
-    new(name): {
-      apiVersion: 'skiperator.kartverket.no/v1alpha1',
-      kind: 'SKIPJob',
-      metadata: {
-        name: name,
-      },
-    },
-  } + probes,
 
   routing: {
     /**
@@ -56,4 +36,44 @@ local replicas = import '../lib/replicas.libsonnet';
       [if port != '' then 'port']: port,
     },
   },
+  application: {
+                 new(name):
+                   v.string(name, 'name', allowEmpty=false) +
+                   appAndObjects.AppAndObjects {
+                     application: {
+                       apiVersion: 'skiperator.kartverket.no/v1alpha1',
+                       kind: 'Application',
+                       metadata: {
+                         name: name,
+                       },
+                     },
+                     objects:: [],
+                   },
+               }
+               + ingress
+               + replicas
+               + environment
+               + accessPolicies
+               + probes,
+
+  skipJob: {
+             new(name):
+               v.string(name, 'name', allowEmpty=false) +
+               appAndObjects.AppAndObjects {
+                 application: {
+                   apiVersion: 'skiperator.kartverket.no/v1alpha1',
+                   kind: 'SKIPJob',
+                   metadata: {
+                     name: name,
+                   },
+                 },
+                 objects:: [],
+               },
+             enableArgokit():
+               hooks.normalizeSkipJob({ isSkipJob: true, isAppAndObjects: false }),
+
+           }
+           + accessPolicies
+           + environment
+           + probes,
 }
