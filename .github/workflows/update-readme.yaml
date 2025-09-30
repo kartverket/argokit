@@ -14,11 +14,11 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps: 
-      - uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f # v1.0.0 from https://skip.kartverket.no/docs/applikasjon-utrulling/argo-cd/hva-er-et-apps-repo
-        id: octo-sts
-        with:
-          scope: kartverket/skip.kartverket.no
-          identity: skip.kartverket.no 
+#      - uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f # v1.0.0 from https://skip.kartverket.no/docs/applikasjon-utrulling/argo-cd/hva-er-et-apps-repo
+        #id: octo-sts
+        #with:
+          #scope: kartverket/skip.kartverket.no
+          #identity: skip.kartverket.no 
 
       - name: Checkout source repo
         uses: actions/checkout@v5 
@@ -31,7 +31,7 @@ jobs:
         with:
           path: target
           repository: kartverket/skip.kartverket.no
-          token: ${{steps.octo-sts.outputs.token}}
+        # token: ${{steps.octo-sts.outputs.token}}
           persist-credentials: false
 
       - name: Copy updated v2/README.md into docs to skip.kartverket.no 
@@ -42,7 +42,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           path: target
-          token: ${{ steps.octo-sts.outputs.token }}
+          token: "test"
           branch: update-argokitv2-docs-branch
           commit-message: "📝 Update ArgoKit v2 documentation"
           title: "Update ArgoKit v2 documentation"
