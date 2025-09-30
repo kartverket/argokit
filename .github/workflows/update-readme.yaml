@@ -5,8 +5,8 @@ on:
     branches:
       - main 
       - updated-documentation
-    #paths: 
-    #- 'v2/README.md'
+    paths: 
+    - 'v2/README.md'
 jobs: 
   sync-docs:
     name: Update target repository
