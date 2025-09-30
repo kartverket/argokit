@@ -12,16 +12,16 @@ questions, please reach out to the #gen-argocd or #spire-kartverket-devex-sparri
 ## Installation
 
 Assuming you have followed the [Getting Started](https://kartverket.atlassian.net/wiki/spaces/SKIPDOK/pages/554827836/Komme+i+gang+med+Argo+CD)
-guide, you can use ArgoKit in your apps-repo. 
+guide, you can use ArgoKit in your apps-repo.
 
-First you need to install jsonnet bundler. This is done by running `brew install jsonnet-bundler` or download the 
+First you need to install jsonnet bundler. This is done by running `brew install jsonnet-bundler` or download the
 [binary release](https://github.com/jsonnet-bundler/jsonnet-bundler).
-Next run `jb init`, and finally run `jb install github.com/kartverket/argokit@main`. If you want 
+Next run `jb init`, and finally run `jb install github.com/kartverket/argokit@main`. If you want
 to stay on a specific version use `jb install github.com/kartverket/argokit@2.0.0`
 
 Remember to add `vendor/` to .gitignore
 
-### Git submodules 
+### Git submodules
 Alternatively you can use submodules if you prefer it over jsonnet bundler (We recommend jsonnet bundler).
 Include the ArgoKit library by running the following command:
 
@@ -74,7 +74,7 @@ The following examples are available at [our github](https://github.com/kartverk
 | `argokit.application.new()` | Creates a Skiperator application, using the appAndObjects convention (this is default).| See above                                                                                  |
 | `argokit.skipJob.new()` | Creates a Skiperator job, using the appAndObjects convention. | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet)|
 ### argoKit's Replicas API
-**NOTE!** It is not recommended to run with less than 2 replicas... 
+**NOTE!** It is not recommended to run with less than 2 replicas...
 | Template                                | Description                                                     | Example                                                                                    |
 |-----------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------|
 | `argokit.application.withReplicas`   | Create replicas for an application with sensible defaults  | [examples/replicas.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas.jsonnet)               |
@@ -100,7 +100,7 @@ The following examples are available at [our github](https://github.com/kartverk
 
 ### argoKit's accessPolicies API
 
-You can define what external services (hosts/IPs) and internal SKIP applications your app or job may communicate with.  
+You can define what external services (hosts/IPs) and internal SKIP applications your app or job may communicate with.
 All functions work for both applications and skipJobs: `argokit.application.*` or `argokit.skipJob.*`.
 
 | Template                                                          | Description                                                                 | Example |
@@ -121,6 +121,15 @@ Configure health probes for applications and skipJobs.
 | `argokit.[application\|skipJob].withReadiness(probe)`                    | Adds a readiness probe (controls when traffic is sent to the pod)      |[examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)|
 | `argokit.[application\|skipJob].withLiveness(probe)`                     | Adds a liveness probe (restarts container if failing)                  | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
 | `argokit.[application\|skipJob].withStartup(probe)`                      | Adds a startup probe (gates other probes until it succeeds)            | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
+
+
+### argoKit's routing API
+Configure routing for applications on SKIP.
+
+| Template                                                                 | Description                                                            | Example |
+|--------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
+| `argokit.routing.new(name, hostname, redirectToHTTPS)` | Builds a route object                                                                    | [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet) |
+| `argokit.routing.withRoute(pathPrefix, targetApp, rewriteUri, port)` | Add route to the routes object                                             | [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet) |
 
 ## Contributing
 
