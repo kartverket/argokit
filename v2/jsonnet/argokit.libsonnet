@@ -9,9 +9,7 @@ local replicas = import '../lib/replicas.libsonnet';
 {
   application: {
                  new(name):
-                   v.compose([
-                     v.string(name, 'name', false),
-                   ]) +
+                   v.string(name, 'name', allowEmpty=false) +
                    appAndObjects.AppAndObjects {
                      application: {
                        apiVersion: 'skiperator.kartverket.no/v1alpha1',
@@ -31,9 +29,7 @@ local replicas = import '../lib/replicas.libsonnet';
 
   skipJob: {
              new(name):
-               v.compose([
-                 v.string(name, 'name', false),
-               ]) +
+               v.string(name, 'name', allowEmpty=false) +
                appAndObjects.AppAndObjects {
                  application: {
                    apiVersion: 'skiperator.kartverket.no/v1alpha1',

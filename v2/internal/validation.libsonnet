@@ -1,17 +1,4 @@
 {
-  // call this method in your method definition
-  // to validate input!
-  // !important! must be able to render in order to validate
-  compose(objs): std.prune(
-    {
-      valid: std.foldl(
-        function(acc, o) acc + o,
-        objs,
-        {}
-      ),
-    }
-  ),
-
   // support normal expressions
   require(cond, msg):
     if cond then {} else error msg
@@ -30,11 +17,15 @@
     else error label + ' must be a number',
 
   // validate array
-  array(value, allowEmpty=true):
-    if std.type(value) == 'array'
+  array(value, label, allowEmpty=true):
+    if std.isArray(value)
     then
       if !allowEmpty && std.length(value) == 0
       then error 'array must not be empty'
       else {}
     else error 'must be array',
+
+  boolean(value, label):
+    if std.isBoolean(value) then {}
+    else error label + ' must be type boolean',
 }
