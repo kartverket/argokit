@@ -1,31 +1,32 @@
-# ArgoKit
+# ArgoKit v2
 
 <p align="center">
 <img src="logo.png" alt="ArgoKit Logo" width="300px" />
 </p>
 
-ArgoKit is a set of reusable jsonnet templates that makes it easier to deploy
+ArgoKit v2 is a set of reusable jsonnet templates, building on the old argoKit, that makes it easier to deploy
 ArgoCD applications on SKIP. It is a work in progress and will be updated as we
 learn more about how to best deploy with ArgoCD on SKIP. If you have any
-questions, please reach out to the #gen-argocd channel in Slack.
+questions, please reach out to the #gen-argocd or #spire-kartverket-devex-sparring channels in Slack.
 
 ## Installation
 
 Assuming you have followed the [Getting Started](https://kartverket.atlassian.net/wiki/spaces/SKIPDOK/pages/554827836/Komme+i+gang+med+Argo+CD)
-guide, you can use ArgoKit in your apps-repo. The first step is to include the
-ArgoKit library by running the following command:
+guide, you can use ArgoKit in your apps-repo. 
+
+First you need to install jsonnet bundler. This is done by running `brew install jsonnet-bundler` or download the 
+[binary release](https://github.com/jsonnet-bundler/jsonnet-bundler).
+Next run `jb init`, and finally run `jb install github.com/kartverket/argokit@main`. If you want 
+to stay on a specific version use `jb install github.com/kartverket/argokit@2.0.0`
+
+Remember to add `vendor/` to .gitignore
+
+### Git submodules 
+Alternatively you can use submodules if you prefer it over jsonnet bundler (We recommend jsonnet bundler).
+Include the ArgoKit library by running the following command:
 
 ```bash
 $ git submodule add https://github.com/kartverket/argokit.git
-```
-
-Alternatively you can use jsonnet-bundler if prefer package managers over
-submodules. To do this, install the CLI by following the instructions in the
-[jsonnet-bundler](https://github.com/jsonnet-bundler/jsonnet-bundler) repo and
-run the following command:
-
-```bash
-$ jb install https://github.com/kartverket/argokit@main
 ```
 
 ### Automatic version updates
@@ -34,10 +35,11 @@ It is highly recommended to use dependabot to automatically update the ArgoKit
 version when a new version is released. To do this, add the following to your
 `.github/dependabot.yml` file:
 
+
 ```yaml
 version: 2
 updates:
-  - package-ecosystem: git-submodules
+  - package-ecosystem: gitsubmodule
     directory: /
     schedule:
       interval: daily
@@ -46,7 +48,7 @@ updates:
 With this configuration, dependabot will automatically create a PR to update the
 ArgoKit version once a day provided that a new version has been released.
 
-## Usage with jsonnet
+## Usage
 
 If you use jsonnet in your apps-repo, you can use the ArgoKit library to deploy
 ArgoCD applications by including the `argokit.libsonnet` file in your jsonnet
@@ -54,103 +56,71 @@ file and calling the `argokit.Application` function. For example, to deploy an
 application, you can use the following jsonnet file:
 
 ```jsonnet
-local argokit = import 'argokit/jsonnet/argokit.libsonnet';
+local argokit = import 'github.com/kartverket/argokit/v2/jsonnet/argokit.libsonnet';
 
-local Probe = {
-    path: "/healthz",
-    port: 8080,
-    failureThreshold: 3,
-    timeout: 1,
-    initialDelay: 0,
-};
-
-local BaseApp = {
-    spec: {
-        port: 8080,
-        replicas: {
-            min: 2,
-            max: 5,
-            targetCPUUtilization: 80,
-        },
-        liveness: Probe,
-        readiness: Probe,
-    },
-};
-
-[
-    BaseApp + argokit.Application("foo-backend") {
-        spec+: {
-            image: "hello-world",
-            ingresses: ["foo.bar.com"],
-            accessPolicy: {
-                inbound: {
-                    rules: [{
-                        application: "foo-frontend",
-                    }],
-                },
-            },
-        },
-    },
-]
+argokit.application.new('foo-backend')
++argokit.application.withReplicas(initial=2, max=5, targetCpuUtilization=80)
++argokit.application.forHostnames('foo.bar.com')
++argokit.application.withInboundSkipApp('foo-frontend')
 ```
 
 ### jsonnet argokit API
 
-The following templates are available for use in the `argokit.libsonnet` file:
+The following examples are available at [our github](https://github.com/kartverket/argokit/v2/examples)
 
 
-TODO: Rewrite this section
 | Template                    | Description                                                           | Example                                                                                    |
 |-----------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| `argokit.application.new()` | Creates a Skiperator application                                      | See above                                                                                  |
-| `argokit.GSMSecretStore`    | Creates a Google Secret Manager External Secrets `SecretStore`        | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)       |
-| `argokit.GSMSecret`         | Creates a Google Secret Manager External Secrets `Secret`             | [examples/jsonnet/secretstore-gsm.jsonnet](examples/jsonnet/secretstore-gsm.jsonnet)       |
-| `argokit.Roles`             | Creates a set of RBAC roles for this namespace                        | [examples/jsonnet/roles.jsonnet](examples/jsonnet/roles.jsonnet)                           |
-| `argokit.AccessPolicies`    | Configures inbound and outbound access policies for services and jobs | [examples/jsonnet/accessPolicies.jsonnet](examples/jsonnet/accessPolicies.jsonnet)         |
-| `argokit.replicas`          | Configures replicasfor the application                           | |
-
+| `argokit.application.new()` | Creates a Skiperator application, using the appAndObjects convention (this is default).| See above                                                                                  |
+| `argokit.skipJob.new()` | Creates a Skiperator job, using the appAndObjects convention. | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet)|
 ### argoKit's Replicas API
 **NOTE!** It is not recommended to run with less than 2 replicas... 
 | Template                                | Description                                                     | Example                                                                                    |
 |-----------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| `argokit.application.withReplicas`   | Create replicas for an application with sensible defaults  | [examples/jsonnet/replicasets.jsonnet](v2/examples/replicasets.jsonnet)               |
-| `argokit.application.withReplicas`   | Create replicas for an application with memory monitoring  | [examples/jsonnet/replicasets-with-memory.jsonnet](v2/examples/replicasets-with-memory.jsonnet)   |
-| `argokit.application.withReplicas`   | Creates a static replica without cpu- and memory monitoring | [examples/jsonnet/replicasets-static.jsonnet](v2/examples/replicasets-static.jsonnet) |
+| `argokit.application.withReplicas`   | Create replicas for an application with sensible defaults  | [examples/replicas.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas.jsonnet)               |
+| `argokit.application.withReplicas`   | Create replicas for an application with memory monitoring  | [examples/replicasets-with-memory.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas-with-memory.jsonnet)   |
+| `argokit.application.withReplicas`   | Creates a static replica without cpu- and memory monitoring | [examples/replicasets-static.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas-static.jsonnet) |
 
 
 ### argoKit's Environment API
 
 | Template                                              | Description                                                    | Example                                                                  |
 |-------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------|
-| `argokit.[application\|skipJOB].withVariable`         | Creates environment variables for an app                       | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
-| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret                     | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
-| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret for a Job container | [examples/jsonnet/envVariables.jsonnet](examples/jsonnet/envVariables.jsonnet) |
+| `argokit.[application\|skipJOB].withVariable`         | Creates environment variables for an app                       | [examples/envVariables.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/envVariables.jsonnet) |
+| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret                     | [examples/envVariables.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/envVariables.jsonnet) |
+| `argokit.[application\|skipJOB].withVariableSecret`   | Creates environment variable from a secret for a Job container | [examples/envVariables.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/envVariables.jsonnet) |
 
 ---
-The following templates are available for use in the `dbArchive.libsonnet` file:
+### argoKit's Ingress API
 
-| Template                 | Description                                                   | Example                                                                  |
-|--------------------------|---------------------------------------------------------------|--------------------------------------------------------------------------|
-| `dbArchive.dbArchiveJob` | Creates a SKIPJob that creates a sql dump and stores it in S3 | [examples/jsonnet/dbArchive.jsonnet](examples/jsonnet/dbArchive.jsonnet) |
+| Template                                              | Description                                                    | Example                                                                  |
+|-------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------|
+| `argokit.application.forHostname`         | Creates ingress for an app or a job                       | [examples/ingress.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/ingress.jsonnet) |
 
-### Input parameters 
 
-#### dbArchiveJob
+### argoKit's accessPolicies API
 
-| Parameter                            | Type    | Default Value            | Description                                                                                                                       |
-|:-------------------------------------|:--------|:-------------------------|:----------------------------------------------------------------------------------------------------------------------------------|
-| **`instanceName`**                   | String  | -                        | **Required.** A unique name for the job and related resources. This name is used as a base for `SKIPJob` and secrets.             |
-| **`schedule`**                       | String  | -                        | **Required.** A cron string defining when the job should run (e.g., `"0 2 * * *"` to run at 02:00 every night).                   |
-| **`databaseIP`**                     | String  | -                        | **Required.** The IP address of the PostgreSQL database to be archived.                                                           |
-| **`gcpS3CredentialsSecret`**         | String  | -                        | **Required.** Name of the secret in GSM containing S3 credentials (`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`).              |
-| **`databaseName`**                   | String  | -                        | **Required.** Name of the database to be archived.                                                                                |
-| **`archiveUser`**                    | String  | `'postgres'`             | The database user the job should use to connect.                                                                                  |
-| **`serviceAccount`**                 | String  | `'dummyaccount@gcp.iam'` | GCP Service Account used by the Kubernetes job to authenticate against Google Cloud (e.g., to fetch secrets from GSM).            |
-| **`cloudsqlInstanceConnectionName`** | String  | -                        | **Required.** The connection name of the Cloud SQL instance (format: `project:region:instance`). Needed for Cloud SQL Auth Proxy. |
-| **`port`**                           | Integer | `5432`                   | The port number of the PostgreSQL database.                                                                                       |
-| **`S3Host`**                         | String  | `'s3-rin.statkart.no'`   | The hostname of the S3 endpoint where the archive should be stored.                                                               |
-| **`S3DestinationPath`**              | String  | -                        | **Required.** Full S3 path where the database archive should be placed (e.g., `s3://my-bucket/archive/database/`).                |
-| **`fullDump`**                       | Bool    | false                    | Flag to include database roles `without passwords` in the dump.                                                                   |
+You can define what external services (hosts/IPs) and internal SKIP applications your app or job may communicate with.  
+All functions work for both applications and skipJobs: `argokit.application.*` or `argokit.skipJob.*`.
+
+| Template                                                          | Description                                                                 | Example |
+|-------------------------------------------------------------------|-----------------------------------------------------------------------------|---------|
+| `argokit.[application\|skipJob].withOutboundPostgres(host, ip)`   | Allow outbound traffic to a Postgres instance           | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundOracle(host, ip)`     | Allow outbound traffic to an Oracle DB                       | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundSsh(host, ip)`        | Allow outbound SSH                                    | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundLdaps(host, ip)`      | Allow outbound secure LDAP port                                   | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundHttp(host, portname='', port=443, protocol='')` | Allow outbound HTTPS/HTTP to a host | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withOutboundSkipApp(appname, namespace='')` | Allow outbound traffic to another SKIP application (outbound rule) | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+| `argokit.[application\|skipJob].withInboundSkipApp(appname, namespace='')`  | Allow another SKIP application to reach this one (inbound rule) | [examples/accessPolicies-for-job.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies-for-job.jsonnet) |
+### argoKit's Probe API
+Configure health probes for applications and skipJobs.
+
+| Template                                                                 | Description                                                            | Example |
+|--------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
+| `argokit.[application\|skipJob].probe(path, port, failureThreshold=3, timeout=1, initialDelay=0)` | Builds a probe object (path, port, thresholds)                         | - |
+| `argokit.[application\|skipJob].withReadiness(probe)`                    | Adds a readiness probe (controls when traffic is sent to the pod)      |[examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)|
+| `argokit.[application\|skipJob].withLiveness(probe)`                     | Adds a liveness probe (restarts container if failing)                  | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
+| `argokit.[application\|skipJob].withStartup(probe)`                      | Adds a startup probe (gates other probes until it succeeds)            | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
 
 ## Contributing
 
@@ -159,5 +129,5 @@ see something changed or added.
 
 ## License
 
-ArgoKit is licensed under the MIT License. See [LICENSE](LICENSE) for the full
+ArgoKit is licensed under the MIT License. See [LICENSE](https://github.com/kartverket/argokit/blob/main/LICENSE) for the full
 license text.
