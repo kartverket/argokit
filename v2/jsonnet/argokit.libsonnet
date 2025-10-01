@@ -7,8 +7,10 @@ local environment = import '../lib/environment.libsonnet';
 local ingress = import '../lib/ingress.libsonnet';
 local probes = import '../lib/probes.libsonnet';
 local replicas = import '../lib/replicas.libsonnet';
+local roles = import '../lib/roles.libsonnet';
 local routing = import '../lib/routing.libsonnet';
 {
+  roles: roles,
   routing: routing,
   application: {
                  new(name):
