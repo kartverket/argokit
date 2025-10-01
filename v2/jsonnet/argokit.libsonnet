@@ -8,7 +8,9 @@ local ingress = import '../lib/ingress.libsonnet';
 local probes = import '../lib/probes.libsonnet';
 local replicas = import '../lib/replicas.libsonnet';
 local routing = import '../lib/routing.libsonnet';
+local secrets = import '../lib/secrets.libsonnet';
 {
+  secrets: secrets.store,
   routing: routing,
   application: {
                  new(name):
@@ -29,7 +31,8 @@ local routing = import '../lib/routing.libsonnet';
                + environment
                + accessPolicies
                + probes
-               + azureAdApplication,
+               + azureAdApplication
+               + secrets.secret,
   skipJob: {
              new(name):
                v.string(name, 'name') +
@@ -49,5 +52,7 @@ local routing = import '../lib/routing.libsonnet';
            }
            + accessPolicies
            + environment
-           + probes,
+           + probes
+           + secrets.secret,
 }
+
