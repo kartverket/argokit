@@ -122,6 +122,15 @@ Configure health probes for applications and skipJobs.
 | `argokit.[application\|skipJob].withLiveness(probe)`                     | Adds a liveness probe (restarts container if failing)                  | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
 | `argokit.[application\|skipJob].withStartup(probe)`                      | Adds a startup probe (gates other probes until it succeeds)            | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
 
+
+### argoKit's routing API
+Configure routing for applications on SKIP.
+
+| Template                                                                 | Description                                                            | Example |
+|--------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
+| `argokit.routing.new(name, hostname, redirectToHTTPS)` | Builds a route object                                                                    | [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet) |
+| `argokit.routing.withRoute(pathPrefix, targetApp, rewriteUri, port)` | Add route to the routes object                                             | [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet) |
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or PR if you would like to

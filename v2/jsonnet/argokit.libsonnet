@@ -7,10 +7,12 @@ local environment = import '../lib/environment.libsonnet';
 local ingress = import '../lib/ingress.libsonnet';
 local probes = import '../lib/probes.libsonnet';
 local replicas = import '../lib/replicas.libsonnet';
+local routing = import '../lib/routing.libsonnet';
 {
+  routing: routing,
   application: {
                  new(name):
-                   v.string(name, 'name', allowEmpty=false) +
+                   v.string(name, 'name') +
                    appAndObjects.AppAndObjects {
                      application:: {
                        apiVersion: 'skiperator.kartverket.no/v1alpha1',
@@ -30,7 +32,7 @@ local replicas = import '../lib/replicas.libsonnet';
                + azureAdApplication,
   skipJob: {
              new(name):
-               v.string(name, 'name', allowEmpty=false) +
+               v.string(name, 'name') +
                appAndObjects.AppAndObjects {
                  application:: {
                    apiVersion: 'skiperator.kartverket.no/v1alpha1',
