@@ -1,10 +1,6 @@
-local hooks = import '../lib/configHooks.libsonnet';
+local hooks = import './configHooks.libsonnet';
+
 {
-  /**
-   * Template for rendering app and objects manifests.
-   * The config hooks are applied in the final stage of the
-   * evaluation, ensuring correct formatting.
-  */
   AppAndObjects:: {
     apiVersion: 'v1',
     kind: 'List',

@@ -1,6 +1,6 @@
-local v = import '../internal/validation.libsonnet';
+local v = import '../../internal/validation.libsonnet';
 {
-  withAzureAdApplication(
+  new(
     name,
     namespace='',
     groups=[],
@@ -20,7 +20,7 @@ local v = import '../internal/validation.libsonnet';
     v.array(replyUrls, 'replyUrls', allowEmpty=true) +
     v.array(preAuthorizedApplications, 'preAuthorizedApplications', allowEmpty=true) +
 
-    local azureAdApp = {
+    {
       apiVersion: 'nais.io/v1',
       kind: 'AzureAdApplication',
       metadata: {
@@ -39,11 +39,5 @@ local v = import '../internal/validation.libsonnet';
         [if logoutUrl != '' then 'logoutUrl']: logoutUrl,
         [if std.length(preAuthorizedApplications) > 0 then 'preAuthorizedApplications']: preAuthorizedApplications,
       } + (if std.length(groups) > 0 then { claims: { groups: groups } } else {}),
-    };
-
-    // add the azure ad application to the objects of the AppAndObjects
-    { objects+:: [azureAdApp] }
-    // add necessary config to the main application
-    + self.withOutboundHttp('login.microsoftonline.com')
-    + self.withSecret(std.format('%s-%s', [secretPrefix, name])),
+    },
 }

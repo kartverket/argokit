@@ -3,8 +3,8 @@ local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
 
 
 local actual =
-  argokit.application.new('test-app')
-  + argokit.application.withAzureAdApplication(
+  argokit.appAndObjects.application.new('test-app')
+  + argokit.appAndObjects.application.withAzureAdApplication(
     name='test-name',
     namespace='test-namespace',
     groups=['test-group'],

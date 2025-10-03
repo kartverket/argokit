@@ -1,11 +1,11 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
+local job = argokit.job;  // simplify import statement
 
-
-argokit.skipJob.new('a-cool-app')
-+ argokit.skipJob.withOutboundSkipApp('appJob', 'mynamespace2')
-+ argokit.skipJob.withOutboundHttp('service.kartverket.no')
-+ argokit.skipJob.withOutboundPostgres('postgres.kartverket.no', '192.168.1.1')
-+ argokit.skipJob.withOutboundOracle('oracle.kartverket.no', '192.168.1.2')
-+ argokit.skipJob.withOutboundSsh('ssh.kartverket.no', '192.168.1.3')
-+ argokit.skipJob.withOutboundLdaps('ldaps.kartverket.no', '192.168.1.4')
-+ argokit.skipJob.withInboundSkipApp('theOtherApp', 'mynamespace')
+job.new('test-jonb')
++ job.withOutboundSkipApp('appJob', 'mynamespace2')
++ job.withOutboundHttp('service.kartverket.no')
++ job.withOutboundPostgres('postgres.kartverket.no', '192.168.1.1')
++ job.withOutboundOracle('oracle.kartverket.no', '192.168.1.2')
++ job.withOutboundSsh('ssh.kartverket.no', '192.168.1.3')
++ job.withOutboundLdaps('ldaps.kartverket.no', '192.168.1.4')
++ job.withInboundSkipApp('theOtherApp', 'mynamespace')

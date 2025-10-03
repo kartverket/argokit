@@ -1,4 +1,4 @@
-local v = import '../internal/validation.libsonnet';
+local v = import '../../internal/validation.libsonnet';
 {
   new(name, hostname, redirectToHTTPS=true)::
     v.string(name, 'name') +
