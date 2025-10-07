@@ -88,7 +88,7 @@ The following examples are available at [our github](https://github.com/kartverk
 |-------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------------|
 | `argokit.[application\|skipJOB].withEnvironmentVariable`         | Creates environment variables for an app                       | [examples/environment-for-application.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment-for-application.jsonnet) |
 | `argokit.[application\|skipJOB].withEnvironmentVariableFromSecret`   | Creates environment variable from a secret                     | [examples/environment-for-application.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment-for-application.jsonnet) |
-| `argokit.[application\|skipJOB].withEnvironmentVariableFromSecret`   | Creates environment variable from a secret for a Job container | [examples/environment-for-application.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment-for-application.jsonnet) |
+| `argokit.[application\|skipJOB].withEnvironmentVariableFromSecret`   | Creates environment variable from a secret | [examples/environment-for-application.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment-for-application.jsonnet) |
 
 ---
 ### argoKit's Ingress API
