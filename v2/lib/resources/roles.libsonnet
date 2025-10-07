@@ -1,4 +1,4 @@
-local v = import '../internal/validation.libsonnet';
+local v = import '../../internal/validation.libsonnet';
 
 {
   newRoleBinding():: {
