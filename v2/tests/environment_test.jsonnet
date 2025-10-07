@@ -1,11 +1,11 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
-
+local application = argokit.appAndObjects.application;
 test.new(std.thisFile)
 + test.case.new(
   name='Standard Variable',
   test=test.expect.eqDiff(
-    actual=(argokit.appAndObjects.application.new('an-app') + argokit.application.withVariable('variableName', 'variableValue') + argokit.application.withVariable('variableName2', 'variableValue2')).spec,
+    actual=(application.withVariable('variableName', 'variableValue') + application.withVariable('variableName2', 'variableValue2')).application.spec,
     expected={
       env: [
         {
@@ -23,28 +23,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='Standard Secret Variable for job',
   test=test.expect.eqDiff(
-    actual=(argokit.appAndObjects.skipJob.new('a-job') + argokit.application.withVariableSecret('variableName', 'secretRef', 'key')).items[0].spec,
-    expected={
-      container: {
-        env: [
-          {
-            name: 'variableName',
-            valueFrom: {
-              secretKeyRef: {
-                name: 'secretRef',
-                key: 'key',
-              },
-            },
-          },
-        ],
-      },
-    },
-  ),
-)
-+ test.case.new(
-  name='Standard Secret Variable for job',
-  test=test.expect.eqDiff(
-    actual=(argokit.appAndObjects.application.new('a-job') + argokit.application.withVariableSecret('variableName', 'secretRef', 'key')).items[0].spec,
+    actual=(application.withVariableSecret('variableName', 'secretRef', 'key')).application.spec,
     expected={
       env: [
         {

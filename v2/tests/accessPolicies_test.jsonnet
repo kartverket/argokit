@@ -1,11 +1,11 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
-
+local application = argokit.appAndObjects.application;
 test.new(std.thisFile)
 + test.case.new(
   name='Postgres',
   test=test.expect.eqDiff(
-    actual=(argokit.appAndObjects.skipJob.new('a-job') + argokit.application.withOutboundPostgres('database.kartverket.no', '192.168.1.9')).spec,
+    actual=(application.withOutboundPostgres('database.kartverket.no', '192.168.1.9')).application.spec,
     expected={
       accessPolicy: {
         outbound: {
@@ -28,35 +28,9 @@ test.new(std.thisFile)
   ),
 )
 + test.case.new(
-  name='HTTP for SKIPJob',
-  test=test.expect.eqDiff(
-    actual=(argokit.appAndObjects.skipJob.new('a-job') + argokit.application.withOutboundHttp('server.kartverket.no', port=444, portname='https', protocol='TCP')).items[0].spec,
-    expected={
-      container: {
-        accessPolicy: {
-          outbound: {
-            external: [
-              {
-                host: 'server.kartverket.no',
-                ports: [
-                  {
-                    name: 'https',
-                    port: 444,
-                    protocol: 'TCP',
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      },
-    }
-  ),
-)
-+ test.case.new(
   name='HTTP for SKIPApp',
   test=test.expect.eqDiff(
-    actual=(argokit.appAndObjects.application.new('an-app') + argokit.application.withOutboundHttp('server.kartverket.no', port=444, portname='https', protocol='TCP')).items[0].spec,
+    actual=(argokit.application.withOutboundHttp('server.kartverket.no', port=444, portname='https', protocol='TCP')).application.spec,
     expected={
       accessPolicy: {
         outbound: {
