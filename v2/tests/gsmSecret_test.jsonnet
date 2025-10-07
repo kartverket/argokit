@@ -1,6 +1,6 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
-
+local application = argokit.appAndObjects.application;
 local secrets = [
   {
     fromSecret: 'the-first-test-file',
@@ -14,8 +14,8 @@ local allKeysFrom = [
 ];
 
 local actual =
-  argokit.application.new('test-app')
-  + argokit.application.withExternalSecret('test-external-secret', secrets=secrets, allKeysFrom=allKeysFrom);
+  application.new('test-app')
+  + application.withExternalSecret('test-external-secret', secrets=secrets, allKeysFrom=allKeysFrom);
 local app = actual.items[0];
 local externalSecret = actual.items[1];
 local label = 'Test External Secret';

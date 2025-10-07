@@ -6,13 +6,15 @@
     - value: string - The value to assign to the environment variable.
   */
   withVariable(name, value):: {
-    spec+: {
-      env+: [
-        {
-          name: name,
-          value: value,
-        },
-      ],
+    application+: {
+      spec+: {
+        env+: [
+          {
+            name: name,
+            value: value,
+          },
+        ],
+      },
     },
   },
 
@@ -22,7 +24,9 @@
         { secret: secretName },
       ],
     },
-    spec+: variableSecret(secretName),
+    application+: {
+      spec+: variableSecret(secretName),
+    },
   },
 
   /**
@@ -46,6 +50,8 @@
         },
       ],
     },
-    spec+: variableSecret(name, secretRef, key),
+    application+: {
+      spec+: variableSecret(name, secretRef, key),
+    },
   },
 }

@@ -8,8 +8,10 @@
   forHostnames(ingress): {
     local handleIngress(ingress) = if std.isString(ingress) then ingress else if (std.objectHas(ingress, 'customCert')) then ingress.hostname + '+' + ingress.customCert else ingress.hostname,
 
-    spec+: {
-      ingresses+: if std.isArray(ingress) then std.map(handleIngress, ingress) else [handleIngress(ingress)],
+    application+: {
+      spec+: {
+        ingresses+: if std.isArray(ingress) then std.map(handleIngress, ingress) else [handleIngress(ingress)],
+      },
     },
   },
 }

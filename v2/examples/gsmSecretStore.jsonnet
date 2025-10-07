@@ -6,9 +6,9 @@ local secrets = [
   },
 ];
 local allKeysFrom = [
-    {
-        fromSecret: 'test-fromSecret'
-    }
+  {
+    fromSecret: 'test-fromSecret',
+  },
 ];
 
-argokit.secrets.newExternalSecretStore('coolio-gcp-project')
+argokit.secrets.store.new('coolio-gcp-project')

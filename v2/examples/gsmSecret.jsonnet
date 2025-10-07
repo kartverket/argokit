@@ -1,4 +1,5 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
+local application = argokit.appAndObjects.application;  // simplify statements
 local secrets = [
   {
     fromSecret: 'test-fromSecret',
@@ -6,11 +7,10 @@ local secrets = [
   },
 ];
 local allKeysFrom = [
-    {
-        fromSecret: 'test-fromSecret'
-    }
+  {
+    fromSecret: 'test-fromSecret',
+  },
 ];
-argokit.application.new('my-gsmSecret-app')
-+ argokit.application.withVariable('cool-var', 'cool-val')
-+ argokit.application.withExternalSecret('super-secret-gsm-app', secrets=secrets,allKeysFrom=allKeysFrom)
-
+application.new('my-gsmSecret-app')
++ application.withVariable('cool-var', 'cool-val')
++ application.withExternalSecret('super-secret-gsm-app', secrets=secrets, allKeysFrom=allKeysFrom)

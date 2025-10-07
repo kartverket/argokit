@@ -4,7 +4,9 @@
   Returning a non-200 code will make kubernetes restart the app.
   	*/
   withLiveness(probe):: {
-    spec+: { liveness: probe },
+    application+: {
+      spec+: { liveness: probe },
+    },
   },
 
   /**
@@ -12,7 +14,9 @@
    until the resource returns 200 OK before 	marking the pod as Running and progressing with the deployment strategy.
    	*/
   withReadiness(probe):: {
-    spec+: { readiness: probe },
+    application+: {
+      spec+: { readiness: probe },
+    },
   },
   /**
   Kubernetes uses startup probes to know when a container application has started. If such a probe is configured, it
@@ -21,7 +25,9 @@
   killed by Kubernetes before they are up and running.
   */
   withStartup(probe):: {
-    spec+: { startup: probe },
+    application+: {
+      spec+: { startup: probe },
+    },
   },
 
   /**
