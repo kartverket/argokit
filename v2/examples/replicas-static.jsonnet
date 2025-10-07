@@ -1,4 +1,5 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
+local application = argokit.appAndObjects.application; // simplify statements
 
-argokit.application.new('testapp')
-+ argokit.application.withReplicas(4)
+application.new('testapp')
++ application.withReplicas(4)

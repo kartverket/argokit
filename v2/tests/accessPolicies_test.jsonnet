@@ -30,7 +30,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='HTTP for SKIPApp',
   test=test.expect.eqDiff(
-    actual=(argokit.application.withOutboundHttp('server.kartverket.no', port=444, portname='https', protocol='TCP')).application.spec,
+    actual=(application.withOutboundHttp('server.kartverket.no', port=444, portname='https', protocol='TCP')).application.spec,
     expected={
       accessPolicy: {
         outbound: {

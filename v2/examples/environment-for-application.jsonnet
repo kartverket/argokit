@@ -1,11 +1,14 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
+local application = argokit.appAndObjects.application; // simplify statements
 
-argokit.application.new('a-cool-app')
-+ argokit.application.withVariable('REDIS_PORT', '6379')
-+ argokit.application.withVariableSecret(
+application.new('a-cool-app')
++ application.withVariable('REDIS_PORT', '6379')
+
++ application.withVariableSecret(
     'EMAIL_CLIENTID',
     'email-client-id')
-+ argokit.application.withVariableSecret(
+
+    + application.withVariableSecret(
     'SPRING_DATASOURCE_USERNAME',
     'GRUNNBOK_DATASOURCE_USERNAME',
     'grunnbok-database-username')

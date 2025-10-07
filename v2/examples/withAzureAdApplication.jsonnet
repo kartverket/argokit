@@ -1,5 +1,5 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
-local application = argokit.appAndObjects.application;  // simplify import statement
+local application = argokit.appAndObjects.application; // simplify statements
 
 application.new('test')
 + application.withAzureAdApplication(

@@ -6,7 +6,6 @@ local ingress = import '../ingress.libsonnet';
 local probes = import '../probes.libsonnet';
 local replicas = import '../replicas.libsonnet';
 local routing = import '../routing.libsonnet';
-local hooks = import './configHooks.libsonnet';
 local templates = import './templates.libsonnet';
 
 local azureAdApplication = import './azureAdApplication.libsonnet';
@@ -32,24 +31,4 @@ local azureAdApplication = import './azureAdApplication.libsonnet';
                + accessPolicies
                + probes
                + azureAdApplication,
-  skipJob: {
-             new(name):
-               v.string(name, 'name') +
-               templates.AppAndObjects {
-                 application:: {
-                   apiVersion: 'skiperator.kartverket.no/v1alpha1',
-                   kind: 'SKIPJob',
-                   metadata: {
-                     name: name,
-                   },
-                 },
-                 objects:: [],
-               },
-             enableArgokit():
-               hooks.normalizeSkipJob({ isSkipJob: true, isAppAndObjects: false }),
-
-           }
-           + accessPolicies
-           + environment
-           + probes,
 }

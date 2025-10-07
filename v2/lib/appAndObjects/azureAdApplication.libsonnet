@@ -18,6 +18,6 @@ local argokit = import '../../jsonnet/argokit.libsonnet';
     // add the azure ad application to the objects of the AppAndObjects
     { objects+:: [azureAdApp] }
     // add necessary config to the main application
-    + argokit.application.withOutboundHttp('login.microsoftonline.com')
-    + argokit.application.withSecret(std.format('%s-%s', [secretPrefix, name])),
+    + argokit.appAndObjects.application.withOutboundHttp('login.microsoftonline.com')
+    + argokit.appAndObjects.application.withSecret(std.format('%s-%s', [secretPrefix, name])),
 }
