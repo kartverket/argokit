@@ -18,6 +18,11 @@
     },
   },
 
+  /**
+  Creates multiple environment variables with static values.
+  Parameters:
+    - pairs: map - Map of key-value pairs of env variables
+  */
   withEnvironmentVariables(pairs):: {
     application+: {
       spec+: {
@@ -25,7 +30,6 @@
           key: k,
           value: pairs[k],
         }, std.objectFields(pairs)),
-
       },
     },
   },
