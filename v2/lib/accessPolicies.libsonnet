@@ -25,15 +25,17 @@
    - ip: string - the ip address of the postgres instance
   */
   withOutboundPostgres(host, ip):: {
-    spec+: {
-      accessPolicy+: {
-        outbound+: {
-          external+: [
-            {
-              host: host,
-              ip: ip,
-            } + ports('postgres-port', 5432, 'TCP'),
-          ],
+    application+: {
+      spec+: {
+        accessPolicy+: {
+          outbound+: {
+            external+: [
+              {
+                host: host,
+                ip: ip,
+              } + ports('postgres-port', 5432, 'TCP'),
+            ],
+          },
         },
       },
     },
@@ -46,15 +48,17 @@
    - ip: string - the ip address of the oracle instance
   */
   withOutboundOracle(host, ip):: {
-    spec+: {
-      accessPolicy+: {
-        outbound+: {
-          external+: [
-            {
-              host: host,
-              ip: ip,
-            } + ports('oracle', 1521, 'TCP'),
-          ],
+    application+: {
+      spec+: {
+        accessPolicy+: {
+          outbound+: {
+            external+: [
+              {
+                host: host,
+                ip: ip,
+              } + ports('oracle', 1521, 'TCP'),
+            ],
+          },
         },
       },
     },
@@ -67,15 +71,17 @@
    - ip: string - the ip address of the ssh server
   */
   withOutboundSsh(host, ip):: {
-    spec+: {
-      accessPolicy+: {
-        outbound+: {
-          external+: [
-            {
-              host: host,
-              ip: ip,
-            } + ports('sftp', 22, 'TCP'),
-          ],
+    application+: {
+      spec+: {
+        accessPolicy+: {
+          outbound+: {
+            external+: [
+              {
+                host: host,
+                ip: ip,
+              } + ports('sftp', 22, 'TCP'),
+            ],
+          },
         },
       },
     },
@@ -88,15 +94,17 @@
    - ip: string - the ip address of the ldaps server
   */
   withOutboundLdaps(host, ip):: {
-    spec+: {
-      accessPolicy+: {
-        outbound+: {
-          external+: [
-            {
-              host: host,
-              ip: ip,
-            } + ports('ldaps', 636, 'TCP'),
-          ],
+    application+: {
+      spec+: {
+        accessPolicy+: {
+          outbound+: {
+            external+: [
+              {
+                host: host,
+                ip: ip,
+              } + ports('ldaps', 636, 'TCP'),
+            ],
+          },
         },
       },
     },
@@ -123,7 +131,9 @@
           },
         },
       },
-      spec+: httpPolicy(portname, port, protocol),
+      application+: {
+        spec+: httpPolicy(portname, port, protocol),
+      },
     },
 
   /**
@@ -140,7 +150,9 @@
           } + rules(appname, namespace),
         },
       },
-      spec+: policy(appname, namespace),
+      application+: {
+        spec+: policy(appname, namespace),
+      },
     },
 
   /**
@@ -150,10 +162,12 @@
      - namespace: string (optional) - the namespace of the application
     */
   withInboundSkipApp(appname, namespace=''):: {
-    spec+: {
-      accessPolicy+: {
-        inbound+: {
-        } + rules(appname, namespace),
+    application+: {
+      spec+: {
+        accessPolicy+: {
+          inbound+: {
+          } + rules(appname, namespace),
+        },
       },
     },
   },
