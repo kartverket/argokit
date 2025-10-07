@@ -122,11 +122,11 @@ Configure health probes for applications and skipJobs.
 | `argokit.[application\|skipJob].withLiveness(probe)`                     | Adds a liveness probe (restarts container if failing)                  | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
 | `argokit.[application\|skipJob].withStartup(probe)`                      | Adds a startup probe (gates other probes until it succeeds)            | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
 ### argoKit's External Secret API
-Configure external secrets for an application and an external secret store 
+Configure external secrets for an application and an external secret store
 
 | Template                                                                 | Description                                                            | Example |
 |--------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
-| `argokit.[application\|skipJob].withExternalSecret(name, secrets=[],allKeysFrom=[])`| Adds external secrets to the application/Job                | [examples/gsmSecret](https://github.com/kartverket/argokit/blob/main/v2/examples/gsmSecret.jsonnet)|
+| `argokit.[application\|skipJob].withEnvironmentVariablesFromExternalSecret(name, secrets=[],allKeysFrom=[])`| Adds external secrets to the application/Job                | [examples/gsmSecret](https://github.com/kartverket/argokit/blob/main/v2/examples/gsmSecret.jsonnet)|
 | |
 | `argokit.secrets.newExternalSecretStore(name)`| Creates an external secret store |[examples/gsmSecretStore](https://github.com/kartverket/argokit/blob/main/v2/examples/gsmSecretStore.jsonnet)|
 

@@ -13,4 +13,4 @@ local allKeysFrom = [
 ];
 application.new('my-gsmSecret-app')
 + application.withVariable('cool-var', 'cool-val')
-+ application.withExternalSecret('super-secret-gsm-app', secrets=secrets, allKeysFrom=allKeysFrom)
++ application.withEnvironmentVariablesFromExternalSecret('super-secret-gsm-app', secrets=secrets, allKeysFrom=allKeysFrom)
