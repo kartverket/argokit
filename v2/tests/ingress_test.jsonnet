@@ -1,11 +1,12 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
+local application = argokit.appAndObjects.application;
 
 test.new(std.thisFile)
 + test.case.new(
   name='Single ingress',
   test=test.expect.eqDiff(
-    actual=argokit.application.forHostnames('hostName.kartverket.no').spec,
+    actual=application.forHostnames('hostName.kartverket.no').application.spec,
     expected={
       ingresses: [
         'hostName.kartverket.no',
@@ -16,7 +17,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='Multiple ingresses',
   test=test.expect.eqDiff(
-    actual=argokit.application.forHostnames(['hostName.kartverket.no', 'hostName2.kartverket.no']).spec,
+    actual=application.forHostnames(['hostName.kartverket.no', 'hostName2.kartverket.no']).application.spec,
     expected={
       ingresses: [
         'hostName.kartverket.no',
@@ -28,7 +29,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='Multiple ingresses with objects',
   test=test.expect.eqDiff(
-    actual=argokit.application.forHostnames([
+    actual=application.forHostnames([
       'hostName.kartverket.no',
       {
         hostname: 'hostNameWithCustomCert.kartverket.no',
@@ -37,7 +38,7 @@ test.new(std.thisFile)
       {
         hostname: 'hostNameWithoutCustomCert.kartverket.no',
       },
-    ]).spec,
+    ]).application.spec,
     expected={
       ingresses: [
         'hostName.kartverket.no',

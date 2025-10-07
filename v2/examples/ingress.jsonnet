@@ -1,17 +1,19 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
-argokit.application.new('testapp')
-+argokit.application.forHostnames(import 'ingress/database-ingress')
-+argokit.application.forHostnames([
+local application = argokit.appAndObjects.application; // simplify statements
+
+application.new('testapp')
++application.forHostnames(import 'ingress/database-ingress')
++application.forHostnames([
   import 'ingress/api-ingress',
   "argokit-frontend-dev.devserver.kartverket-intern.cloud"]
 )
-+argokit.application.forHostnames(
++application.forHostnames(
   [
     import 'ingress/api-ingress',
     'argokit-frontend-dev.devserver.kartverket-intern.cloud',
   ]
 )
-+ argokit.ingress.forHostnames(
++ application.forHostnames(
   [
     'grunnbok.atkv3-prod.kartverket-intern.cloud',
     {
