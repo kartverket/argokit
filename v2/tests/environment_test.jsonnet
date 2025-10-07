@@ -5,7 +5,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='Standard Variable',
   test=test.expect.eqDiff(
-    actual=(application.withVariable('variableName', 'variableValue') + application.withVariable('variableName2', 'variableValue2')).application.spec,
+    actual=(application.withEnvironmentVariable('variableName', 'variableValue') + application.withEnvironmentVariable('variableName2', 'variableValue2')).application.spec,
     expected={
       env: [
         {

@@ -5,7 +5,7 @@
     - name: string - The name of the environment variable.
     - value: string - The value to assign to the environment variable.
   */
-  withVariable(name, value):: {
+  withEnvironmentVariable(name, value):: {
     application+: {
       spec+: {
         env+: [
