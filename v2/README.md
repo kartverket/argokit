@@ -136,9 +136,9 @@ Configure routing for applications on SKIP.
 Configure rolebinding resources for applications on SKIP. Create the resource with the `new()` function, then add either users or a group as the subject.
 | template | Description |Example |
 |---|---|---|
-|argokit.rolebinding.new()| Create a new rolebinding resource| [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
-|argokit.rolebinding.withUsers(users)| Add a list of users as subjects | [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
-|argokit.rolebinding.withNamespaceAdminGroup(groupname)| Add a namespace‑admin group as a subject | [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
+|argokit.k8s.rolebinding.new()| Create a new rolebinding resource| [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
+|argokit.k8s.rolebinding.withUsers(users)| Add a list of users as subjects | [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
+|argokit.k8s.rolebinding.withNamespaceAdminGroup(groupname)| Add a namespace‑admin group as a subject | [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
 
 
 ## Contributing

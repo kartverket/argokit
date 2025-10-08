@@ -14,12 +14,12 @@ local testGroupName = 'test-group';
 
 // build test objects
 local rbTeam =
-  argokit.rolebinding.new()
-  + argokit.rolebinding.withUsers(testUsers);
+  argokit.k8s.rolebinding.new()
+  + argokit.k8s.rolebinding.withUsers(testUsers);
 
 local rbAdmin =
-  argokit.rolebinding.new()
-  + argokit.rolebinding.withNamespaceAdminGroup(testGroupName);
+  argokit.k8s.rolebinding.new()
+  + argokit.k8s.rolebinding.withNamespaceAdminGroup(testGroupName);
 
 
 // test cases for resourcebinding team admin
