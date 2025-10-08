@@ -15,7 +15,12 @@ local allKeysFrom = [
 
 local actual =
   application.new('test-app')
-  + application.withEnvironmentVariablesFromExternalSecret('test-external-secret', secrets=secrets, allKeysFrom=allKeysFrom);
+  + application.withEnvironmentVariablesFromExternalSecret(
+    name='test-external-secret',
+    secrets=secrets,
+    allKeysFrom=allKeysFrom
+  );
+
 local app = actual.items[0];
 local externalSecret = actual.items[1];
 local label = 'Test External Secret';

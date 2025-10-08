@@ -126,9 +126,9 @@ Configure external secrets for an application and an external secret store
 
 | Template                                                                 | Description                                                            | Example |
 |--------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
-| `argokit.[application\|skipJob].withEnvironmentVariablesFromExternalSecret(name, secrets=[],allKeysFrom=[])`| Adds external secrets to the application/Job                | [examples/gsmSecret](https://github.com/kartverket/argokit/blob/main/v2/examples/gsmSecret.jsonnet)|
+| `argokit.appAndObjects.application.withEnvironmentVariablesFromExternalSecret(name, secrets=[],allKeysFrom=[])`| Adds external secrets to the application                | [examples/withExternalSecret](https://github.com/kartverket/argokit/blob/main/v2/examples/withExternalSecret.jsonnet)|
 | |
-| `argokit.secrets.newExternalSecretStore(name)`| Creates an external secret store |[examples/gsmSecretStore](https://github.com/kartverket/argokit/blob/main/v2/examples/gsmSecretStore.jsonnet)|
+| `argokit.externalSecrets.store.new(name)`| Creates an external secret store |[examples/newExternaleSecretStore](https://github.com/kartverket/argokit/blob/main/v2/examples/newExternaleSecretStore.jsonnet)|
 
 
 ### argoKit's routing API

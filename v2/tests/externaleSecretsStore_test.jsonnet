@@ -1,7 +1,7 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
 
-local store = argokit.secrets.store.new('test-gsm-store');
+local store = argokit.externalSecrets.store.new('test-gsm-store');
 local label = 'Test External Secret Store';
 
 test.new(std.thisFile)
