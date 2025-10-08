@@ -128,7 +128,8 @@ Configure external secrets for an application and an external secret store
 |--------------------------------------------------------------------------|------------------------------------------------------------------------|---------|
 | `argokit.appAndObjects.application.withEnvironmentVariablesFromExternalSecret(name, secrets=[],allKeysFrom=[])`| Adds external secrets to the application                | [examples/withExternalSecret](https://github.com/kartverket/argokit/blob/main/v2/examples/withExternalSecret.jsonnet)|
 | |
-| `argokit.externalSecrets.store.new(name)`| Creates an external secret store |[examples/newExternaleSecretStore](https://github.com/kartverket/argokit/blob/main/v2/examples/newExternaleSecretStore.jsonnet)|
+| `argokit.externalSecrets.store.new(name)`| Creates an external secret store |[examples/externalSecrets](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)|
+| `argokit.externalSecrets.secret.new(name)`| Creates an external secret |[examples/externalSecrets](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)|
 
 
 ### argoKit's routing API
