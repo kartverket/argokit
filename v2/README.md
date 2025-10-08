@@ -141,6 +141,12 @@ Configure rolebinding resources for applications on SKIP. Create the resource wi
 |argokit.rolebinding.withNamespaceAdminGroup(groupname)| Add a namespace‑admin group as a subject | [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
 
 
+## argokit's ConfigMap API
+Configure ConfigMap resources for applications on SKIP. Set hashed or un-hashed using the hased parameter (default false)
+| template | Description |Example |
+|---|---|---|
+|argokit.configMap.new(name, data, hashed)| Create a new rolebinding resource| [examples/configMaps.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMaps.jsonnet)|
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or PR if you would like to

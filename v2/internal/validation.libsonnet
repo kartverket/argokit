@@ -29,4 +29,11 @@
   boolean(value, label):
     if std.isBoolean(value) then {}
     else error label + ' must be type boolean',
+
+  object(value, label, allowEmpty=false):
+    if std.isObject(value) then
+      if !allowEmpty && std.length(std.objectFields(value)) == 0
+      then error label + ' object must not be empty'
+      else {}
+    else error label + ' must be object',
 }
