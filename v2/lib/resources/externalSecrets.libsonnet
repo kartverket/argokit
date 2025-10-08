@@ -23,6 +23,8 @@ local v = import '../../internal/validation.libsonnet';
       v.string(name, 'name') +
       v.array(secrets, 'secrets', allowEmpty=true) +
       v.array(allKeysFrom, 'allKeysFrom', allowEmpty=true) +
+      (if std.length(secrets) > 0 || std.length(allKeysFrom) > 0 then {}
+       else error 'invalid secret: either secrets or allKeysFrom must contain at least one item') +
 
       {
         apiVersion: 'external-secrets.io/v1',
