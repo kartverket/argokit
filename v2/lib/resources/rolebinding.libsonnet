@@ -5,10 +5,9 @@ local v = import '../../internal/validation.libsonnet';
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'RoleBinding',
     metadata: {
-      name: 'team-admin',
-      annotations: {
-        description: 'Binds cluster-admin to every member and relevant SAs within a product. Allows all subjects to have full rights within their namespace. Usually reserved for dev/sandbox.',
-      },
+      // will be overridden on withUsers or withNamespaceAdminGroup call on this object
+      name: error 'incomplete rolebinding: you need to extend the rolebinging with, +withUsers() or +withNamespaceAdminGroup()',
+
     },
     subjects: [],
     roleRef: {
