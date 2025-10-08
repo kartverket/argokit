@@ -140,6 +140,16 @@ Configure routing for applications on SKIP.
 | `argokit.routing.new(name, hostname, redirectToHTTPS)` | Builds a route object                                                                    | [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet) |
 | `argokit.routing.withRoute(pathPrefix, targetApp, rewriteUri, port)` | Add route to the routes object                                             | [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet) |
 
+
+## argokit's Rolebinding API
+Configure rolebinding resources for applications on SKIP. Create the resource with the `new()` function, then add either users or a group as the subject.
+| template | Description |Example |
+|---|---|---|
+|argokit.rolebinding.new()| Create a new rolebinding resource| [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
+|argokit.rolebinding.withUsers(users)| Add a list of users as subjects | [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
+|argokit.rolebinding.withNamespaceAdminGroup(groupname)| Add a namespace‑admin group as a subject | [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
+
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or PR if you would like to
