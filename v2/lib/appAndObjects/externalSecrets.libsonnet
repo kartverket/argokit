@@ -5,5 +5,5 @@ local argokit = import '../../jsonnet/argokit.libsonnet';
   withEnvironmentVariablesFromExternalSecret(name, secrets=[], allKeysFrom=[])::
     local gsmSecret = argokit.externalSecrets.secret.new(name, secrets, allKeysFrom);
     { objects+:: [gsmSecret] }
-    + argokit.appAndObjects.application.withSecret(name),
+    + argokit.appAndObjects.application.withEnvironmentVariablesFromSecret(name),
 }
