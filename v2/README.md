@@ -142,11 +142,13 @@ Configure rolebinding resources for applications on SKIP. Create the resource wi
 
 
 ## argokit's ConfigMap API
-Configure ConfigMap resources for applications on SKIP. Create a unique name for the config map using the `addHashToName` parameter (default false).
+Configure ConfigMap resources for applications on SKIP.
+All methods have the `addHashToName` parameter to create the ConfigMap with a unique name (hashed suffix).
 | template | Description |Example |
 |---|---|---|
-|argokit.configMap.new(name, data, addHashToName=false)| Create a new ConfigMap | [examples/configMaps.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMaps.jsonnet)|
-|argokit.configMap.new(name, data, addHashToName=true)| Create a new ConfigMap with a unique name (hashed suffix) | [examples/configMaps.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMaps.jsonnet)|
+|argokit.configMap.new(name, data, addHashToName)| Create a new ConfigMap | [examples/configMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMap.jsonnet)|
+|argokit.appAndObjects.application.withConfigMapAsEnv(name, data, addHashToName)| Create a new ConfigMap and add its content as env in the application | [examples/withConfigMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withConfigMap.jsonnet)|
+|argokit.appAndObjects.application.withConfigMapAsMount(name, mountPath, data, addHashToName)| Create a new ConfigMap and mount it as a file in the application's file system | [examples/withConfigMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withConfigMap.jsonnet)|
 
 ## Contributing
 
