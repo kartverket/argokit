@@ -145,7 +145,8 @@ Configure rolebinding resources for applications on SKIP. Create the resource wi
 Configure ConfigMap resources for applications on SKIP. Set hashed or un-hashed using the hased parameter (default false)
 | template | Description |Example |
 |---|---|---|
-|argokit.configMap.new(name, data, hashed)| Create a new rolebinding resource| [examples/configMaps.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMaps.jsonnet)|
+|argokit.configMap.new(name, data, hashed=false)| Create a new ConfigMap | [examples/configMaps.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMaps.jsonnet)|
+|argokit.configMap.new(name, data, hashed=true)| Create a new ConfigMap with a unique name (hashed suffix) | [examples/configMaps.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMaps.jsonnet)|
 
 ## Contributing
 
