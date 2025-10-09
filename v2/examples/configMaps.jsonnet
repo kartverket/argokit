@@ -14,6 +14,6 @@ local serviceConfig = {
   argokit.k8s.configMap.new(
     name='hashed-configmap',
     data=serviceConfig,
-    hashed=true,
+    addHashToName=true,
   ),
 ]

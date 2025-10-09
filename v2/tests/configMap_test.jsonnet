@@ -15,7 +15,7 @@ local configMap = argokit.k8s.configMap.new(
 local hashedConfigMap = argokit.k8s.configMap.new(
   name='hashed',
   data=testConfig,
-  hashed=true,
+  addHashToName=true,
 );
 
 local label = 'Test ConfigMaps ';

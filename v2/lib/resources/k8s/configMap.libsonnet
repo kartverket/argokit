@@ -11,10 +11,10 @@ local hashConfigMap() = {
 };
 
 {
-  new(name, data, hashed=false):
+  new(name, data, addHashToName=false):
     v.string(name, 'name') +
     v.object(data, 'data') +
-    v.boolean(hashed, 'hashed') +
+    v.boolean(addHashToName, 'addHashToName') +
     {
       apiVersion: 'v1',
       kind: 'ConfigMap',
@@ -22,5 +22,5 @@ local hashConfigMap() = {
         name: name + '-configmap',
       },
       data: data,
-    } + if hashed then hashConfigMap() else {},
+    } + if addHashToName then hashConfigMap() else {},
 }
