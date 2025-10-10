@@ -9,7 +9,7 @@ local routing = import '../routing.libsonnet';
 local templates = import './templates.libsonnet';
 
 local azureAdApplication = import './azureAdApplication.libsonnet';
-
+local externalSecrets = import './externalSecrets.libsonnet';
 {
   application: {
                  new(name):
@@ -30,5 +30,6 @@ local azureAdApplication = import './azureAdApplication.libsonnet';
                + environment
                + accessPolicies
                + probes
-               + azureAdApplication,
+               + azureAdApplication
+               + externalSecrets,
 }
