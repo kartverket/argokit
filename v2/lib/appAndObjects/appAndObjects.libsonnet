@@ -6,6 +6,8 @@ local ingress = import '../ingress.libsonnet';
 local probes = import '../probes.libsonnet';
 local replicas = import '../replicas.libsonnet';
 local routing = import '../routing.libsonnet';
+local azureAdApplication = import './azureAdApplication.libsonnet';
+local configMap = import './configMap.libsonnet';
 local templates = import './templates.libsonnet';
 
 local azureAdApplication = import './azureAdApplication.libsonnet';
@@ -31,5 +33,6 @@ local externalSecrets = import './externalSecrets.libsonnet';
                + accessPolicies
                + probes
                + azureAdApplication
+               + configMap
                + externalSecrets,
 }
