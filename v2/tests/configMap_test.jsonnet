@@ -1,6 +1,6 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
-
+local application = argokit.appAndObjects.application;
 
 local testConfig = {
   PORT: 3000,
@@ -17,6 +17,18 @@ local hashedConfigMap = argokit.k8s.configMap.new(
   data=testConfig,
   addHashToName=true,
 );
+
+
+// app and objcet test data
+
+local appAndObjectsconfigMapAsEnv =
+  application.new('application')
+  + application.withConfigMapAsEnv(name='port', data={ PORT: 3333 });
+
+local appAndObjectsconfigMapAsMount =
+  application.new('application')
+  + application.withConfigMapAsMount(name='port', mountPath='port-as-file', data={ PORT: 3333 });
+
 
 local label = 'Test ConfigMaps ';
 test.new(std.thisFile)
@@ -63,7 +75,46 @@ test.new(std.thisFile)
     },
     expected={
       orgName: 'hashed-configmap',
-      len: std.length(self.orgName) + 8,  // 7 char has and '-'
+      len: std.length(self.orgName) + 8,  // 7 char hash and '-'
     },
+  )
+)
+
+// app and objects test cases
+// withConfigMapAsEnv
+
++ test.case.new(
+  name='withConfigMapAsEnv creates valid configMap resource',
+  test=test.expect.eqDiff(
+    actual=appAndObjectsconfigMapAsEnv.items[1].kind,
+    expected='ConfigMap'
+  )
+)
+
++ test.case.new(
+  name='withConfigMapAsEnv sets correct env',
+  test=test.expect.eqDiff(
+    actual=appAndObjectsconfigMapAsEnv.items[0].spec.envFrom[0].configMap,
+    expected=appAndObjectsconfigMapAsEnv.items[1].metadata.name
+  )
+)
+
+// withConfigMapAsMount
++ test.case.new(
+  name='withConfigMapAsMount creates valid configMap resource',
+  test=test.expect.eqDiff(
+    actual=appAndObjectsconfigMapAsMount.items[1].kind,
+    expected='ConfigMap'
+  )
+)
+
++ test.case.new(
+  name='withConfigMapAsMount sets correct env',
+  test=test.expect.eqDiff(
+    actual=appAndObjectsconfigMapAsMount.items[0].spec.filesFrom[0],
+    expected={
+      configMap: appAndObjectsconfigMapAsEnv.items[1].metadata.name,
+      mountPath: 'port-as-file',
+    }
   )
 )
