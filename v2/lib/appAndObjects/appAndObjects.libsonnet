@@ -10,6 +10,7 @@ local azureAdApplication = import './azureAdApplication.libsonnet';
 local configMap = import './configMap.libsonnet';
 local templates = import './templates.libsonnet';
 
+local externalSecrets = import './externalSecrets.libsonnet';
 {
   application: {
                  new(name):
@@ -31,5 +32,6 @@ local templates = import './templates.libsonnet';
                + accessPolicies
                + probes
                + azureAdApplication
-               + configMap,
+               + configMap
+               + externalSecrets,
 }
