@@ -123,7 +123,7 @@ Configure health probes for applications.
 | `argokit.appAndObjects.application.withStartup(probe)`                      | Adds a startup probe (gates other probes until it succeeds)            | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
 
 
-### argoKit's routing API
+#### argoKit's routing API
 Configure routing for applications on SKIP.
 
 | Template                                                                 | Description                                                            | Example |
@@ -132,7 +132,7 @@ Configure routing for applications on SKIP.
 | `argokit.routing.withRoute(pathPrefix, targetApp, rewriteUri, port)` | Add route to the routes object                                             | [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet) |
 
 
-## argokit's Rolebinding API
+### argokit's Rolebinding API
 Configure rolebinding resources for applications on SKIP. Create the resource with the `new()` function, then add either users or a group as the subject.
 | template | Description |Example |
 |---|---|---|
@@ -140,8 +140,14 @@ Configure rolebinding resources for applications on SKIP. Create the resource wi
 |argokit.k8s.rolebinding.withUsers(users)| Add a list of users as subjects | [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
 |argokit.k8s.rolebinding.withNamespaceAdminGroup(groupname)| Add a namespace‑admin group as a subject | [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)|
 
+### argokit's ExternalSecret API
+Configure external secrets and stores.
+| template | Description |Example |
+|---|---|---|
+|argokit.externalSecrets.secret.new()| Create a new external secret | [examples/externalSecrets.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)|
+|argokit.externalSecrets.store.new()| Create a new external store | [examples/externalSecrets.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)|
 
-## argokit's ConfigMap API
+### argokit's ConfigMap API
 Configure ConfigMap resources for applications on SKIP.
 All methods have the `addHashToName` parameter to create the ConfigMap with a unique name (hashed suffix).
 | template | Description |Example |

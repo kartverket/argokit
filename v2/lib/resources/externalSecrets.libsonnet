@@ -1,13 +1,14 @@
 local v = import '../../internal/validation.libsonnet';
 {
   store: {
-    new(gcpProject):
+    new(name, gcpProject):
       v.string(gcpProject, 'gcpProject') +
+      v.string(name, 'name') +
       {
         apiVersion: 'external-secrets.io/v1',
         kind: 'SecretStore',
         metadata: {
-          name: 'gsm',
+          name: name,
         },
         spec: {
           provider: {
@@ -19,10 +20,11 @@ local v = import '../../internal/validation.libsonnet';
       },
   },
   secret: {
-    new(name, secrets=[], allKeysFrom=[])::
+    new(name, secrets=[], allKeysFrom=[], secretStoreRef='gsm')::
       v.string(name, 'name') +
       v.array(secrets, 'secrets', allowEmpty=true) +
       v.array(allKeysFrom, 'allKeysFrom', allowEmpty=true) +
+      v.string(secretStoreRef, 'secretStoreRef', allowEmpty=true) +
       (if std.length(secrets) > 0 || std.length(allKeysFrom) > 0 then {}
        else error 'invalid secret: either secrets or allKeysFrom must contain at least one item') +
 
@@ -49,7 +51,7 @@ local v = import '../../internal/validation.libsonnet';
           refreshInterval: '1h',
           secretStoreRef: {
             kind: 'SecretStore',
-            name: 'gsm',
+            name: secretStoreRef,
           },
           target: {
             name: name,
