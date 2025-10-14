@@ -14,9 +14,9 @@ local allKeysFrom = [
 
 
 [
-  argokit.externalSecrets.store.new('coolio-gcp-project'),
+  argokit.externalSecrets.store.new('my-secret-store', 'coolio-gcp-project'),
 
-  argokit.externalSecrets.secret.new(name='testsecrets', secrets=secrets),
+  argokit.externalSecrets.secret.new(name='testsecrets', secrets=secrets, secretStoreRef='my-secret-store'),
 
   argokit.externalSecrets.secret.new(name='testsecrets-2', allKeysFrom=allKeysFrom),
 ]
