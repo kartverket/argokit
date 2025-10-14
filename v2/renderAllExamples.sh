@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -u
+set -eou pipefail
 
 failed=()
 ok=0
