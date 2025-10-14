@@ -1,7 +1,7 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
-local application = argokit.appAndObjects.application; // simplify statements
+local application = argokit.appAndObjects.application;  // simplify statements
 
-application.new('test')
+application.new('test', 'foo.io/image', 8080)
 + application.withAzureAdApplication(
   name='testapp',
   namespace='tilgangsstyring-main',

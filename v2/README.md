@@ -58,7 +58,7 @@ application, you can use the following jsonnet file:
 ```jsonnet
 local argokit = import 'github.com/kartverket/argokit/v2/jsonnet/argokit.libsonnet';
 local application = argokit.appAndObjects.application;
-application.new('foo-backend')
+application.new('foo-backend', 'foo.io/image', 8080)
  + application.withReplicas(initial=2, max=5, targetCpuUtilization=80)
  + application.forHostnames('foo.bar.com')
  + application.withInboundSkipApp('foo-frontend')
