@@ -1,7 +1,7 @@
 local v = import '../../internal/validation.libsonnet';
 {
   store: {
-    new(name, gcpProject):
+    new(name='gsm', gcpProject):
       v.string(gcpProject, 'gcpProject') +
       v.string(name, 'name') +
       {
