@@ -123,7 +123,7 @@ Configure health probes for applications.
 | `argokit.appAndObjects.application.withStartup(probe)`                      | Adds a startup probe (gates other probes until it succeeds)            | [examples/probes](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet) |
 
 
-#### argoKit's routing API
+### argoKit's routing API
 Configure routing for applications on SKIP.
 
 | Template                                                                 | Description                                                            | Example |
