@@ -38,7 +38,7 @@ jobs:
 
       - name: Copy updated v2/README.md into target
         run: |
-          cp source/v2/README.md target/docs/03-applikasjon-utrulling/10-argokit/02-argokit-v2.md
+          cp source/v2/README.md target/docs/03-applikasjon-utrulling/10-argokit/03-argokit-v2.md
 
       - name: Create PR
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e
