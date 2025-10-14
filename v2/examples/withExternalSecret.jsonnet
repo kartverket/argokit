@@ -11,8 +11,8 @@ local allKeysFrom = [
     fromSecret: 'test-fromSecret',
   },
 ];
-application.new('my-gsmSecret-app')
-+ application.withVariable('cool-var', 'cool-val')
+application.new('my-gsmSecret-app', 'foo.io/image', 8080)
++ application.withEnvironmentVariable('cool-var', 'cool-val')
 + application.withEnvironmentVariablesFromExternalSecret(
   name='super-secret-gsm-app',
   secrets=secrets,

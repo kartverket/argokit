@@ -14,7 +14,7 @@ local allKeysFrom = [
 ];
 
 local actual =
-  application.new('test-app')
+  application.new('test-app', 'foo.io/image', 8080)
   + application.withEnvironmentVariablesFromExternalSecret(
     name='test-external-secret',
     secrets=secrets,

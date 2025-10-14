@@ -22,11 +22,11 @@ local hashedConfigMap = argokit.k8s.configMap.new(
 // app and objcet test data
 
 local appAndObjectsconfigMapAsEnv =
-  application.new('application')
+  application.new('application', 'foo.io/image', 8080)
   + application.withConfigMapAsEnv(name='port', data={ PORT: 3333 });
 
 local appAndObjectsconfigMapAsMount =
-  application.new('application')
+  application.new('application', 'foo.io/image', 8080)
   + application.withConfigMapAsMount(name='port', mountPath='port-as-file', data={ PORT: 3333 });
 
 

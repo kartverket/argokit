@@ -1,7 +1,7 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local application = argokit.appAndObjects.application;  // simplify statements
 
-application.new('application')
+application.new('application', 'foo.io/image', 8080)
 + application.withEnvironmentVariable('REDIS_PORT', '6379')
 
 + application.withEnvironmentVariables({
