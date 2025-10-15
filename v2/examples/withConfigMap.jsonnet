@@ -15,14 +15,14 @@ local serverSettings = {
 
 [
   // config map with as env
-  application.new('app')
+  application.new('app', 'foo.io/image', 8080)
   + application.withConfigMapAsEnv(name='db-credentials', data=conf),
   // + application.withConfigMapAsEnv(name='db-credentials', data=conf, addHashToName=true)
 
 
   // config map as mount
 
-  application.new('app')
+  application.new('app', 'foo.io/image', 8080)
   + application.withConfigMapAsMount(name='server-settings', mountPath='serverSettings', data=serverSettings, addHashToName=true),
   //+ application.withConfigMapAsMount(name='server-settings', mountPath='serverSettings', data=serverSettings),
 

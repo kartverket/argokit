@@ -1,7 +1,7 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local application = argokit.appAndObjects.application;  // simplify statements
 
-application.new('app')
+application.new('app', 'foo.io/image', 8080)
 
 + application.withOutboundPostgres(host='postgres-host', ip='10.0.0.1')
 

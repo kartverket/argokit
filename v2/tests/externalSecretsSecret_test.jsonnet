@@ -14,11 +14,12 @@ local allKeysFrom = [
 ];
 
 local actual =
-  application.new('test-app')
+  application.new('test-app', 'foo.io/image', 8080)
   + application.withEnvironmentVariablesFromExternalSecret(
     name='test-external-secret',
     secrets=secrets,
-    allKeysFrom=allKeysFrom
+    allKeysFrom=allKeysFrom,
+    secretStoreRef='some-store'
   );
 
 local app = actual.items[0];
@@ -31,6 +32,13 @@ test.new(std.thisFile)
   test=test.expect.eqDiff(
     actual=externalSecret.kind,
     expected='ExternalSecret'
+  )
+)
++ test.case.new(
+  name=label + 'external secret store ref is set',
+  test=test.expect.eqDiff(
+    actual=externalSecret.spec.secretStoreRef.name,
+    expected='some-store'
   )
 )
 + test.case.new(
