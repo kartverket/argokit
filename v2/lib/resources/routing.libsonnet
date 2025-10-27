@@ -1,4 +1,6 @@
+local utils = import '../../internal/utils.libsonnet';
 local v = import '../../internal/validation.libsonnet';
+
 {
   new(name, hostname, redirectToHTTPS=true)::
     v.string(name, 'name') +
@@ -15,7 +17,7 @@ local v = import '../../internal/validation.libsonnet';
         hostname: hostname,
         routes: [],
       },
-    },
+    } + utils.withArgokitVersionAnnotation(),
   withRoute(pathPrefix, targetApp, rewriteUri, port=null)::
     v.string(pathPrefix, 'pathPrefix') +
     v.string(targetApp, 'targetApp') +
