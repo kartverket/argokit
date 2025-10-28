@@ -5,7 +5,7 @@
 | Funksjon                    | Beskrivelse                                                           | Eksempel                                                                                    |
 |-----------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
 | `argokit.appAndObjects.application.new()` | Oppretter en Skiperator‑applikasjon ved å bruke appAndObjects‑konvensjonen (dette er standard). | Se over                                                                                  |
-| `argokit.appAndObjects.application.withAdditionalObjects()` | Legg til ekstra objekter i 'objects' listen til appAndObjects strukturen| [examples/additionalObjects.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/additionalObjects.jsonnet)|
+| `argokit.appAndObjects.application.withObjects()` | Legg til ekstra objekter i 'objects' listen til appAndObjects strukturen| [examples/additionalObjects.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/additionalObjects.jsonnet)|
 
 ## ArgoKit's Replicas API
 

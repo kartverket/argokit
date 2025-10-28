@@ -4,7 +4,7 @@ local application = argokit.appAndObjects.application;
 
 application.new('app', 'foo.io/image', 8080)
 
-+ application.withAdditionalObjects(
++ application.withObjects(
   {
     apiVersion: 'networking.istio.io/v1alpha3',
     kind: 'DestinationRule',

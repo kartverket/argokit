@@ -27,12 +27,12 @@ local object = {
 
 local app =
   application.new('app', 'foo.io/image', 8080)
-  + application.withAdditionalObjects(object);
+  + application.withObjects(object);
 
 
 local appB =
   application.new('app', 'foo.io/image', 8080)
-  + application.withAdditionalObjects([
+  + application.withObjects([
     {
       apiVersion: 'v1',
       kind: 'List',
@@ -49,7 +49,7 @@ local appB =
     },
   ]);
 
-local label = 'Test withAdditionalObjects ';
+local label = 'Test withObjects ';
 
 test.new(std.thisFile)
 + test.case.new(
