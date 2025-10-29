@@ -27,7 +27,7 @@
     application+: {
       spec+: {
         env+: std.map(function(k) {
-          key: k,
+          name: k,
           value: pairs[k],
         }, std.objectFields(pairs)),
       },

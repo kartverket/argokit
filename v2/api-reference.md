@@ -24,7 +24,7 @@
 | `argokit.appAndObjects.application.withEnvironmentVariable`         | Oppretter miljøvariabler for en app                            | [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet) |
 | `argokit.appAndObjects.application.withEnvironmentVariables`        | Oppretter flere miljøvariabler for en app                      | [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet) |
 | `argokit.appAndObjects.application.withEnvironmentVariableFromSecret`   | Oppretter miljøvariabel fra en secret                          | [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet) |
-| `argokit.appAndObjects.application.withEnvironmentVariableFromSecret`   | Oppretter miljøvariabel fra en secret                          | [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet) |
+| `argokit.appAndObjects.application.withEnvironmentVariablesFromSecret`   | Oppretter miljøvariabler fra en secret                          | [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet) |
 
 ---
 
