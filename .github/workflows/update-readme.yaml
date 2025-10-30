@@ -6,7 +6,7 @@ on:
       - main
       - updated-documentation
     paths:
-      - "v2/README.md"
+      - "v2/api-reference.md"
 jobs:
   sync-docs:
     name: Update target repository

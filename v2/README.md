@@ -26,7 +26,7 @@ Alternatively you can use submodules if you prefer it over jsonnet bundler (We r
 Include the ArgoKit library by running the following command:
 
 ```bash
-$ git submodule add https://github.com/kartverket/argokit.git
+git submodule add https://github.com/kartverket/argokit.git
 ```
 
 ### Automatic version updates
