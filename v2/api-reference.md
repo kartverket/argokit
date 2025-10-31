@@ -11,16 +11,16 @@ Oppretter en Skiperator‑applikasjon ved å bruke `appAndObjects`‑konvensjone
 |`image`|`string`|`true`| - | image som skal kjøres|
 |`port`|`number`|`true`| - | port applikasjonen skal kjøre på|
 
-**eksempel:** [examples/application.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/application.jsonnet)
+**Eksempel:** [examples/application.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/application.jsonnet)
 
 ### `argokit.appAndObjects.application.withObjects()`
-Legg til ekstra objekter i 'objects' listen til `appAndObjects`-strukturen.
+Legg til ekstra objekter i `objects`-listen til `appAndObjects`-strukturen.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
 |`objects`|`array` or `object` |`true`| - | objekter som skal legges til i manifestet|
 
-**eksempel:** [examples/additionalObjects.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/additionalObjects.jsonnet)
+**Eksempel:** [examples/additionalObjects.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/additionalObjects.jsonnet)
 
 ## ArgoKit's Replicas API
 
@@ -34,9 +34,9 @@ Sett replikaer for en applikasjon med autoskalering basert på CPU og minne.
 |`initial`|`number`|`true`|-|initialt antall replikaer (2 er anbefalt)|
 |`max`|`number`|`false`|-|maksimum antall replikaer (hvis satt, aktiverer autoskalering)|
 |`targetCpuUtilization`|`number`|`false`|80|CPU-terskel i prosent før autoskalering|
-|`targetMemoryUtilization`|`number`|`false`|-|Minne-terskel i prosent før autoskalering|
+|`targetMemoryUtilization`|`number`|`false`|-|Minneterskel i prosent før autoskalering|
 
-**eksempel:** [examples/replicas.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas.jsonnet)
+**Eksempel:** [examples/replicas.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas.jsonnet)
 
 ## ArgoKit's Environment API
 
@@ -48,16 +48,16 @@ Oppretter en miljøvariabel for en applikasjon.
 |`name`|`string`|`true`| - |navn på miljøvariabelen|
 |`value`|`string`|`true`| - |verdi for miljøvariabelen|
 
-**eksempel:** [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet)
+**Eksempel:** [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet)
 
 ### `argokit.appAndObjects.application.withEnvironmentVariables()`
 Oppretter flere miljøvariabler for en applikasjon.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
-|`envVars`|`object`|`true`| - |objekt med nøkkel-verdi par for miljøvariabler|
+|`envVars`|`object`|`true`| - |objekt med nøkkelverdi par for miljøvariabler|
 
-**eksempel:** [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet)
+**Eksempel:** [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet)
 
 ### `argokit.appAndObjects.application.withEnvironmentVariableFromSecret()`
 Oppretter en miljøvariabel fra en hemmelighet.
@@ -68,7 +68,7 @@ Oppretter en miljøvariabel fra en hemmelighet.
 |`secretRef`|`string`|`true`| - |navn på hemmelighet|
 |`key`|`string`|`false`|`name`|nøkkel i hemmelighet (default er samme som `name`)|
 
-**eksempel:** [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet)
+**Eksempel:** [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet)
 
 ### `argokit.appAndObjects.application.withEnvironmentVariablesFromSecret()`
 Oppretter miljøvariabler fra en hemmelighet.
@@ -77,7 +77,7 @@ Oppretter miljøvariabler fra en hemmelighet.
 |-|-|-|-|-|
 |`secretName`|`string`|`true`| - |navn på hemmelighet|
 
-**eksempel:** [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet)
+**Eksempel:** [examples/environment.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/environment.jsonnet)
 
 ## ArgoKit's Ingress API
 
@@ -88,7 +88,7 @@ Oppretter ingress for en applikasjon.
 |-|-|-|-|-|
 |`ingress`|`array` or `string` or `object`|`true`| - |kan være en string med `hostname`, en array av `hostnames`/objekter, eller et objekt med {`hostname`, `customCert`}|
 
-**eksempel:** [examples/ingress.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/ingress.jsonnet)
+**Eksempel:** [examples/ingress.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/ingress.jsonnet)
 
 ## ArgoKit's accessPolicies API
 
@@ -102,7 +102,7 @@ Tillat utgående trafikk til en Postgres‑instans.
 |`host`|`string`|`true`| - |vertsnavn til Postgres-instansen|
 |`ip`|`string`|`true`| - |IP-adresse til Postgres-instansen|
 
-**eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
+**Eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
 
 ### `argokit.appAndObjects.application.withOutboundOracle()`
 Tillat utgående trafikk til en Oracle‑database.
@@ -112,7 +112,7 @@ Tillat utgående trafikk til en Oracle‑database.
 |`host`|`string`|`true`| - |vertsnavn til Oracle-databasen|
 |`ip`|`string`|`true`| - |IP-adresse til Oracle-databasen|
 
-**eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
+**Eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
 
 ### `argokit.appAndObjects.application.withOutboundSsh()`
 Tillat utgående SSH.
@@ -122,7 +122,7 @@ Tillat utgående SSH.
 |`host`|`string`|`true`| - |vertsnavn til SSH-serveren|
 |`ip`|`string`|`true`| - |IP-adresse til SSH-serveren|
 
-**eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
+**Eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
 
 ### `argokit.appAndObjects.application.withOutboundLdaps()`
 Tillat utgående sikker LDAP‑port.
@@ -132,7 +132,7 @@ Tillat utgående sikker LDAP‑port.
 |`host`|`string`|`true`| - |vertsnavn til LDAP-serveren|
 |`ip`|`string`|`true`| - |IP-adresse til LDAP-serveren|
 
-**eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
+**Eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
 
 ### `argokit.appAndObjects.application.withOutboundHttp()`
 Tillat utgående HTTPS/HTTP til en vert.
@@ -142,9 +142,9 @@ Tillat utgående HTTPS/HTTP til en vert.
 |`host`|`string`|`true`| - |vertsnavn til serveren|
 |`portname`|`string`|`false`|-|navn på porten|
 |`port`|`number`|`false`|443|portnummer|
-|`protocol`|`string`|`false`|-|protokoll (http/https)|
+|`protocol`|`string`|`false`|-|protokoll (HTTP/HTTPS)|
 
-**eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
+**Eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
 
 ### `argokit.appAndObjects.application.withOutboundSkipApp()`
 Tillat utgående trafikk til en annen SKIP‑applikasjon (utgående regel).
@@ -154,7 +154,7 @@ Tillat utgående trafikk til en annen SKIP‑applikasjon (utgående regel).
 |appname|`string`|`true`| - |navn på SKIP-applikasjonen|
 |namespace|`string`|`false`|-|`namespace` til applikasjonen|
 
-**eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
+**Eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
 
 ### `argokit.appAndObjects.application.withInboundSkipApp()`
 Tillat en annen SKIP‑applikasjon å nå denne (inngående regel).
@@ -164,7 +164,7 @@ Tillat en annen SKIP‑applikasjon å nå denne (inngående regel).
 |`appname`|`string`|`true`| - |navn på SKIP-applikasjonen|
 |`namespace`|`string`|`false`|-|`namespace` til applikasjonen|
 
-**eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
+**Eksempel:** [examples/accessPolicies.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/accessPolicies.jsonnet)
 
 ## ArgoKit's Probe API
 Konfigurer helseprober for applikasjoner.
@@ -180,7 +180,7 @@ Bygger et probe‑objekt (sti, port, terskler)
 |`timeout`|`number`|`false`|1|timeout i sekunder|
 |`initialDelay`|`number`|`false`|0|forsinkelse før første probe|
 
-**eksempel:** [examples/probes.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)
+**Eksempel:** [examples/probes.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)
 
 ### `argokit.appAndObjects.application.withReadiness()`
 Legger til en readiness‑probe (styrer når trafikk sendes til poden).
@@ -189,7 +189,7 @@ Legger til en readiness‑probe (styrer når trafikk sendes til poden).
 |-|-|-|-|-|
 |`probe`|`object`|`true`| - |probe-objekt opprettet med `probe()`|
 
-**eksempel:** [examples/probes.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)
+**Eksempel:** [examples/probes.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)
 
 ### `argokit.appAndObjects.application.withLiveness()`
 Legger til en liveness‑probe (restarter container ved feil).
@@ -198,7 +198,7 @@ Legger til en liveness‑probe (restarter container ved feil).
 |-|-|-|-|-|
 |`probe`|`object`|`true`| - |probe-objekt opprettet med `probe()`|
 
-**eksempel:** [examples/probes.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)
+**Eksempel:** [examples/probes.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)
 
 ### `argokit.appAndObjects.application.withStartup()`
 Legger til en startup‑probe (blokkerer andre prober til den lykkes).
@@ -207,14 +207,14 @@ Legger til en startup‑probe (blokkerer andre prober til den lykkes).
 |-|-|-|-|-|
 |`probe`|`object`|`true`| - |probe-objekt opprettet med `probe()`|
 
-**eksempel:** [examples/probes.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)
+**Eksempel:** [examples/probes.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)
 
 ## ArgoKit's routing API
 
 Konfigurer ruting for applikasjoner på SKIP.
 
 ### `argokit.routing.new()`
-Bygger et rute‑objekt
+Bygger et rute‑objekt.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
@@ -222,7 +222,7 @@ Bygger et rute‑objekt
 |`hostname`|`string`|`true`| - |vertsnavn for ruten|
 |`redirectToHTTPS`|`boolean`|`false`|true|om trafikk skal omdirigeres til HTTPS|
 
-**eksempel:** [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet)
+**Eksempel:** [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet)
 
 ### `argokit.routing.withRoute()`
 Legg til rute i `routing`‑objektet.
@@ -234,7 +234,7 @@ Legg til rute i `routing`‑objektet.
 |`rewriteUri`|`boolean`|`true`| - |om URI skal omskrives|
 |`port`|`number`|`false`|null|port for målapplikasjonen|
 
-**eksempel:** [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet)
+**Eksempel:** [examples/routing.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routing.jsonnet)
 
 ## ArgoKit's Rolebinding API
 
@@ -249,7 +249,7 @@ Opprett en ny `rolebinding`‑ressurs.
 |-|-|-|-|-|
 |-|-|-|-|ingen parametere|
 
-**eksempel:** [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)
+**Eksempel:** [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)
 
 ### `argokit.k8s.rolebinding.withUsers()`
 Legg til en liste over brukere som `subjects`.
@@ -258,23 +258,23 @@ Legg til en liste over brukere som `subjects`.
 |-|-|-|-|-|
 |`users`|`array`|`true`| - |liste over brukernavn|
 
-**eksempel:** [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)
+**Eksempel:** [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)
 
 ### `argokit.k8s.rolebinding.withNamespaceAdminGroup()`
-Legg til en `namespace‑admin-group` som `subject`
+Legg til en `namespace‑admin-group` som `subject`.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
 |`groupName`|`string`|`true`| - |navn på gruppen|
 
-**eksempel:** [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)
+**Eksempel:** [examples/rolebinding.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/rolebinding.jsonnet)
 
 ## ArgoKit's ExternalSecret API
 
 Konfigurer `ExternalSecrets` og `SecretStore`.
 
 ### `argokit.externalSecrets.secret.new()`
-Opprett en ny ekstern secret
+Opprett en ny ekstern secret.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
@@ -285,7 +285,7 @@ Opprett en ny ekstern secret
 
 **OBS:** Enten `secrets` eller `allKeysFrom` må inneholde minst ett element.
 
-**eksempel:** [examples/externalSecrets.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)
+**Eksempel:** [examples/externalSecrets.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)
 
 ### `argokit.externalSecrets.store.new()`
 Opprett en ny ekstern `SecretStore`.
@@ -295,7 +295,7 @@ Opprett en ny ekstern `SecretStore`.
 |`name`|`string`|`false`|'gsm'|navn på `store`|
 |`gcpProject`|`string`|`true`| - |GCP prosjekt ID|
 
-**eksempel:** [examples/externalSecrets.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)
+**Eksempel:** [examples/externalSecrets.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)
 
 ## ArgoKit's ConfigMap API
 
@@ -310,7 +310,7 @@ Opprett en ny `ConfigMap`.
 |`data`|`object`|`true`| - |data i `ConfigMap`|
 |`addHashToName`|`boolean`|`false`|false|om hash skal legges til navnet|
 
-**eksempel:** [examples/configMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMap.jsonnet)
+**Eksempel:** [examples/configMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMap.jsonnet)
 
 ### `argokit.appAndObjects.application.withConfigMapAsEnv()`
 Opprett en ny `ConfigMap` og legg innholdet som `env` i applikasjonen.
@@ -321,7 +321,7 @@ Opprett en ny `ConfigMap` og legg innholdet som `env` i applikasjonen.
 |`data`|`object`|`true`| - |data i `ConfigMap`|
 |`addHashToName`|`boolean`|`false`|false|om hash skal legges til navnet|
 
-**eksempel:** [examples/withConfigMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withConfigMap.jsonnet)
+**Eksempel:** [examples/withConfigMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withConfigMap.jsonnet)
 
 ### `argokit.appAndObjects.application.withConfigMapAsMount()`
 Opprett en ny `ConfigMap` og monter den som en fil i applikasjonens filsystem.
@@ -333,13 +333,13 @@ Opprett en ny `ConfigMap` og monter den som en fil i applikasjonens filsystem.
 |`data`|`object`|`true`| - |data i `ConfigMap`|
 |`addHashToName`|`boolean`|`false`|false|om hash skal legges til navnet|
 
-**eksempel:** [examples/withConfigMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withConfigMap.jsonnet)
+**Eksempel:** [examples/withConfigMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withConfigMap.jsonnet)
 
 ## ArgoKit's ExternalSecrets API
 
 
 ### `argokit.appAndObjects.application.withEnvironmentVariablesFromExternalSecret()`
-Oppretter en `ExternalSecret` og legger til miljøvariabler fra den i applikasjonen.
+Opprett en `ExternalSecret` og legg til miljøvariabler fra den i applikasjonen.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
@@ -350,40 +350,40 @@ Oppretter en `ExternalSecret` og legger til miljøvariabler fra den i applikasjo
 
 **OBS:** Enten `secrets` eller `allKeysFrom` må inneholde minst ett element.
 
-**eksempel:** [examples/externalSecrets.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)
+**Eksempel:** [examples/externalSecrets.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/externalSecrets.jsonnet)
 
 ## ArgoKit's AzureAD API
 
 ### `argokit.azureAdApplication.new()`
-Opprett en standalone `AzureADApplication`-ressurs.
+Opprett en frittstående `AzureADApplication`-ressurs.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
-|`name`|`string`|`true`| - |navn på Azure AD applikasjonen|
+|`name`|`string`|`true`| - |navn på `AzureAdApplication`-ressursen|
 |`namespace`|`string`|`false`|-|`namespace` for ressursen|
 |`groups`|`array`|`false`|[]|Azure AD grupper for `claims`|
 |`secretPrefix`|`string`|`false`|'azuread'|prefix for `secret`-navnet|
 |`allowAllUsers`|`boolean`|`false`|false|om alle brukere skal ha tilgang|
 |`logoutUrl`|`string`|`false`|-|logout URL|
 |`replyUrls`|`array`|`false`|[]|liste over reply URLs|
-|`preAuthorizedApplications`|`array`|`false`|[]|liste over pre-autoriserte applikasjoner|
+|`preAuthorizedApplications`|`array`|`false`|[]|liste over forhåndsautoriserte applikasjoner|
 
-**eksempel:** [examples/newAzureAdApplication.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/newAzureAdApplication.jsonnet)
+**Eksempel:** [examples/newAzureAdApplication.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/newAzureAdApplication.jsonnet)
 
 
 
 ### `argokit.appAndObjects.application.withAzureAdApplication()`
-Legger til en `AzureADApplication` ressurs og konfigurerer applikasjonen.
+Legg til en `AzureADApplication`-ressurs og konfigurerer applikasjonen.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
-|`name`|`string`|`true`| - |navn på Azure AD applikasjonen|
+|`name`|`string`|`true`| - |navn på `AzureAdApplication`-ressursen|
 |`namespace`|`string`|`false`|-|`namespace` for ressursen|
 |`groups`|`array`|`false`|[]|Azure AD grupper for `claims`|
 |`secretPrefix`|`string`|`false`|'azuread'|prefix for `secret` navnet|
 |`allowAllUsers`|`boolean`|`false`|false|om alle brukere skal ha tilgang|
 |`logoutUrl`|`string`|`false`|-|logout URL|
 |`replyUrls`|`array`|`false`|[]|liste over reply URLs|
-|`preAuthorizedApplications`|`array`|`false`|[]|liste over pre-autoriserte applikasjoner|
+|`preAuthorizedApplications`|`array`|`false`|[]|liste over forhåndsautoriserte applikasjoner|
 
-**eksempel:** [examples/withAzureAdApplication.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withAzureAdApplication.jsonnet)
+**Eksempel:** [examples/withAzureAdApplication.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withAzureAdApplication.jsonnet)
