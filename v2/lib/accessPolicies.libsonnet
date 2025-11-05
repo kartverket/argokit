@@ -1,5 +1,7 @@
+local v = import '../internal/validation.libsonnet';
 {
-  local rules(appname, namespace) = {
+  local rules(appname, namespace) = 
+  {
     rules+: [
       {
         application: appname,
@@ -7,8 +9,13 @@
       },
     ],
   },
+  
 
-  local ports(portname, port, protocol) = {
+  local ports(portname, port, protocol) = 
+  v.string(portname, 'portname') +
+  v.number(port, 'port') +
+  v.string(protocol, 'protocol') +
+  {
     ports: [
       {
         name: portname,
@@ -24,7 +31,10 @@
    - host: string - the hostname of the postgres instance
    - ip: string - the ip address of the postgres instance
   */
-  withOutboundPostgres(host, ip):: {
+  withOutboundPostgres(host, ip):: 
+  v.string(host, 'host') +
+  v.string(ip, 'ip') +
+  {
     application+: {
       spec+: {
         accessPolicy+: {
@@ -47,7 +57,10 @@
    - host: string - the hostname of the oracle instance
    - ip: string - the ip address of the oracle instance
   */
-  withOutboundOracle(host, ip):: {
+  withOutboundOracle(host, ip):: 
+  v.string(host, 'host') +
+  v.string(ip, 'ip') +
+  {
     application+: {
       spec+: {
         accessPolicy+: {
@@ -70,7 +83,10 @@
    - host: string - the hostname of the ssh server
    - ip: string - the ip address of the ssh server
   */
-  withOutboundSsh(host, ip):: {
+  withOutboundSsh(host, ip):: 
+  v.string(host, 'host') +
+  v.string(ip, 'ip') +
+  {
     application+: {
       spec+: {
         accessPolicy+: {
@@ -93,7 +109,10 @@
    - host: string - the hostname of the ldaps server
    - ip: string - the ip address of the ldaps server
   */
-  withOutboundLdaps(host, ip):: {
+  withOutboundLdaps(host, ip):: 
+  v.string(host, 'host') +
+  v.string(ip, 'ip') +
+  {
     application+: {
       spec+: {
         accessPolicy+: {
@@ -119,6 +138,10 @@
    - protocol: string (optional) - the protocol of the connection
   */
   withOutboundHttp(host, portname='', port=443, protocol='')::
+    v.string(host, 'host') +
+    v.string(portname, 'portname', true) +
+    v.number(port, 'port') +
+    v.string(protocol, 'protocol', true) +
     {
       local httpPolicy(portname, port, protocol) = {
         accessPolicy+: {
@@ -143,6 +166,8 @@
    - namespace: string (optional) - the namespace of the application
   */
   withOutboundSkipApp(appname, namespace='')::
+    v.string(appname, 'appname') +
+    v.string(namespace, 'namespace', true) +
     {
       local policy(appname, namespace) = {
         accessPolicy+: {
@@ -161,7 +186,10 @@
      - appname: string - the name of the application
      - namespace: string (optional) - the namespace of the application
     */
-  withInboundSkipApp(appname, namespace=''):: {
+  withInboundSkipApp(appname, namespace=''):: 
+    v.string(appname, 'appname') +
+    v.string(namespace, 'namespace', true) +
+    {
     application+: {
       spec+: {
         accessPolicy+: {
