@@ -313,7 +313,7 @@ Opprett en ny `ConfigMap`.
 **Eksempel:** [examples/configMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/configMap.jsonnet)
 
 ### `argokit.appAndObjects.application.withConfigMapAsEnv()`
-Opprett en ny `ConfigMap` og lag innholdet som `env` i applikasjonen. Hver nøkkel i `ConfigMap` blir en egen miljøvariabel med en tilsvarende verdi i applikajsonen.  
+Opprett en ny `ConfigMap` og legg innholdet som `env` i applikasjonen. Hver nøkkel i `ConfigMap` blir en egen miljøvariabel med en tilsvarende verdi i applikajsonen.  
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
