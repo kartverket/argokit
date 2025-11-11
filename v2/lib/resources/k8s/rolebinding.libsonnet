@@ -1,5 +1,5 @@
+local utils = import '../../../internal/utils.libsonnet';
 local v = import '../../../internal/validation.libsonnet';
-
 {
   new():: {
     apiVersion: 'rbac.authorization.k8s.io/v1',
@@ -15,7 +15,7 @@ local v = import '../../../internal/validation.libsonnet';
       name: 'cluster-admin',
       apiGroup: 'rbac.authorization.k8s.io',
     },
-  },
+  } + utils.withArgokitVersionAnnotation(),
 
   withUsers(users)::
     v.array(users, 'users') +
