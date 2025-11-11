@@ -1,7 +1,7 @@
 name: Update documentation
 
 on:
-  pull_request:
+  push:
 
 jobs:
   update-docs:
