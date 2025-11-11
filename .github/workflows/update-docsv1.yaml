@@ -1,0 +1,15 @@
+name: Update documentation
+
+on:
+  pull_request:
+
+jobs:
+  update-docs:
+    name: Update documentation in target repository
+    uses: kartverket/github-workflows/.github/workflows/Placeholder
+    with:
+      source_path: "is there a v1 api reference?"
+      target_path: "kartverket/skip.kartverket.no"
+      branch_name: "update-argokitv2-docs-branch"
+      author_name: "GithubActions <argokit@kartverket.no>"
+      identity: "argokit"
