@@ -12,4 +12,5 @@ jobs:
       target_path: "docs/03-applikasjon-utrulling/10-argokit/09-argokit-v1.md"
       branch_name: "update-argokitv2-docs-branch"
       author_name: "GithubActions <argokit@kartverket.no>"
-      identity: "argokit"
+      identity: "argokit" 
+      
