@@ -1,12 +1,16 @@
 name: Update documentation
 
 on:
-  pull_request:
+  push:
+
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
   update-docs:
     name: Update documentation in target repository
-    uses: kartverket/github-workflows/.github/workflows/Placeholder
+    uses: kartverket/github-workflows/.github/workflows/update-skip-docs.yaml@main
     with:
       source_path: "v2/api-reference.md"
       target_path: "docs/03-applikasjon-utrulling/10-argokit/09-argokit-v2.md"
