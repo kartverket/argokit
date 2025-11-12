@@ -6,7 +6,7 @@ on:
 jobs:
   update-docs:
     name: Update documentation in target repository
-    uses: kartverket/github-workflows/.github/workflows/Placeholder
+    uses: artverket/github-workflows/.github/workflows/update-skip-docs.yaml@feature/generic-workflow-for-docs
     with:
       source_path: "is there a v1 api reference?"
       target_path: "kartverket/skip.kartverket.no"
