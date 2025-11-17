@@ -1,9 +1,11 @@
 name: Update documentation
 
 on:
-  pull_request:
+  push:
     branches:
       - main
+    paths:
+      - 'v2/api-reference.md'
 
 permissions:
   contents: write
