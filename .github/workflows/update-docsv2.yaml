@@ -1,15 +1,15 @@
 name: Update documentation
 
 on:
-  pull_request:
+  push:
 
 jobs:
   update-docs:
     name: Update documentation in target repository
-    uses: artverket/github-workflows/.github/workflows/update-skip-docs.yaml@feature/generic-workflow-for-docs
+    uses: kartverket/github-workflows/.github/workflows/update-skip-docs.yaml@main
     with:
-      source_path: "is there a v1 api reference?"
-      target_path: "kartverket/skip.kartverket.no"
+      source_path: "v2/api-reference.md"
+      target_path: "docs/03-applikasjon-utrulling/10-argokit/09-argokit-v2.md"
       branch_name: "update-argokitv2-docs-branch"
       author_name: "GithubActions <argokit@kartverket.no>"
       identity: "argokit"
