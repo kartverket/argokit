@@ -1,5 +1,5 @@
-local environment = import '../lib/environment.libsonnet';
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
+local environment = import '../lib/environment.libsonnet';
 
 {
   Env: environment,
@@ -86,6 +86,8 @@ local accessPolicies = import '../lib/accessPolicies.libsonnet';
       } for secret in input.secrets],
       [if input.allKeysFrom != null then 'dataFrom']: [{
         extract: {
+          conversionStrategy: 'Default',
+          decodingStrategy: 'None',
           key: secret.fromSecret,
           metadataPolicy: 'None',
         },
