@@ -50,7 +50,7 @@ local v = import '../../internal/validation.libsonnet';
               metadataPolicy: 'None',
             },
           } for secret in allKeysFrom],
-          refreshInterval: '1h',
+          refreshInterval: '1h0m0s',
           secretStoreRef: {
             kind: 'SecretStore',
             name: secretStoreRef,

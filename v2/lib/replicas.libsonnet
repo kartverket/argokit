@@ -1,5 +1,5 @@
+local v = import '../internal/validation.libsonnet';
 {
-
   /**
   Setup for replicas
   You can set static replicas
@@ -12,17 +12,22 @@
    - targetCpuUtilization: int (optional) - maximum cpu utilization before increasing current replicas
    - targetMemoryUtilization: int (optional) - maximum memory utilization before increasing current replicas
   */
-  withReplicas(initial, max='', targetCpuUtilization=80, targetMemoryUtilization=''): {
+  withReplicas(initial=2, max=null, targetCpuUtilization=80, targetMemoryUtilization=null): 
+  v.number(initial, 'initial') +
+  v.number(max, 'max', true) +
+  v.number(targetCpuUtilization, 'targetCpuUtilization') +
+  v.number(targetMemoryUtilization, 'targetMemoryUtilization', true) + 
+  {
     application+: {
       spec+:
-        if max != '' && initial != max then
+        if max != null && initial != max then
           {
-            replicas: {
+            replicas: std.prune({
               min: initial,
               max: max,
               targetCpuUtilization: targetCpuUtilization,
-              [if targetMemoryUtilization != '' then 'targetMemoryUtilization']: targetMemoryUtilization,
-            },
+              targetMemoryUtilization: targetMemoryUtilization
+            }),
           }
         else
           {

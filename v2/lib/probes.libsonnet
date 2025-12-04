@@ -1,9 +1,12 @@
+local v = import '../internal/validation.libsonnet';
 {
   /**
   Liveness probes define a resource that returns 200 OK when the app is running as intended.
   Returning a non-200 code will make kubernetes restart the app.
   	*/
-  withLiveness(probe):: {
+  withLiveness(probe):: 
+  v.object(probe, 'probe') +
+  {
     application+: {
       spec+: { liveness: probe },
     },
@@ -13,7 +16,9 @@
    Readiness probes define a resource that returns 200 OK when the app is running as intended. Kubernetes will wait
    until the resource returns 200 OK before 	marking the pod as Running and progressing with the deployment strategy.
    	*/
-  withReadiness(probe):: {
+  withReadiness(probe):: 
+  v.object(probe, 'probe') +
+  {
     application+: {
       spec+: { readiness: probe },
     },
@@ -24,7 +29,9 @@
   application startup. This can be used to adopt liveness checks on slow starting containers, avoiding them	getting
   killed by Kubernetes before they are up and running.
   */
-  withStartup(probe):: {
+  withStartup(probe):: 
+  v.object(probe, 'probe') +
+  {
     application+: {
       spec+: { startup: probe },
     },
@@ -40,7 +47,13 @@
    - timeout: int (optional, default=1) - timeout of the resource
    - initialDelay: int (optional, default=0) - how long to wait after startup before starting probing
   */
-  probe(path, port, failureThreshold=3, timeout=1, initialDelay=0):: {
+  probe(path, port, failureThreshold=3, timeout=1, initialDelay=0):: 
+  v.string(path, 'path') + 
+  v.number(port, 'port') +
+  v.number(failureThreshold, 'failureThreshold', true) +
+  v.number(timeout, 'timeout', true) +
+  v.number(initialDelay, 'initialDelay', true) +
+  {
     path: path,
     port: port,
     failureThreshold: failureThreshold,

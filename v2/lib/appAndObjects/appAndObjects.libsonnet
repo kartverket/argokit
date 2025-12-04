@@ -10,6 +10,7 @@ local routing = import '../routing.libsonnet';
 local azureAdApplication = import './azureAdApplication.libsonnet';
 local configMap = import './configMap.libsonnet';
 local templates = import './templates.libsonnet';
+local utils = import './utils.libsonnet';
 
 local azureAdApplication = import './azureAdApplication.libsonnet';
 local externalSecrets = import './externalSecrets.libsonnet';
@@ -41,5 +42,6 @@ local externalSecrets = import './externalSecrets.libsonnet';
                + probes
                + azureAdApplication
                + configMap
-               + externalSecrets,
+               + externalSecrets
+               + utils,
 }

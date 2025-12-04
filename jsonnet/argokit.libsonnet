@@ -90,7 +90,7 @@ local accessPolicies = import '../lib/accessPolicies.libsonnet';
           metadataPolicy: 'None',
         },
       } for secret in input.allKeysFrom],
-      refreshInterval: '1h',
+      refreshInterval: '1h0m0s',
       secretStoreRef: {
         kind: 'SecretStore',
         name: 'gsm',

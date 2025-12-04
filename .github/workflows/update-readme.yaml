@@ -6,7 +6,7 @@ on:
       - main
       - updated-documentation
     paths:
-      - "v2/README.md"
+      - "v2/api-reference.md"
 jobs:
   sync-docs:
     name: Update target repository
@@ -16,20 +16,20 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f # v1.0.0 from https://skip.kartverket.no/docs/applikasjon-utrulling/argo-cd/hva-er-et-apps-repo
+      - uses: octo-sts/action@d6c70ad3b9ac85df6da6b9749014d7283987cfec # v1.0.0 from https://skip.kartverket.no/docs/applikasjon-utrulling/argo-cd/hva-er-et-apps-repo
         id: octo-sts
         with:
           scope: kartverket/skip.kartverket.no
           identity: argokit
 
       - name: Checkout source repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: source
           persist-credentials: false
 
       - name: Checkout target repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: target
           repository: kartverket/skip.kartverket.no
@@ -41,7 +41,7 @@ jobs:
           cp source/v2/api-reference.md target/docs/03-applikasjon-utrulling/10-argokit/09-argokit-v2.md
 
       - name: Create PR
-        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e
+        uses: peter-evans/create-pull-request@84ae59a2cdc2258d6fa0732dd66352dddae2a412
         with:
           path: target
           token: ${{ steps.octo-sts.outputs.token }}
