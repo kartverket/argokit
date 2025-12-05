@@ -16,32 +16,32 @@ local azureAdApplication = import './azureAdApplication.libsonnet';
 local externalSecrets = import './externalSecrets.libsonnet';
 {
   application: {
-                 new(name, image, port):
-                   v.string(name, 'name') +
-                   v.string(image, 'image') +
-                   v.number(port, 'port') +
-                   templates.AppAndObjects {
-                     application:: {
-                       apiVersion: 'skiperator.kartverket.no/v1alpha1',
-                       kind: 'Application',
-                       metadata: {
-                         name: name,
-                       },
-                       spec+: std.prune({
-                         image: image,
-                         port: port,
-                       },),
-                     } + utils.withArgokitVersionLabel('v2'),
-                     objects:: [],
-                   },
-               }
-               + ingress
-               + replicas
-               + environment
-               + accessPolicies
-               + probes
-               + azureAdApplication
-               + configMap
-               + externalSecrets
-               + utils,
+    new(name, image, port):
+      v.string(name, 'name') +
+      v.string(image, 'image') +
+      v.number(port, 'port') +
+      templates.AppAndObjects {
+        application:: {
+          apiVersion: 'skiperator.kartverket.no/v1alpha1',
+          kind: 'Application',
+          metadata: {
+            name: name,
+          },
+          spec+: std.prune({
+            image: image,
+            port: port,
+          },),
+        } + utils.withArgokitVersionLabel('v2'),
+        objects:: [],
+      },
+  }
+  + ingress
+  + replicas
+  + environment
+  + accessPolicies
+  + probes
+  + azureAdApplication
+  + configMap
+  + externalSecrets
+  + utils,
 }
