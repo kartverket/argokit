@@ -1,4 +1,4 @@
-local utils = import '../../internal/utils.libsonnet';
+local internalUtils = import '../../internal/utils.libsonnet';
 local v = import '../../internal/validation.libsonnet';
 local accessPolicies = import '../accessPolicies.libsonnet';
 local appAndObjects = import '../appAndObjects.libsonnet';
@@ -34,7 +34,7 @@ local externalSecrets = import './externalSecrets.libsonnet';
         } + utils.withArgokitVersionLabel('v2'),
         objects:: [],
       },
-  } + utils.withArgokitVersionLabel(false)
+  } + internalUtils.withArgokitVersionLabel(false)
   + ingress
   + replicas
   + environment
