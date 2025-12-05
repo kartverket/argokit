@@ -31,7 +31,7 @@ local externalSecrets = import './externalSecrets.libsonnet';
             image: image,
             port: port,
           },),
-        } + utils.withArgokitVersionLabel('v2'),
+        },
         objects:: [],
       },
   } + internalUtils.withArgokitVersionLabel(false)
