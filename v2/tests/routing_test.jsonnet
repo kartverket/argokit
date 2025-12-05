@@ -1,6 +1,6 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
-
+local utils = import '../internal/utils.libsonnet';
 
 local expected = {
   apiVersion: 'skiperator.kartverket.no/v1alpha1',
@@ -25,7 +25,7 @@ local expected = {
       },
     ],
   },
-};
+} + utils.withArgokitVersionLabel(false);
 
 
 local actual =

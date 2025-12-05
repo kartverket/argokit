@@ -30,7 +30,7 @@ local utils = import '../../internal/utils.libsonnet';
       name: 'cluster-admin',
       apiGroup: 'rbac.authorization.k8s.io',
     },
-  } + utils.withArgokitVersionLabel(false),
+  } + utils.withArgokitVersionLabel(true),
   NamespaceAdminGroup(groupName): {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'RoleBinding',
@@ -52,7 +52,7 @@ local utils = import '../../internal/utils.libsonnet';
       name: 'cluster-admin',
       apiGroup: 'rbac.authorization.k8s.io',
     },
-  } + utils.withArgokitVersionLabel(false),
+  } + utils.withArgokitVersionLabel(true),
   GSMSecretStore(gcpProject): {
     apiVersion: 'external-secrets.io/v1',
     kind: 'SecretStore',
@@ -66,7 +66,7 @@ local utils = import '../../internal/utils.libsonnet';
         },
       },
     },
-  } + utils.withArgokitVersionLabel(false),
+  } + utils.withArgokitVersionLabel(true),
   GSMSecret(name): {
     local input = self,
     secrets:: null,
@@ -100,14 +100,14 @@ local utils = import '../../internal/utils.libsonnet';
         name: name,
       },
     },
-  } + utils.withArgokitVersionLabel(false),
+  } + utils.withArgokitVersionLabel(true),
   Application(name): {
     apiVersion: 'skiperator.kartverket.no/v1alpha1',
     kind: 'Application',
     metadata: {
       name: name,
     },
-  } + utils.withArgokitVersionLabel(false),
+  } + utils.withArgokitVersionLabel(true),
   ManifestsFrom: function(elements) {
     apiVersion: 'v1',
     kind: 'List',

@@ -1,6 +1,6 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local application = argokit.appAndObjects.application;
-
+local utils = import '../internal/utils.libsonnet';
 
 application.new('app', 'foo.io/image', 8080)
 
@@ -25,5 +25,5 @@ application.new('app', 'foo.io/image', 8080)
         },
       },
     },
-  },
+  } + utils.withArgokitVersionLabel(false),
 )
