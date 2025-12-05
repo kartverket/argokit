@@ -25,7 +25,7 @@ local expected = {
       },
     ],
   },
-} + utils.withArgokitVersionLabel(false);
+} + utils.withArgokitVersionLabel(false, 'v2');
 
 
 local actual =

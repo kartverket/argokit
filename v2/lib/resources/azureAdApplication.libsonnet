@@ -40,5 +40,5 @@ local v = import '../../internal/validation.libsonnet';
         [if logoutUrl != '' then 'logoutUrl']: logoutUrl,
         [if std.length(preAuthorizedApplications) > 0 then 'preAuthorizedApplications']: preAuthorizedApplications,
       } + (if std.length(groups) > 0 then { claims: { groups: groups } } else {}),
-    } + utils.withArgokitVersionLabel(),
+    } + utils.withArgokitVersionLabel(false ,'v2'),
 }
