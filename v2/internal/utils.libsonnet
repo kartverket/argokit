@@ -1,11 +1,11 @@
 local ArgoKitVersionSHA = importstr '../../.git/refs/heads/main';
 
 {
-  withArgokitVersionAnnotation():
+  withArgokitVersionLabel():
     {
       metadata+: {
         labels+: {
-          'skip.kartverket.no/argokit-version': std.stripChars(ArgoKitVersionSHA, '\n'),
+          'skip.kartverket.no/argokit-git-ref': std.stripChars(ArgoKitVersionSHA, '\n'),
         },
       },
     },
