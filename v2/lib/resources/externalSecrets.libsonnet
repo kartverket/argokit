@@ -61,6 +61,6 @@ local v = import '../../internal/validation.libsonnet';
             name: name,
           },
         },
-      }
-  } + utils.withArgokitVersionLabel(false, 'v2'),
+      } + utils.withArgokitVersionLabel(false, 'v2'),
+  } 
 }

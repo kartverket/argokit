@@ -6,6 +6,6 @@ local internalUtils = import '../../internal/utils.libsonnet';
     apiVersion: 'v1',
     kind: 'List',
 
-    items: std.sort([self.application + internalUtils.withArgokitVersionLabel(false)] + self.objects, keyF=function(x) x.metadata.name),
+    items: std.sort([self.application + internalUtils.withArgokitVersionLabel(false, 'v2')] + self.objects, keyF=function(x) x.metadata.name),
   },
 }
