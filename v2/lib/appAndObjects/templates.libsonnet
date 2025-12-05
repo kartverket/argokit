@@ -1,10 +1,11 @@
 local hooks = import './configHooks.libsonnet';
+local internalUtils = import '../../internal/utils.libsonnet';
 
 {
   AppAndObjects:: {
     apiVersion: 'v1',
     kind: 'List',
 
-    items: std.sort([self.application] + self.objects, keyF=function(x) x.metadata.name),
+    items: std.sort([self.application + internalUtils.withArgokitVersionLabel(false)] + self.objects, keyF=function(x) x.metadata.name),
   },
 }
