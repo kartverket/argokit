@@ -46,6 +46,8 @@ local v = import '../../internal/validation.libsonnet';
           } for secret in secrets],
           [if std.length(allKeysFrom) > 0 then 'dataFrom']: [{
             extract: {
+              conversionStrategy: 'Default',
+              decodingStrategy: 'None',
               key: secret.fromSecret,
               metadataPolicy: 'None',
             },
