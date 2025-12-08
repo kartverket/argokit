@@ -157,7 +157,7 @@ local utils = import '../internal/utils.libsonnet';
             },
           },
         },
-      } + utils.withArgokitVersionLabel(false, 'v1'),
+      } + utils.withArgokitVersionLabel(true, 'v1'),
       argokit.GSMSecret(instanceSecretName) {
         allKeysFrom: [
           {

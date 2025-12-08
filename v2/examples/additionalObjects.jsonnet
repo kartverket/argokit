@@ -25,5 +25,5 @@ application.new('app', 'foo.io/image', 8080)
         },
       },
     },
-  } + utils.withArgokitVersionLabel(false),
+  } + utils.withArgokitVersionLabel(false, 'v2'),
 )
