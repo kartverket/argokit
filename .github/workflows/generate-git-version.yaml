@@ -1,0 +1,34 @@
+name: Generate Git Version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'version.libsonnet'
+jobs:
+  generate-git-version:
+    name: Generate Git Version
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Jsonnet
+        uses: jsonnet-bundler/setup-jsonnet@v1
+        with:
+          jsonnet-version: '0.18.0'
+
+      - name: Generate version
+        run: ./version.libsonnet
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add version.libsonnet
+          git commit -m "chore: Update version.libsonnet with latest Git SHA" || echo "No changes to commit"
+          git push origin main
