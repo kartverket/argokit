@@ -16,7 +16,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: octo-sts/action@d6c70ad3b9ac85df6da6b9749014d7283987cfec # v1.0.0 from https://skip.kartverket.no/docs/applikasjon-utrulling/argo-cd/hva-er-et-apps-repo
+      - uses: octo-sts/action@f603d3be9d8dd9871a265776e625a27b00effe05 # v1.0.0 from https://skip.kartverket.no/docs/applikasjon-utrulling/argo-cd/hva-er-et-apps-repo
         id: octo-sts
         with:
           scope: kartverket/skip.kartverket.no
@@ -41,7 +41,7 @@ jobs:
           cp source/v2/api-reference.md target/docs/03-applikasjon-utrulling/10-argokit/09-argokit-v2.md
 
       - name: Create PR
-        uses: peter-evans/create-pull-request@84ae59a2cdc2258d6fa0732dd66352dddae2a412
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676
         with:
           path: target
           token: ${{ steps.octo-sts.outputs.token }}
