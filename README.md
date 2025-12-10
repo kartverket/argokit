@@ -46,6 +46,10 @@ updates:
 With this configuration, dependabot will automatically create a PR to update the
 ArgoKit version once a day provided that a new version has been released.
 
+## Version tracking
+
+ArgoKit automatically tracks version information in deployed resources. When developing locally or testing branches, run `./generate-version.sh` to update version metadata. See [VERSION_GENERATION.md](VERSION_GENERATION.md) for details.
+
 ## Usage with jsonnet
 
 If you use jsonnet in your apps-repo, you can use the ArgoKit library to deploy
