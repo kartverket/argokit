@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'version.libsonnet'
+
 jobs:
   generate-git-version:
     name: Generate Git Version
@@ -16,19 +15,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Set up Jsonnet
-        uses: jsonnet-bundler/setup-jsonnet@v1
         with:
-          jsonnet-version: '0.18.0'
+          fetch-depth: 0  # Fetch all history for tags
 
       - name: Generate version
-        run: ./version.libsonnet
+        run: ./generate-version.sh
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet version.libsonnet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add version.libsonnet
-          git commit -m "chore: Update version.libsonnet with latest Git SHA" || echo "No changes to commit"
+          git commit -m "chore: Update version.libsonnet [skip ci]"
           git push origin main
