@@ -2,8 +2,12 @@ name: Generate Git Version
 
 on:
   push:
+    tags:
+      - '*'
     branches:
       - main
+    paths-ignore:
+      - version.libsonnet
 
 jobs:
   generate-git-version:
