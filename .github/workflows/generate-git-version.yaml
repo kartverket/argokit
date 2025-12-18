@@ -23,12 +23,11 @@ jobs:
 
       - name: Check for changes
         id: check_changes
+        shell: bash
         run: |
-          if git diff --quiet version.libsonnet; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
+          git diff --quiet -- version.libsonnet 2>/dev/null \
+            && echo "changed=false" >> "$GITHUB_OUTPUT" \
+            || echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Commit and push changes
         if: steps.check_changes.outputs.changed == 'true'
