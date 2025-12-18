@@ -1,7 +1,7 @@
 local version = import '../../version.libsonnet';
 
 {
-  withArgokitVersionLabel(versionDeprecated=null, flavor='v2'):
+  withArgokitVersionLabel(versionDeprecated=false, flavor='v2'):
     {
       metadata+: {
         labels+: {
