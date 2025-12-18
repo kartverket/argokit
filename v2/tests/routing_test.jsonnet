@@ -1,12 +1,16 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
-local utils = import '../internal/utils.libsonnet';
 
 local expected = {
   apiVersion: 'skiperator.kartverket.no/v1alpha1',
   kind: 'Routing',
   metadata: {
     name: 'myapp-routing',
+    labels: {
+      'skip.kartverket.no/argokit-git-ref': '58ac182fa0f09a1fd7e0997d519207d1b80fc61c',
+      'skip.kartverket.no/argokit-tag': 'dev-dirty',
+      'skip.kartverket.no/argokit-flavor': 'v2',
+    },
   },
   spec: {
     hostname: 'myhostname',
@@ -25,7 +29,7 @@ local expected = {
       },
     ],
   },
-} + utils.withArgokitVersionLabel(false, 'v2');
+};
 
 
 local actual =
