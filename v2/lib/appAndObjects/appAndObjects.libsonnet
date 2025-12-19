@@ -11,7 +11,7 @@ local azureAdApplication = import './azureAdApplication.libsonnet';
 local configMap = import './configMap.libsonnet';
 local templates = import './templates.libsonnet';
 local utils = import './utils.libsonnet';
-
+local resources = import '../specResources.libsonnet';
 local azureAdApplication = import './azureAdApplication.libsonnet';
 local externalSecrets = import './externalSecrets.libsonnet';
 {
@@ -43,5 +43,6 @@ local externalSecrets = import './externalSecrets.libsonnet';
   + azureAdApplication
   + configMap
   + externalSecrets
-  + utils,
+  + utils
+  + resources,
 }
