@@ -27,10 +27,9 @@ jobs:
       - name: Install jsonnet-bundler
         run: |
           JB_VERSION="0.5.1"
-          curl -sLo jb.tar.gz "https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v${JB_VERSION}/jb-linux-amd64.tar.gz"
-          tar -xzf jb.tar.gz
+          curl -sLo jb "https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v${JB_VERSION}/jb-linux-amd64"
+          chmod +x jb
           sudo mv jb /usr/local/bin/
-          rm jb.tar.gz
 
       - name: Generate version
         run: ./generate-version.sh
