@@ -24,8 +24,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jsonnet
 
+      - name: Install jsonnet-bundler
+        run: |
+          JB_VERSION="0.5.1"
+          curl -sLo jb.tar.gz "https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v${JB_VERSION}/jb-linux-amd64.tar.gz"
+          tar -xzf jb.tar.gz
+          sudo mv jb /usr/local/bin/
+          rm jb.tar.gz
+
       - name: Generate version
         run: ./generate-version.sh
+
+      - name: Install test dependencies
+        working-directory: v2
+        run: jb install
 
       - name: Run v2 tests
         working-directory: v2
