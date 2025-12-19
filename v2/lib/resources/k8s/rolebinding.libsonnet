@@ -15,7 +15,7 @@ local v = import '../../../internal/validation.libsonnet';
       name: 'cluster-admin',
       apiGroup: 'rbac.authorization.k8s.io',
     },
-  } + utils.withArgokitVersionLabel(false, 'v2'),
+  } + utils.withArgokitVersionLabel(flavor='v2'),
 
   withUsers(users)::
     v.array(users, 'users') +

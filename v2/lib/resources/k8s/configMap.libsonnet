@@ -23,7 +23,7 @@ local hashConfigMap() = {
         name: name + '-configmap',
       },
       data: data,
-    } + utils.withArgokitVersionLabel(false, 'v2')
+    } + utils.withArgokitVersionLabel(flavor='v2')
     + if addHashToName then hashConfigMap() else {},
 
 }

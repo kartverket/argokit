@@ -20,7 +20,7 @@ local v = import '../../internal/validation.libsonnet';
           },
         },
       }
-  } + utils.withArgokitVersionLabel(false, 'v2'),
+  } + utils.withArgokitVersionLabel(flavor='v2'),
   secret: {
     new(name, secrets=[], allKeysFrom=[], secretStoreRef='gsm')::
       v.string(name, 'name') +
@@ -61,6 +61,6 @@ local v = import '../../internal/validation.libsonnet';
             name: name,
           },
         },
-      } + utils.withArgokitVersionLabel(false, 'v2'),
+      } + utils.withArgokitVersionLabel(flavor='v2'),
   } 
 }

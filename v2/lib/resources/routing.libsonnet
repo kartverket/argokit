@@ -17,7 +17,7 @@ local v = import '../../internal/validation.libsonnet';
         hostname: hostname,
         routes: [],
       },
-    } + utils.withArgokitVersionLabel(false, 'v2'),
+    } + utils.withArgokitVersionLabel(flavor='v2'),
   withRoute(pathPrefix, targetApp, rewriteUri, port=null)::
     v.string(pathPrefix, 'pathPrefix') +
     v.string(targetApp, 'targetApp') +

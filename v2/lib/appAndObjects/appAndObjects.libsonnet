@@ -34,7 +34,7 @@ local externalSecrets = import './externalSecrets.libsonnet';
         },
         objects:: [],
       },
-  } + internalUtils.withArgokitVersionLabel(false, 'v2')
+  } + internalUtils.withArgokitVersionLabel(flavor='v2')
   + ingress
   + replicas
   + environment
