@@ -1,4 +1,6 @@
+local utils = import '../../internal/utils.libsonnet';
 local v = import '../../internal/validation.libsonnet';
+
 {
   store: {
     new(name='gsm', gcpProject):
@@ -17,8 +19,8 @@ local v = import '../../internal/validation.libsonnet';
             },
           },
         },
-      },
-  },
+      }
+  } + utils.withArgokitVersionLabel(flavor='v2'),
   secret: {
     new(name, secrets=[], allKeysFrom=[], secretStoreRef='gsm')::
       v.string(name, 'name') +
@@ -59,6 +61,6 @@ local v = import '../../internal/validation.libsonnet';
             name: name,
           },
         },
-      },
-  },
+      } + utils.withArgokitVersionLabel(flavor='v2'),
+  } 
 }

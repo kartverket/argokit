@@ -1,4 +1,5 @@
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
+local utils = import '../v2/internal/utils.libsonnet';
 local environment = import '../lib/environment.libsonnet';
 
 {
@@ -29,7 +30,7 @@ local environment = import '../lib/environment.libsonnet';
       name: 'cluster-admin',
       apiGroup: 'rbac.authorization.k8s.io',
     },
-  },
+  } + utils.withArgokitVersionLabel(true, 'v1'),
   NamespaceAdminGroup(groupName): {
     apiVersion: 'rbac.authorization.k8s.io/v1',
     kind: 'RoleBinding',
@@ -51,7 +52,7 @@ local environment = import '../lib/environment.libsonnet';
       name: 'cluster-admin',
       apiGroup: 'rbac.authorization.k8s.io',
     },
-  },
+  } + utils.withArgokitVersionLabel(true, 'v1'),
   GSMSecretStore(gcpProject): {
     apiVersion: 'external-secrets.io/v1',
     kind: 'SecretStore',
@@ -65,7 +66,7 @@ local environment = import '../lib/environment.libsonnet';
         },
       },
     },
-  },
+  } + utils.withArgokitVersionLabel(true, 'v1'),
   GSMSecret(name): {
     local input = self,
     secrets:: null,
@@ -101,14 +102,14 @@ local environment = import '../lib/environment.libsonnet';
         name: name,
       },
     },
-  },
+  } + utils.withArgokitVersionLabel(true, 'v1'),
   Application(name): {
     apiVersion: 'skiperator.kartverket.no/v1alpha1',
     kind: 'Application',
     metadata: {
       name: name,
     },
-  },
+  } + utils.withArgokitVersionLabel(true, 'v1'),
   ManifestsFrom: function(elements) {
     apiVersion: 'v1',
     kind: 'List',

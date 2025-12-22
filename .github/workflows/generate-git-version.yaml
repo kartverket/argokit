@@ -1,0 +1,43 @@
+name: Generate Git Version
+
+on:
+  push:
+    tags:
+      - '*'
+    branches:
+      - main
+    paths-ignore:
+      - version.libsonnet
+
+jobs:
+  generate-git-version:
+    name: Generate Git Version
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0  # Fetch all history for tags
+
+      - name: Generate version
+        run: ./generate-version.sh
+
+      - name: Check for changes
+        id: check_changes
+        shell: bash
+        run: |
+          git diff --quiet -- version.libsonnet 2>/dev/null \
+            && echo "changed=false" >> "$GITHUB_OUTPUT" \
+            || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add version.libsonnet
+          git commit -m "chore: Update version.libsonnet [skip ci]"
+          git push origin main

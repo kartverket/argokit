@@ -1,3 +1,4 @@
+local utils = import '../../../internal/utils.libsonnet';
 local v = import '../../../internal/validation.libsonnet';
 
 local hashConfigMap() = {
@@ -22,5 +23,7 @@ local hashConfigMap() = {
         name: name + '-configmap',
       },
       data: data,
-    } + if addHashToName then hashConfigMap() else {},
+    } + utils.withArgokitVersionLabel(flavor='v2')
+    + if addHashToName then hashConfigMap() else {},
+
 }

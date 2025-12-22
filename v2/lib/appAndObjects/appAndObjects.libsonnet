@@ -1,3 +1,4 @@
+local internalUtils = import '../../internal/utils.libsonnet';
 local v = import '../../internal/validation.libsonnet';
 local accessPolicies = import '../accessPolicies.libsonnet';
 local appAndObjects = import '../appAndObjects.libsonnet';
@@ -15,32 +16,32 @@ local azureAdApplication = import './azureAdApplication.libsonnet';
 local externalSecrets = import './externalSecrets.libsonnet';
 {
   application: {
-                 new(name, image, port):
-                   v.string(name, 'name') +
-                   v.string(image, 'image') +
-                   v.number(port, 'port') +
-                   templates.AppAndObjects {
-                     application:: {
-                       apiVersion: 'skiperator.kartverket.no/v1alpha1',
-                       kind: 'Application',
-                       metadata: {
-                         name: name,
-                       },
-                       spec+: std.prune({
-                         image: image,
-                         port: port,
-                       },),
-                     },
-                     objects:: [],
-                   },
-               }
-               + ingress
-               + replicas
-               + environment
-               + accessPolicies
-               + probes
-               + azureAdApplication
-               + configMap
-               + externalSecrets
-               + utils,
+    new(name, image, port):
+      v.string(name, 'name') +
+      v.string(image, 'image') +
+      v.number(port, 'port') +
+      templates.AppAndObjects {
+        application:: {
+          apiVersion: 'skiperator.kartverket.no/v1alpha1',
+          kind: 'Application',
+          metadata: {
+            name: name,
+          },
+          spec+: std.prune({
+            image: image,
+            port: port,
+          },),
+        },
+        objects:: [],
+      },
+  } + internalUtils.withArgokitVersionLabel(flavor='v2')
+  + ingress
+  + replicas
+  + environment
+  + accessPolicies
+  + probes
+  + azureAdApplication
+  + configMap
+  + externalSecrets
+  + utils,
 }

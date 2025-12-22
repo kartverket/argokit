@@ -1,4 +1,5 @@
 local argokit = import './argokit.libsonnet';
+local utils = import '../internal/utils.libsonnet';
 {
   dbArchiveJob(
     instanceName,
@@ -156,7 +157,7 @@ local argokit = import './argokit.libsonnet';
             },
           },
         },
-      },
+      } + utils.withArgokitVersionLabel(false, 'v1'),
       argokit.GSMSecret(instanceSecretName) {
         allKeysFrom: [
           {
