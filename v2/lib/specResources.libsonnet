@@ -14,12 +14,13 @@ local memSuffixes = ['Ei', 'Pi', 'Ti', 'Gi', 'Mi', 'Ki', 'E', 'P', 'T', 'G', 'M'
 // Validate if string contains only digits and optional single decimal point
 local isNumericString(s, allowDecimal=true) =
   local chars = std.stringChars(s);
-  local digitChars = std.filter(function(c) c >= '0' && c <= '9', chars);
+  local validChars = std.filter(function(c) (c >= '0' && c <= '9') || c == '.', chars);
   local dotCount = std.length(std.filter(function(c) c == '.', chars));
   !std.startsWith(s, "-")
-  && std.length(digitChars) > 0
+  && std.length(validChars) > 0
   && (if allowDecimal then dotCount <= 1 else dotCount == 0)
-  && std.length(chars) - std.length(digitChars) <= (if allowDecimal then 1 else 0);
+  && std.length(validChars) == std.length(chars)
+  && std.length(chars) - dotCount > 0;
 
 // Get the memory suffix if present
 local getMemorySuffix(mem) =
