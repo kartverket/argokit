@@ -29,15 +29,17 @@ jobs:
         id: check_changes
         shell: bash
         run: |
-          git diff --quiet -- version.libsonnet 2>/dev/null \
-            && echo "changed=false" >> "$GITHUB_OUTPUT" \
-            || echo "changed=true" >> "$GITHUB_OUTPUT"
+          git add version.libsonnet
+          if git diff --cached --quiet -- version.libsonnet 2>/dev/null; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Commit and push changes
         if: steps.check_changes.outputs.changed == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add version.libsonnet
           git commit -m "chore: Update version.libsonnet [skip ci]"
           git push origin main
