@@ -83,3 +83,15 @@ test.new(std.thisFile)
     expected=false
   ),
 )
++ test.case.new(
+  name='Routing has deprecated label when marked as deprecated',
+  test=(
+    local deprecatedRouting = 
+      argokit.routing.new('myapp-routing', 'myhostname')
+      + utils.withArgokitVersionLabel(versionDeprecated=true, flavor='v2');
+    test.expect.eq(
+      actual=deprecatedRouting.metadata.labels['skip.kartverket.no/argokit-deprecated-version'],
+      expected='true'
+    )
+  ),
+)
