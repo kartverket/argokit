@@ -39,18 +39,22 @@ local v = import '../../internal/validation.libsonnet';
         spec: {
           [if std.length(secrets) > 0 then 'data']: [{
             secretKey: secret.toKey,
-            remoteRef: {
+            remoteRef: std.prune({
+              conversionStrategy: std.get(secret, 'conversionStrategy', 'Default'),
+              decodingStrategy: std.get(secret, 'decodingStrategy', 'None'),
               key: secret.fromSecret,
-              metadataPolicy: 'None',
-            },
+              metadataPolicy: std.get(secret, 'metadataPolicy', 'None'),
+              property: std.get(secret, 'property', null),
+            }),
           } for secret in secrets],
           [if std.length(allKeysFrom) > 0 then 'dataFrom']: [{
-            extract: {
-              conversionStrategy: 'Default',
-              decodingStrategy: 'None',
+            extract: std.prune({
+              conversionStrategy: std.get(secret, 'conversionStrategy', 'Default'),
+              decodingStrategy: std.get(secret, 'decodingStrategy', 'None'),
               key: secret.fromSecret,
-              metadataPolicy: 'None',
-            },
+              metadataPolicy: std.get(secret, 'metadataPolicy', 'None'),
+              property: std.get(secret, 'property', null),
+            }),
           } for secret in allKeysFrom],
           refreshInterval: '1h0m0s',
           secretStoreRef: {
