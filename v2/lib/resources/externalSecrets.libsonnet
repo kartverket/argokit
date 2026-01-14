@@ -22,8 +22,9 @@ local v = import '../../internal/validation.libsonnet';
       }
   } + utils.withArgokitVersionLabel(flavor='v2'),
   secret: {
-    new(name, secrets=[], allKeysFrom=[], secretStoreRef='gsm')::
+    new(name, creationPolicy=null, secrets=[], allKeysFrom=[], secretStoreRef='gsm')::
       v.string(name, 'name') +
+      (if creationPolicy != null then v.string(creationPolicy, 'creationPolicy') else {}) +
       v.array(secrets, 'secrets', allowEmpty=true) +
       v.array(allKeysFrom, 'allKeysFrom', allowEmpty=true) +
       v.string(secretStoreRef, 'secretStoreRef', allowEmpty=true) +
@@ -61,9 +62,10 @@ local v = import '../../internal/validation.libsonnet';
             kind: 'SecretStore',
             name: secretStoreRef,
           },
-          target: {
+          target: std.prune({
             name: name,
-          },
+            creationPolicy: creationPolicy,
+          }),
         },
       } + utils.withArgokitVersionLabel(flavor='v2'),
   } 
