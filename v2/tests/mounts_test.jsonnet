@@ -14,7 +14,7 @@ local combinedMountApp =
 test.new(std.thisFile)
 
 + test.case.new(
-  name='withSecretAsFileMount adds correct filesFrom entry',
+  name='withSecretAsMount adds correct filesFrom entry',
   test=test.expect.eqDiff(
     actual=secretMountApp.items[0].spec.filesFrom[0],
     expected={
