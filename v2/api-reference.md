@@ -344,9 +344,11 @@ Opprett en `ExternalSecret` og legg til miljøvariabler fra den i applikasjonen.
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
 |`name`|`string`|`true`| - |navn på `ExternalSecret`|
-|`secrets`|`array`|`false`|[]|array av secret objekter med {`toKey`, `fromSecret`}|
+| `creationPolicy` | `string | null` | `false` | `null` | styrer `spec.target.creationPolicy`. Når `null`/utelatt blir feltet **ikke** med i manifestet. |
+|`secrets`|`array`|`false`|[]|array av secret objekter med {`toKey` (påkrevd), `fromSecret` (påkrevd), `property`, `decodingStrategy`, `conversionStrategy`, `metadataPolicy`}|
 |`allKeysFrom`|`array`|`false`|[]|array av secret objekter med {`fromSecret`} for å hente alle `keys`|
 |`secretStoreRef`|`string`|`false`|'gsm'|navn på `store`|
+
 
 **OBS:** Enten `secrets` eller `allKeysFrom` må inneholde minst ett element.
 
