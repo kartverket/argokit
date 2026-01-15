@@ -38,6 +38,30 @@ Sett replikaer for en applikasjon med autoskalering basert på CPU og minne.
 
 **Eksempel:** [examples/replicas.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas.jsonnet)
 
+## ArgoKit's Resources API
+
+Konfigurer CPU og minneressurser for applikasjoner. Requests definerer minimumsressurser containeren trenger, mens limits definerer maksimalressurser containeren kan bruke.
+
+### `argokit.appAndObjects.application.resources.withRequests()`
+Sett ressurskrav (requests) for applikasjonscontaineren.
+
+|navn|type|obligatorisk|standardverdi|beskrivelse|
+|-|-|-|-|-|
+|`cpu`|`string` or `number`|`false`|-|CPU-krav. Kan være tall (f.eks. `1`, `0.5`) eller string med "m" suffiks (f.eks. `"100m"`)|
+|`memory`|`string` or `number`|`false`|-|Minnekrav. Kan være tall (bytes) eller string med suffiks (f.eks. `"128Mi"`, `"1Gi"`). Støttede suffikser: `Ei`, `Pi`, `Ti`, `Gi`, `Mi`, `Ki`, `E`, `P`, `T`, `G`, `M`, `k`|
+
+**Eksempel:** [examples/appWithResources.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/appWithResources.jsonnet)
+
+### `argokit.appAndObjects.application.resources.withLimits()`
+Sett ressursgrenser (limits) for applikasjonscontaineren.
+
+|navn|type|obligatorisk|standardverdi|beskrivelse|
+|-|-|-|-|-|
+|`cpu`|`string` or `number`|`false`|-|CPU-grense. Kan være tall (f.eks. `1`, `2.0`) eller string med "m" suffiks (f.eks. `"500m"`)|
+|`memory`|`string` or `number`|`false`|-|Minnegrense. Kan være tall (bytes) eller string med suffiks (f.eks. `"512Mi"`, `"2Gi"`). Støttede suffikser: `Ei`, `Pi`, `Ti`, `Gi`, `Mi`, `Ki`, `E`, `P`, `T`, `G`, `M`, `k`|
+
+**Eksempel:** [examples/appWithResources.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/appWithResources.jsonnet)
+
 ## ArgoKit's Environment API
 
 ### `argokit.appAndObjects.application.withEnvironmentVariable()`
