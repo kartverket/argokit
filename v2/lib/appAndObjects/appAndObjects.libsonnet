@@ -13,6 +13,7 @@ local utils = import './utils.libsonnet';
 local resources = import '../specResources.libsonnet';
 local azureAdApplication = import './azureAdApplication.libsonnet';
 local externalSecrets = import './externalSecrets.libsonnet';
+local mounts = import './mounts.libsonnet';
 {
   application: {
     new(name, image, port):
@@ -42,6 +43,7 @@ local externalSecrets = import './externalSecrets.libsonnet';
   + azureAdApplication
   + configMap
   + externalSecrets
+  + mounts
   + utils
   + resources,
 }

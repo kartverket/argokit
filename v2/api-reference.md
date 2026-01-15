@@ -389,3 +389,25 @@ Legg til en `AzureADApplication`-ressurs og konfigurerer applikasjonen.
 |`preAuthorizedApplications`|`array`|`false`|[]|liste over forhåndsautoriserte applikasjoner|
 
 **Eksempel:** [examples/withAzureAdApplication.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withAzureAdApplication.jsonnet)
+
+## ArgoKit's Mounts API
+
+### `argokit.appAndObjects.application.withSecretAsMount()`
+Monter en eksisterende hemmelighet som filer på angitt sti.
+
+|navn|type|obligatorisk|standardverdi|beskrivelse|
+|-|-|-|-|-|
+|`secretName`|`string`|`true`| - |navn på hemmeligheten som skal monteres|
+|`mountPath`|`string`|`true`| - |stien hvor hemmeligheten skal monteres|
+
+**Eksempel:** [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
+
+### `argokit.appAndObjects.application.withPersistentVolumeClaimAsMount()`
+Monter en Persistent Volume Claim (PVC) på angitt sti.
+
+|navn|type|obligatorisk|standardverdi|beskrivelse|
+|-|-|-|-|-|
+|`pvcName`|`string`|`true`| - |navn på PVC som skal monteres|
+|`mountPath`|`string`|`true`| - |stien for montering|
+
+**Eksempel:** [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
