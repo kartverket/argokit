@@ -393,7 +393,7 @@ Legg til en `AzureADApplication`-ressurs og konfigurerer applikasjonen.
 ## ArgoKit's Mounts API
 
 ### `argokit.appAndObjects.application.withSecretAsMount()`
-Monterer en eksisterende hemmelighet som filer på angitt sti.
+Monter en eksisterende hemmelighet som filer på angitt sti.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
@@ -403,7 +403,7 @@ Monterer en eksisterende hemmelighet som filer på angitt sti.
 **Eksempel:** [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
 
 ### `argokit.appAndObjects.application.withPersistentVolumeClaimAsMount()`
-Monterer en Persistent Volume Claim (PVC) på angitt sti.
+Monter en Persistent Volume Claim (PVC) på angitt sti.
 
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
