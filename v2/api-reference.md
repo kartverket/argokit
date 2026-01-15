@@ -233,6 +233,34 @@ Legger til en startup‑probe (blokkerer andre prober til den lykkes).
 
 **Eksempel:** [examples/probes.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/probes.jsonnet)
 
+## ArgoKit's Prometheus API
+Konfigurer Prometheus metrics scraping for applikasjoner.
+
+### `argokit.appAndObjects.application.withPrometheus()`
+Konfigurer hvordan Prometheus‑kompatible metrics skal hentes (scraped).
+
+|navn|type|obligatorisk|standardverdi|beskrivelse|
+|-|-|-|-|-|
+|`path`|`string`|`true`| - |sti hvor metrics er eksponert (f.eks. `/metrics`, `/actuator/prometheus`)|
+|`port`|`number`|`true`| - |portnummer hvor metrics er eksponert|
+|`allowAllMetrics`|`boolean`|`false`|false|hvis `true`, vil alle eksponerte metrics bli skrapet. Ellers vil en forhåndsdefinert liste med metrics bli droppet|
+
+**Eksempel:** [examples/application-with-prometheus.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/application-with-prometheus.jsonnet)
+
+**Alternativ syntaks:** Du kan også sette prometheus direkte via objektsyntaks:
+```jsonnet
++ {
+  application+: {
+    spec+: {
+      prometheus: {
+        path: '/kommuneinfo/v1/metrics',
+        port: 5000,
+      },
+    },
+  },
+}
+```
+
 ## ArgoKit's routing API
 
 Konfigurer ruting for applikasjoner på SKIP.
