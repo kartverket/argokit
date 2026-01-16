@@ -12,10 +12,10 @@ local v = import '../internal/validation.libsonnet';
    - targetCpuUtilization: int (optional) - maximum cpu utilization before increasing current replicas
    - targetMemoryUtilization: int (optional) - maximum memory utilization before increasing current replicas
   */
-  withReplicas(initial=2, max=null, targetCpuUtilization=80, targetMemoryUtilization=null): 
+  withReplicas(initial=2, max=null, targetCpuUtilization=null, targetMemoryUtilization=null): 
   v.number(initial, 'initial') +
   v.number(max, 'max', true) +
-  v.number(targetCpuUtilization, 'targetCpuUtilization') +
+  v.number(targetCpuUtilization, 'targetCpuUtilization', true) +
   v.number(targetMemoryUtilization, 'targetMemoryUtilization', true) + 
   {
     application+: {
