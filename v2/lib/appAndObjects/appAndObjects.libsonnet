@@ -5,6 +5,7 @@ local appAndObjects = import '../appAndObjects.libsonnet';
 local environment = import '../environment.libsonnet';
 local ingress = import '../ingress.libsonnet';
 local probes = import '../probes.libsonnet';
+local prometheus = import '../prometheus.libsonnet';
 local replicas = import '../replicas.libsonnet';
 local routing = import '../routing.libsonnet';
 local configMap = import './configMap.libsonnet';
@@ -40,6 +41,7 @@ local mounts = import './mounts.libsonnet';
   + environment
   + accessPolicies
   + probes
+  + prometheus
   + azureAdApplication
   + configMap
   + externalSecrets
