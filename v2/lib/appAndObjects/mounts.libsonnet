@@ -44,4 +44,24 @@ local v = import '../../internal/validation.libsonnet';
         },
       },
     },
+
+  /**
+  Mounts an emptyDir volume at the specified path.
+  Parameters:
+    - mountPath: string - The path to the mount.
+  */
+  withEmptyDirAsMount(mountPath)::
+    v.string(mountPath, 'mountPath') +
+    {
+      application+: {
+        spec+: {
+          filesFrom+: [
+            {
+              mountPath: mountPath,
+              emptyDir: {},
+            },
+          ],
+        },
+      },
+    },
 }
