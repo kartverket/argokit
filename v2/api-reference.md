@@ -33,7 +33,7 @@ Sett replikaer for en applikasjon med autoskalering basert på CPU og minne.
 |-|-|-|-|-|
 |`initial`|`number`|`true`|-|initialt antall replikaer (2 er anbefalt)|
 |`max`|`number`|`false`|-|maksimum antall replikaer (hvis satt, aktiverer autoskalering)|
-|`targetCpuUtilization`|`number`|`false`|80|CPU-terskel i prosent før autoskalering|
+|`targetCpuUtilization`|`number`|`false`|-|CPU-terskel i prosent før autoskalering|
 |`targetMemoryUtilization`|`number`|`false`|-|Minneterskel i prosent før autoskalering|
 
 **Eksempel:** [examples/replicas.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/replicas.jsonnet)
