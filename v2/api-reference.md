@@ -411,3 +411,12 @@ Monter en Persistent Volume Claim (PVC) på angitt sti.
 |`mountPath`|`string`|`true`| - |stien for montering|
 
 **Eksempel:** [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
+
+### `argokit.appAndObjects.application.withEmptyDirAsMount()`
+Monter en emptyDir-volum på angitt sti.
+
+|navn|type|obligatorisk|standardverdi|beskrivelse|
+|-|-|-|-|-|
+|`mountPath`|`string`|`true`| - |stien for montering|
+
+**Eksempel:** [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
