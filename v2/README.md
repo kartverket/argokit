@@ -68,6 +68,16 @@ application.new('foo-backend', "backend-image", 8080)
 
 [Read the full ArgoKit V2 API Reference here](./api-reference.md)
 
+## Migrating from v1 to v2
+
+### Differences in Output Format
+
+One key difference between ArgoKit v1 and v2 is how Kubernetes resources are returned:
+
+- **v2** wraps resources in a Kubernetes `List` object with `kind: List`
+- **v1** returns a raw array of resources without the `List` wrapper
+
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or PR if you would like to
