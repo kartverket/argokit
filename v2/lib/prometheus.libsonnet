@@ -12,7 +12,7 @@ local v = import '../internal/validation.libsonnet';
   withPrometheus(path, port, allowAllMetrics=false)::
     v.string(path, 'path') +
     v.number(port, 'port') +
-    (if allowAllMetrics != false then v.boolean(allowAllMetrics, 'allowAllMetrics') else {}) +
+    v.boolean(allowAllMetrics, 'allowAllMetrics') +
     {
       application+: {
         spec+: {
