@@ -9,5 +9,4 @@ local nginxApp = argokit.appAndObjects.application;
 
 nginxApp.new(name='nginx-app',image='nginx',port=8080)
 # Below defines the access policies
-+ nginxApp.withInboundSkipApp(appname='redis-app')
 + nginxApp.withOutboundSkipApp(appname='redis-app')

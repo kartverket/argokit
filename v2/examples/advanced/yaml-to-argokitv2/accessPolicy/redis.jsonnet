@@ -6,7 +6,6 @@ having multiple in the same file
 local argokit = import '../../../../jsonnet/argokit.libsonnet';
 local redisApp = argokit.appAndObjects.application;
 
-redisApp.new(name='redis-app',image='redis',port=8080)
+redisApp.new(name='redis-app',image='redis',port=6379)
 # Below defines the access policies
-+ redisApp.withOutboundSkipApp(appname='nginx-app')
 + redisApp.withInboundSkipApp(appname='nginx-app')
