@@ -4,9 +4,9 @@ local application = argokit.appAndObjects.application;
 
 test.new(std.thisFile)
  + test.case.new(
-   name='prometheus with allowAllMetrics false (explicit)',
-   test=test.expect.eqDiff(
-     actual=(application.withPrometheus(path='/metrics', port=8080, allowAllMetrics=false)).application.spec,
+  name='prometheus with allowAllMetrics false (explicit)',
+  test=test.expect.eqDiff(
+    actual=(application.withPrometheus(path='/metrics', port=8080, allowAllMetrics=false)).application.spec,
      expected={
        prometheus: {
          path: '/metrics',
