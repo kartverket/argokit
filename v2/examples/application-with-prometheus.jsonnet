@@ -1,8 +1,8 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local application = argokit.appAndObjects.application;
 
-application.new('my-app', 'my-app:1.0.0', 8080)
+application.new('kommuneinfo', 'kommuneinfo:1.0.0', 5000)
 + application.withPrometheus(
-  path='/metrics',
-  port=8080
+  path='/kommuneinfo/v1/metrics',
+  port=5000
 )
