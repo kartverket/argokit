@@ -1,4 +1,4 @@
-/** Creates an external secret store and secret equivivalent to externalSecret.yaml. 
+/** Creates an external secret store and secret equivalent to externalSecret.yaml. 
 Render it out with "skipctl m r -p path/to/externalSecret.jsonnet" and see the similarities
 */
 local argokit = import '../../../../jsonnet/argokit.libsonnet';
