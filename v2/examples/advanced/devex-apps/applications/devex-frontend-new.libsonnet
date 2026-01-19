@@ -3,7 +3,7 @@ local application = argokit.appAndObjects.application;
 
 function(name, env, version)
   application.new(name=name, image=version, port=3000)
-  + application.forHostnames('devex.demo-frontend' + env + 'host.com')
+  + application.forHostnames('devex.demo-frontend-' + env + '.host.com')
   + application.withOutboundSkipApp('demo-backend')
   + application.withEnvironmentVariables({
     VITE_AUTHORITY: 'https://login.microsoftonline.com/1234-5678/v2.0',
