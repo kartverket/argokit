@@ -11,6 +11,7 @@ test.new(std.thisFile)
        prometheus: {
          path: '/metrics',
          port: 8080,
+         scrapeInterval: '60s',
        },
      },
    ),
@@ -23,6 +24,7 @@ test.new(std.thisFile)
       prometheus: {
         path: '/metrics',
         port: 8080,
+        scrapeInterval: '60s',
       },
     },
   ),
@@ -35,6 +37,7 @@ test.new(std.thisFile)
       prometheus: {
         path: '/kommuneinfo/v1/metrics',
         port: 5000,
+        scrapeInterval: '60s',
       },
     },
   ),
@@ -48,6 +51,7 @@ test.new(std.thisFile)
         path: '/actuator/prometheus',
         port: 8081,
         allowAllMetrics: true,
+        scrapeInterval: '60s',
       },
     },
   ),
@@ -75,3 +79,81 @@ test.new(std.thisFile)
     },
   ),
 )
++ test.case.new(
+  name='prometheus with default scrapeInterval (60s)',
+  test=test.expect.eqDiff(
+    actual=(application.withPrometheus(path='/metrics', port=8080)).application.spec,
+    expected={
+      prometheus: {
+        path: '/metrics',
+        port: 8080,
+        scrapeInterval: '60s',
+      },
+    },
+  ),
+)
++ test.case.new(
+  name='prometheus with custom scrapeInterval in seconds',
+  test=test.expect.eqDiff(
+    actual=(application.withPrometheus(path='/metrics', port=8080, scrapeInterval='30s')).application.spec,
+    expected={
+      prometheus: {
+        path: '/metrics',
+        port: 8080,
+        scrapeInterval: '30s',
+      },
+    },
+  ),
+)
++ test.case.new(
+  name='prometheus with scrapeInterval in minutes',
+  test=test.expect.eqDiff(
+    actual=(application.withPrometheus(path='/metrics', port=8080, scrapeInterval='2m')).application.spec,
+    expected={
+      prometheus: {
+        path: '/metrics',
+        port: 8080,
+        scrapeInterval: '2m',
+      },
+    },
+  ),
+)
++ test.case.new(
+  name='prometheus with empty scrapeInterval',
+  test=test.expect.eqDiff(
+    actual=(application.withPrometheus(path='/metrics', port=8080, scrapeInterval='')).application.spec,
+    expected={
+      prometheus: {
+        path: '/metrics',
+        port: 8080,
+      },
+    },
+  ),
+)
++ test.case.new(
+  name='prometheus with minimum valid scrapeInterval (15s)',
+  test=test.expect.eqDiff(
+    actual=(application.withPrometheus(path='/metrics', port=8080, scrapeInterval='15s')).application.spec,
+    expected={
+      prometheus: {
+        path: '/metrics',
+        port: 8080,
+        scrapeInterval: '15s',
+      },
+    },
+  ),
+)
++ test.case.new(
+  name='prometheus with 1 minute scrapeInterval',
+  test=test.expect.eqDiff(
+    actual=(application.withPrometheus(path='/metrics', port=8080, scrapeInterval='1m')).application.spec,
+    expected={
+      prometheus: {
+        path: '/metrics',
+        port: 8080,
+        scrapeInterval: '1m',
+      },
+    },
+  ),
+)
+
