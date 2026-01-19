@@ -1,4 +1,4 @@
-# This manifest describe two applications that can communicate between eachother 
+# This manifest describes two applications where nginx-app can communicate with redis-app
 apiVersion: skiperator.kartverket.no/v1alpha1
 kind: Application
 metadata:
@@ -7,9 +7,6 @@ spec:
   image: nginx
   port: 8080
   accessPolicy:
-    inbound:
-      rules:
-        - application: redis-app
     outbound:
       rules:
         - application: redis-app
@@ -20,11 +17,8 @@ metadata:
   name: redis-app
 spec:
   image: redis
-  port: 8080
+  port: 6379
   accessPolicy:
     inbound:
-      rules:
-        - application: nginx-app
-    outbound:
       rules:
         - application: nginx-app
