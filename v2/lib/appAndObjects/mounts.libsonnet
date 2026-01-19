@@ -58,7 +58,7 @@ local v = import '../../internal/validation.libsonnet';
           filesFrom+: [
             {
               mountPath: mountPath,
-              emptyDir: {},
+              emptyDir: '',
             },
           ],
         },
