@@ -27,5 +27,5 @@ secretApp.new(name='secret-app',image='secret-image',port=8080)
     name='ansattporten-secrets',
     secrets=secrets,
     secretStoreRef=common.ansattportenSecretStore.metadata.name) 
-# The secret store can be added to the manifest like below, if it not allready deployed
+# The secret store can be added to the manifest like below, if it not already deployed
 // + secretApp.withObjects(common.ansattPortenSecretStore)
