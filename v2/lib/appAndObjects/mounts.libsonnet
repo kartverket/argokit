@@ -45,20 +45,29 @@ local v = import '../../internal/validation.libsonnet';
       },
     },
 
+local validateEmptyDirName(emptyDir) =
+    if std.length(emptyDir) == 0 then
+      error 'emptyDir name cannot be an empty string'
+    else if emptyDir == 'tmp' then
+      error 'emptyDir name cannot be "tmp" as it is a reserved name'
+    else emptyDir,
+
   /**
   Mounts an emptyDir volume at the specified path.
   Parameters:
     - mountPath: string - The path to the mount.
+    - emptyDir: string - Name of the volume
   */
-  withEmptyDirAsMount(mountPath)::
+  withEmptyDirAsMount(mountPath, emptyDir)::
     v.string(mountPath, 'mountPath') +
+    v.string(emptyDir, 'emptyDir') +
     {
       application+: {
         spec+: {
           filesFrom+: [
             {
               mountPath: mountPath,
-              emptyDir: '',
+              emptyDir: validateEmptyDirName(emptyDir),
             },
           ],
         },
