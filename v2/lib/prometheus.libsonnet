@@ -7,7 +7,7 @@ local v = import '../internal/validation.libsonnet';
     else {},
 
   /**
-   * Configure Prometheus metrics scraping for the application.
+   * Configure Prometheus metrics scraping for the application. After configuring an endpoint that exposes metrics, the platform itself will collect the metrics on the application's behalf.
    * 
    * Variables:
    *  - path: string - The path where metrics are exposed (e.g., '/metrics' or '/actuator/prometheus')
