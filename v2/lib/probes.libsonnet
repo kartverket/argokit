@@ -53,11 +53,11 @@ local v = import '../internal/validation.libsonnet';
   v.number(failureThreshold, 'failureThreshold', true) +
   v.number(timeout, 'timeout', true) +
   v.number(initialDelay, 'initialDelay', true) +
-  {
+  std.prune({
     path: path,
     port: port,
     failureThreshold: failureThreshold,
     timeout: timeout,
     initialDelay: initialDelay,
-  },
+  }),
 }
