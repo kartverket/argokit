@@ -418,5 +418,6 @@ Monter en emptyDir-volum på angitt sti.
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
 |`mountPath`|`string`|`true`| - |stien for montering|
+|`emptyDir`|`string`|`true`| - |navn på volum|
 
 **Eksempel:** [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
