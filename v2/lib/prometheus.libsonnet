@@ -14,6 +14,7 @@ local v = import '../internal/validation.libsonnet';
    *  - port: int - The port number where metrics are exposed
    *  - allowAllMetrics: bool (optional, default=false) - If true, all exposed metrics are scraped. 
    *                                                       Otherwise, a predefined list of metrics will be dropped.
+   * See DefaultMetricDropList here: https://github.com/kartverket/skiperator/blob/main/pkg/util/constants.go#L19-L23
    *  - scrapeInterval: string (optional, default='60s') - ScrapeInterval specifies the interval at which Prometheus should scrape the metrics.
    */
   withPrometheus(path, port, allowAllMetrics=false, scrapeInterval='60s')::
