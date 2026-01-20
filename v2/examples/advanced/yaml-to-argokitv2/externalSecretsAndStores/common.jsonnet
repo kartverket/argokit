@@ -7,6 +7,6 @@ local argokit = import '../../../../jsonnet/argokit.libsonnet';
 
 {
   # Some secret stores
-  ansattportenSecretStore: argokit.externalSecrets.store.new(name='ansattporten-gsm', gcpProject='tilgangsstyring-sandbox-e5ab'),
+  ansattportenSecretStore: argokit.externalSecrets.store.new(name='ansattporten-gsm', gcpProject='some-team-sandbox-aabb'),
   otherSecretStore: argokit.externalSecrets.store.new(name='other-gsm', gcpProject='other-project'),
 }
