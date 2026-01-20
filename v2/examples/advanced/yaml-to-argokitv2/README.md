@@ -5,7 +5,7 @@ This folder provides side-by-side comparisons demonstrating how to migrate stand
 ## Examples Included
 
 ### 1. Access Policies (`accessPolicy/`)
-Demonstrates how to define network policies between applications.
+Demonstrates how to define access policies (not to be confused with the Kubernetes native `NetworkPolicy`) between applications.
 *   **YAML**: Manual definition of `accessPolicy` in application manifests.
 *   **ArgoKit**: Using `withInboundSkipApp` and `withOutboundSkipApp` wrappers to succinctly define allow-lists.
 
