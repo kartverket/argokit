@@ -477,6 +477,30 @@ Oppretter en Istio DestinationRule for sticky sessions ved bruk av konsistent ha
 
 **Eksempel:** [examples/stickySession.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/stickySession.jsonnet)
 
+### `argokit.appAndObjects.application.withPortLevelTls()`
+Oppretter en Istio DestinationRule for port-nivå TLS-konfigurasjon. Dette muliggjør TLS for spesifikke porter på en tjeneste.
+
+|navn|type|obligatorisk|standardverdi|beskrivelse|
+|-|-|-|-|-|
+|`host`|`string`|`true`| - |mål-vert (kan være enkel hostname eller formatert som 'pod.service')|
+|`port`|`number`|`false`|443|portnummer for TLS-konfigurasjon|
+|`tlsMode`|`string`|`false`|'SIMPLE'|TLS-modus (ISTIO_MUTUAL, SIMPLE, MUTUAL, DISABLE)|
+|`name`|`string`|`false`|`null`|egendefinert navn for DestinationRule (standard: applikasjonsnavn)|
+
+**Eksempel:** [examples/portLevelTls.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/portLevelTls.jsonnet)
+
+### `argokit.appAndObjects.application.withTrafficPolicyTls()`
+Oppretter en Istio DestinationRule med traffic policy TLS-konfigurasjon. Dette konfigurerer TLS-innstillinger for utgående trafikk til eksterne tjenester med SNI-støtte.
+
+|navn|type|obligatorisk|standardverdi|beskrivelse|
+|-|-|-|-|-|
+|`name`|`string`|`true`| - |navn på DestinationRule|
+|`host`|`string`|`true`| - |ekstern vert/host|
+|`tlsMode`|`string`|`false`|'SIMPLE'|TLS-modus (SIMPLE, MUTUAL, ISTIO_MUTUAL, DISABLE)|
+|`sni`|`string`|`false`|`null`|SNI-streng som presenteres til serveren under TLS-handshake|
+
+**Eksempel:** [examples/trafficPolicyTls.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/trafficPolicyTls.jsonnet)
+
 ### `argokit.appAndObjects.application.withEmptyDirAsMount()`
 Monter en emptyDir-volum på angitt sti.
 
