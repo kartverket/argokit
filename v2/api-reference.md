@@ -464,6 +464,19 @@ Monter en Persistent Volume Claim (PVC) på angitt sti.
 
 **Eksempel:** [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
 
+## ArgoKit's DestinationRule API
+
+### `argokit.appAndObjects.application.withStickySession()`
+Oppretter en Istio DestinationRule for sticky sessions ved bruk av konsistent hash-basert lastbalansering. Dette muliggjør sesjonspersistens ved å rute forespørsler fra samme klient til samme pod.
+
+|navn|type|obligatorisk|standardverdi|beskrivelse|
+|-|-|-|-|-|
+|`cookieName`|`string`|`false`|'ISTIO-STICKY'|navn på cookie som brukes for sticky sessions|
+|`cookiePath`|`string`|`false`|'/'|sti for cookien|
+|`cookieTtl`|`string`|`false`|'0'|TTL for cookien ('0' betyr sesjonscookie)|
+
+**Eksempel:** [examples/stickySession.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/stickySession.jsonnet)
+
 ### `argokit.appAndObjects.application.withEmptyDirAsMount()`
 Monter en emptyDir-volum på angitt sti.
 
