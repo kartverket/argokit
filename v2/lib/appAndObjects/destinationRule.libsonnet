@@ -7,13 +7,13 @@ local v = import '../../internal/validation.libsonnet';
    * 
    * Parameters:
    *  - cookieName: string (optional, default='ISTIO-STICKY') - The name of the cookie to use for sticky sessions
-   *  - cookiePath: string (optional, default='/') - The path for the cookie
+   *  - cookiePath: string (optional, default=null) - The path for the cookie. If not set, path is omitted from the cookie config
    *  - cookieTtl: string (optional, default='0') - The TTL for the cookie (0 means session cookie)
    */
-  withStickySession(cookieName='ISTIO-STICKY', cookiePath='/', cookieTtl='0')::
+  withStickySession(cookieName='ISTIO-STICKY', cookiePath=null, cookieTtl='0')::
     v.string(cookieName, 'cookieName') +
-    v.string(cookiePath, 'cookiePath') +
     v.string(cookieTtl, 'cookieTtl') +
+    (if cookiePath != null then v.string(cookiePath, 'cookiePath') else {}) +
     {
       local name = self.application.metadata.name,
       objects+: [
@@ -28,11 +28,11 @@ local v = import '../../internal/validation.libsonnet';
             trafficPolicy: {
               loadBalancer: {
                 consistentHash: {
-                  httpCookie: {
+                  httpCookie: std.prune({
                     name: cookieName,
-                    path: cookiePath,
+                    [if cookiePath != null then 'path']: cookiePath,
                     ttl: cookieTtl,
-                  },
+                  }),
                 },
               },
             },

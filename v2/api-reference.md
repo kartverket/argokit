@@ -472,7 +472,7 @@ Oppretter en Istio DestinationRule for sticky sessions ved bruk av konsistent ha
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
 |`cookieName`|`string`|`false`|'ISTIO-STICKY'|navn på cookie som brukes for sticky sessions|
-|`cookiePath`|`string`|`false`|'/'|sti for cookien|
+|`cookiePath`|`string`|`false`|`null`|sti for cookien (valgfritt - utelates hvis ikke angitt)|
 |`cookieTtl`|`string`|`false`|'0'|TTL for cookien ('0' betyr sesjonscookie)|
 
 **Eksempel:** [examples/stickySession.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/stickySession.jsonnet)
