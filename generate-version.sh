@@ -33,4 +33,3 @@ cat > version.libsonnet <<EOF
 EOF
 
 echo "Generated version.libsonnet with sha ${SHA} and tag ${TAG}"
-

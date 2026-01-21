@@ -35,8 +35,8 @@ test.new(std.thisFile)
           name: 'test-app',
           labels: {
             'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': 'edbabd565a7515ba8cd3909631396344c5a3a2ee',
-            'skip.kartverket.no/argokit-tag': 'dev-dirty',
+            'skip.kartverket.no/argokit-git-ref': '3c61c1df6be098f3e805ad93efd8cfa2e0ffa366',
+            'skip.kartverket.no/argokit-tag': 'dev-332',
           },
         },
         spec: {
@@ -80,8 +80,8 @@ test.new(std.thisFile)
           name: 'test-app',
           labels: {
             'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': 'edbabd565a7515ba8cd3909631396344c5a3a2ee',
-            'skip.kartverket.no/argokit-tag': 'dev-dirty',
+            'skip.kartverket.no/argokit-git-ref': '3c61c1df6be098f3e805ad93efd8cfa2e0ffa366',
+            'skip.kartverket.no/argokit-tag': 'dev-332',
           },
         },
         spec: {
@@ -104,8 +104,8 @@ test.new(std.thisFile)
           name: 'aal-register',
           labels: {
             'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': 'edbabd565a7515ba8cd3909631396344c5a3a2ee',
-            'skip.kartverket.no/argokit-tag': 'dev-dirty',
+            'skip.kartverket.no/argokit-git-ref': '3c61c1df6be098f3e805ad93efd8cfa2e0ffa366',
+            'skip.kartverket.no/argokit-tag': 'dev-332',
           },
         },
         spec: {
@@ -148,8 +148,8 @@ test.new(std.thisFile)
           name: 'my-service',
           labels: {
             'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': 'edbabd565a7515ba8cd3909631396344c5a3a2ee',
-            'skip.kartverket.no/argokit-tag': 'dev-dirty',
+            'skip.kartverket.no/argokit-git-ref': '3c61c1df6be098f3e805ad93efd8cfa2e0ffa366',
+            'skip.kartverket.no/argokit-tag': 'dev-332',
           },
         },
         spec: {
@@ -216,8 +216,8 @@ test.new(std.thisFile)
           name: 'secure-app',
           labels: {
             'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': 'edbabd565a7515ba8cd3909631396344c5a3a2ee',
-            'skip.kartverket.no/argokit-tag': 'dev-dirty',
+            'skip.kartverket.no/argokit-git-ref': '3c61c1df6be098f3e805ad93efd8cfa2e0ffa366',
+            'skip.kartverket.no/argokit-tag': 'dev-332',
           },
         },
         spec: {
@@ -256,8 +256,8 @@ test.new(std.thisFile)
           name: 'my-app',
           labels: {
             'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': 'edbabd565a7515ba8cd3909631396344c5a3a2ee',
-            'skip.kartverket.no/argokit-tag': 'dev-dirty',
+            'skip.kartverket.no/argokit-git-ref': '3c61c1df6be098f3e805ad93efd8cfa2e0ffa366',
+            'skip.kartverket.no/argokit-tag': 'dev-332',
           },
         },
         spec: {
@@ -295,8 +295,8 @@ test.new(std.thisFile)
           name: 'my-app',
           labels: {
             'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': 'edbabd565a7515ba8cd3909631396344c5a3a2ee',
-            'skip.kartverket.no/argokit-tag': 'dev-dirty',
+            'skip.kartverket.no/argokit-git-ref': '3c61c1df6be098f3e805ad93efd8cfa2e0ffa366',
+            'skip.kartverket.no/argokit-tag': 'dev-332',
           },
         },
         spec: {
