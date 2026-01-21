@@ -35,8 +35,8 @@ test.new(std.thisFile)
           name: 'test-app',
           labels: {
             'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': '7dc5c1e46a97fe6e0cb11555d435d9c1f75ecc96',
-            'skip.kartverket.no/argokit-tag': 'dev-315',
+            'skip.kartverket.no/argokit-git-ref': 'a838ee16fbc34ba7efba0be7c0d5a16fe7e7945c',
+            'skip.kartverket.no/argokit-tag': 'dev-327',
           },
         },
         spec: {
@@ -80,8 +80,8 @@ test.new(std.thisFile)
           name: 'test-app',
           labels: {
             'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': '7dc5c1e46a97fe6e0cb11555d435d9c1f75ecc96',
-            'skip.kartverket.no/argokit-tag': 'dev-315',
+            'skip.kartverket.no/argokit-git-ref': 'a838ee16fbc34ba7efba0be7c0d5a16fe7e7945c',
+            'skip.kartverket.no/argokit-tag': 'dev-327',
           },
         },
         spec: {
@@ -97,6 +97,22 @@ test.new(std.thisFile)
   test=test.expect.eqDiff(
     actual=(application.new('aal-register', 'aal:1.0', 8080) + application.withStickySession(cookieName='AAL-SESSION', cookieTtl='1800s')).items,
     expected=[
+      {
+        apiVersion: 'skiperator.kartverket.no/v1alpha1',
+        kind: 'Application',
+        metadata: {
+          name: 'aal-register',
+          labels: {
+            'skip.kartverket.no/argokit-flavor': 'v2',
+            'skip.kartverket.no/argokit-git-ref': 'a838ee16fbc34ba7efba0be7c0d5a16fe7e7945c',
+            'skip.kartverket.no/argokit-tag': 'dev-327',
+          },
+        },
+        spec: {
+          image: 'aal:1.0',
+          port: 8080,
+        },
+      },
       {
         apiVersion: 'networking.istio.io/v1',
         kind: 'DestinationRule',
@@ -115,22 +131,6 @@ test.new(std.thisFile)
               },
             },
           },
-        },
-      },
-      {
-        apiVersion: 'skiperator.kartverket.no/v1alpha1',
-        kind: 'Application',
-        metadata: {
-          name: 'aal-register',
-          labels: {
-            'skip.kartverket.no/argokit-flavor': 'v2',
-            'skip.kartverket.no/argokit-git-ref': '7dc5c1e46a97fe6e0cb11555d435d9c1f75ecc96',
-            'skip.kartverket.no/argokit-tag': 'dev-315',
-          },
-        },
-        spec: {
-          image: 'aal:1.0',
-          port: 8080,
         },
       },
     ],
