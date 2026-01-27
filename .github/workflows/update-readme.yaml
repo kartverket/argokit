@@ -41,7 +41,7 @@ jobs:
           cp source/v2/api-reference.md target/docs/03-applikasjon-utrulling/10-argokit/09-argokit-v2.md
 
       - name: Create PR
-        uses: peter-evans/create-pull-request@98357b18bf14b5342f975ff684046ec3b2a07725
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0
         with:
           path: target
           token: ${{ steps.octo-sts.outputs.token }}
