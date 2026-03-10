@@ -14,7 +14,7 @@ permissions:
 jobs:
   update-docs:
     name: Update documentation in target repository
-    uses: kartverket/github-workflows/.github/workflows/update-skip-docs.yaml@916459137b7fdf3ce28a60d846cf1938b2beb3ca
+    uses: kartverket/github-workflows/.github/workflows/update-skip-docs.yaml@13d1bd357bb1f60a920a90cc20b5de0ed7488706
     with:
       source_path: "v2/api-reference.md"
       target_path: "docs/03-applikasjon-utrulling/10-argokit/09-argokit-v2.md"
