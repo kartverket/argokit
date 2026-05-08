@@ -43,6 +43,7 @@ local v = import '../../internal/validation.libsonnet';
             remoteRef: std.prune({
               conversionStrategy: std.get(secret, 'conversionStrategy', 'Default'),
               decodingStrategy: std.get(secret, 'decodingStrategy', 'None'),
+              nullBytePolicy: std.get(secret, 'nullBytePolicy', 'Ignore'),
               key: secret.fromSecret,
               metadataPolicy: std.get(secret, 'metadataPolicy', 'None'),
               property: std.get(secret, 'property', null),
@@ -52,6 +53,7 @@ local v = import '../../internal/validation.libsonnet';
             extract: std.prune({
               conversionStrategy: std.get(secret, 'conversionStrategy', 'Default'),
               decodingStrategy: std.get(secret, 'decodingStrategy', 'None'),
+              nullBytePolicy: std.get(secret, 'nullBytePolicy', 'Ignore'),
               key: secret.fromSecret,
               metadataPolicy: std.get(secret, 'metadataPolicy', 'None'),
               property: std.get(secret, 'property', null),
