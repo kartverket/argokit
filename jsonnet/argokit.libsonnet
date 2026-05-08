@@ -82,6 +82,7 @@ local environment = import '../lib/environment.libsonnet';
         secretKey: secret.toKey,
         remoteRef: {
           key: secret.fromSecret,
+          [if std.objectHas(secret, 'property') then 'property']: secret.property,
           metadataPolicy: 'None',
         },
       } for secret in input.secrets],
