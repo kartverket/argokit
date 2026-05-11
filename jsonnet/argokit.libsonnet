@@ -83,14 +83,18 @@ local environment = import '../lib/environment.libsonnet';
         remoteRef: {
           key: secret.fromSecret,
           metadataPolicy: 'None',
+          nullBytePolicy: 'Ignore',
+          decodingStrategy: 'None',
+          conversionStrategy: 'Default',
         },
       } for secret in input.secrets],
       [if input.allKeysFrom != null then 'dataFrom']: [{
         extract: {
-          conversionStrategy: 'Default',
-          decodingStrategy: 'None',
           key: secret.fromSecret,
           metadataPolicy: 'None',
+          nullBytePolicy: 'Ignore',
+          decodingStrategy: 'None',
+          conversionStrategy: 'Default',
         },
       } for secret in input.allKeysFrom],
       refreshInterval: '1h0m0s',
