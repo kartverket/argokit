@@ -22,12 +22,13 @@ local v = import '../../internal/validation.libsonnet';
       }
   } + utils.withArgokitVersionLabel(flavor='v2'),
   secret: {
-    new(name, creationPolicy=null, secrets=[], allKeysFrom=[], secretStoreRef='gsm')::
+    new(name, creationPolicy=null, secrets=[], allKeysFrom=[], secretStoreRef='gsm', property=null)::
       v.string(name, 'name') +
       (if creationPolicy != null then v.string(creationPolicy, 'creationPolicy') else {}) +
       v.array(secrets, 'secrets', allowEmpty=true) +
       v.array(allKeysFrom, 'allKeysFrom', allowEmpty=true) +
       v.string(secretStoreRef, 'secretStoreRef', allowEmpty=true) +
+      (if property != null then v.string(property, 'property') else {}) +
       (if std.length(secrets) > 0 || std.length(allKeysFrom) > 0 then {}
        else error 'invalid secret: either secrets or allKeysFrom must contain at least one item') +
 
@@ -43,18 +44,20 @@ local v = import '../../internal/validation.libsonnet';
             remoteRef: std.prune({
               conversionStrategy: std.get(secret, 'conversionStrategy', 'Default'),
               decodingStrategy: std.get(secret, 'decodingStrategy', 'None'),
+              nullBytePolicy: std.get(secret, 'nullBytePolicy', 'Ignore'),
               key: secret.fromSecret,
               metadataPolicy: std.get(secret, 'metadataPolicy', 'None'),
-              property: std.get(secret, 'property', null),
+              property: std.get(secret, 'property', property),
             }),
           } for secret in secrets],
           [if std.length(allKeysFrom) > 0 then 'dataFrom']: [{
             extract: std.prune({
               conversionStrategy: std.get(secret, 'conversionStrategy', 'Default'),
               decodingStrategy: std.get(secret, 'decodingStrategy', 'None'),
+              nullBytePolicy: std.get(secret, 'nullBytePolicy', 'Ignore'),
               key: secret.fromSecret,
               metadataPolicy: std.get(secret, 'metadataPolicy', 'None'),
-              property: std.get(secret, 'property', null),
+              property: std.get(secret, 'property', property),
             }),
           } for secret in allKeysFrom],
           refreshInterval: '1h0m0s',
