@@ -1,5 +1,5 @@
 local argokit = import './argokit.libsonnet';
-local utils = import '../internal/utils.libsonnet';
+local utils = import '../v2/internal/utils.libsonnet';
 {
   dbArchiveJob(
     instanceName,
