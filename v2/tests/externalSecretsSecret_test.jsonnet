@@ -5,11 +5,18 @@ local secrets = [
   {
     fromSecret: 'the-first-test-file',
     toKey: 'test-key',
+    property: 'test-property',
   },
 ];
 local allKeysFrom = [
   {
     fromSecret: 'test-file',
+  },
+];
+local allKeysFromWithProperty = [
+  {
+    fromSecret: 'test-file',
+    property: 'extract-property',
   },
 ];
 
@@ -22,9 +29,19 @@ local actual =
     secretStoreRef='some-store'
   );
 
+local actualWithExtractProperty =
+  application.new('test-app', 'foo.io/image', 8080)
+  + application.withEnvironmentVariablesFromExternalSecret(
+    name='test-external-secret',
+    secrets=secrets,
+    allKeysFrom=allKeysFromWithProperty,
+    secretStoreRef='some-store'
+  );
+
 local app = actual.items[0];
 local externalSecret = actual.items[1];
-local label = 'Test External Secret';
+local externalSecretWithExtractProperty = actualWithExtractProperty.items[1];
+local label = 'Test External Secret ';
 
 test.new(std.thisFile)
 + test.case.new(
@@ -60,5 +77,26 @@ test.new(std.thisFile)
   test=test.expect.eqDiff(
     actual=app.spec.envFrom[0].secret,
     expected=externalSecret.metadata.name,
+  )
+)
++ test.case.new(
+  name=label + 'external secret has correct remoteRef property',
+  test=test.expect.eqDiff(
+    actual=externalSecret.spec.data[0].remoteRef.property,
+    expected='test-property',
+  )
+)
++ test.case.new(
+  name=label + 'dataFrom.extract property is absent when not set',
+  test=test.expect.eqDiff(
+    actual=std.objectHas(externalSecret.spec.dataFrom[0].extract, 'property'),
+    expected=false,
+  )
+)
++ test.case.new(
+  name=label + 'dataFrom.extract property is set when provided',
+  test=test.expect.eqDiff(
+    actual=externalSecretWithExtractProperty.spec.dataFrom[0].extract.property,
+    expected='extract-property',
   )
 )
