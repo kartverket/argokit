@@ -3,6 +3,7 @@ local v = import '../../internal/validation.libsonnet';
 local accessPolicies = import '../accessPolicies.libsonnet';
 local appAndObjects = import '../appAndObjects.libsonnet';
 local environment = import '../environment.libsonnet';
+local gcp = import '../gcp.libsonnet';
 local ingress = import '../ingress.libsonnet';
 local probes = import '../probes.libsonnet';
 local prometheus = import '../prometheus.libsonnet';
@@ -40,6 +41,7 @@ local utils = import './utils.libsonnet';
     + ingress
     + replicas
     + environment
+    + gcp
     + accessPolicies
     + probes
     + prometheus
