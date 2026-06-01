@@ -19,7 +19,7 @@ local v = import '../../internal/validation.libsonnet';
             },
           },
         },
-      }
+      },
   } + utils.withArgokitVersionLabel(flavor='v2'),
   secret: {
     new(name, creationPolicy=null, secrets=[], allKeysFrom=[], secretStoreRef='gsm', property=null)::
@@ -71,5 +71,5 @@ local v = import '../../internal/validation.libsonnet';
           }),
         },
       } + utils.withArgokitVersionLabel(flavor='v2'),
-  } 
+  },
 }

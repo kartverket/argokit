@@ -45,7 +45,7 @@ local v = import '../../internal/validation.libsonnet';
       },
     },
 
-local validateEmptyDirName(emptyDir) =
+  local validateEmptyDirName(emptyDir) =
     if std.length(emptyDir) == 0 then
       error 'emptyDir name cannot be an empty string'
     else if emptyDir == 'tmp' then

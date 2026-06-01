@@ -16,7 +16,7 @@ local isNumericString(s, allowDecimal=true) =
   local chars = std.stringChars(s);
   local validChars = std.filter(function(c) (c >= '0' && c <= '9') || c == '.', chars);
   local dotCount = std.length(std.filter(function(c) c == '.', chars));
-  !std.startsWith(s, "-")
+  !std.startsWith(s, '-')
   && std.length(validChars) > 0
   && (if allowDecimal then dotCount <= 1 else dotCount == 0)
   && std.length(validChars) == std.length(chars)
@@ -75,7 +75,7 @@ local validateCPU(cpu) =
     */
     withRequests(cpu=null, memory=null)::
       validateMemory(memory) +
-      validateCPU(cpu) + 
+      validateCPU(cpu) +
       {
         application+: {
           spec+: {

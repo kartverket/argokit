@@ -12,27 +12,27 @@ local v = import '../internal/validation.libsonnet';
    - targetCpuUtilization: int (optional) - maximum cpu utilization before increasing current replicas
    - targetMemoryUtilization: int (optional) - maximum memory utilization before increasing current replicas
   */
-  withReplicas(initial=2, max=null, targetCpuUtilization=null, targetMemoryUtilization=null): 
-  v.number(initial, 'initial') +
-  v.number(max, 'max', true) +
-  v.number(targetCpuUtilization, 'targetCpuUtilization', true) +
-  v.number(targetMemoryUtilization, 'targetMemoryUtilization', true) + 
-  {
-    application+: {
-      spec+:
-        if max != null && initial != max then
-          {
-            replicas: std.prune({
-              min: initial,
-              max: max,
-              targetCpuUtilization: targetCpuUtilization,
-              targetMemoryUtilization: targetMemoryUtilization
-            }),
-          }
-        else
-          {
-            replicas: initial,
-          },
+  withReplicas(initial=2, max=null, targetCpuUtilization=null, targetMemoryUtilization=null):
+    v.number(initial, 'initial') +
+    v.number(max, 'max', true) +
+    v.number(targetCpuUtilization, 'targetCpuUtilization', true) +
+    v.number(targetMemoryUtilization, 'targetMemoryUtilization', true) +
+    {
+      application+: {
+        spec+:
+          if max != null && initial != max then
+            {
+              replicas: std.prune({
+                min: initial,
+                max: max,
+                targetCpuUtilization: targetCpuUtilization,
+                targetMemoryUtilization: targetMemoryUtilization,
+              }),
+            }
+          else
+            {
+              replicas: initial,
+            },
+      },
     },
-  },
 }

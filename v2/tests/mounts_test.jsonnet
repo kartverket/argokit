@@ -6,8 +6,8 @@ local app = application.new('app', 'image', 8080);
 
 local secretMountApp = app + application.withSecretAsMount('my-secret', '/var/run/secrets/my-secret');
 local pvcMountApp = app + application.withPersistentVolumeClaimAsMount('my-pvc', '/var/data');
-local combinedMountApp = 
-  app 
+local combinedMountApp =
+  app
   + application.withSecretAsMount('secret-1', '/path/1')
   + application.withPersistentVolumeClaimAsMount('pvc-1', '/path/2');
 

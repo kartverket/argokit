@@ -1,6 +1,6 @@
 local test = {
-    name: 'application test',
-    dog:: error 'rufus',
+  name: 'application test',
+  dog:: error 'rufus',
 };
 
-test 
+test

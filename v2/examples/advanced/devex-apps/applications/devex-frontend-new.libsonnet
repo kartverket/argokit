@@ -1,4 +1,4 @@
-local argokit = import '../../../../jsonnet/argokit.libsonnet'; # remember to use YOUR correct path here
+local argokit = import '../../../../jsonnet/argokit.libsonnet';  // remember to use YOUR correct path here
 local application = argokit.appAndObjects.application;
 
 function(name, env, version)
