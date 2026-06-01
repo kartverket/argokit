@@ -64,6 +64,28 @@ Setter restart policy for jobben.
 |-|-|-|-|-|
 | `restartPolicy` | `string` | `true` | - | `OnFailure` eller `Never` |
 
+## Sammensatte maler
+
+### `argokit.dbArchiveJob()`
+Oppretter en `SKIPJob` v1beta1 som tar PostgreSQL-dump og lagrer den i S3, sammen med ExternalSecrets for database- og S3-hemmeligheter.
+
+| navn | type | obligatorisk | standardverdi | beskrivelse |
+|-|-|-|-|-|
+| `instanceName` | `string` | `true` | - | navn på databaseinstansen og SKIPJob-ressursen |
+| `schedule` | `string` | `true` | - | cron-uttrykk for arkiveringsjobben |
+| `databaseIP` | `string` | `true` | - | IP-adresse til databasen |
+| `gcpS3CredentialsSecret` | `string` | `true` | - | navn på hemmelighet med S3-credentials |
+| `databaseName` | `string` | `true` | - | databasen som skal arkiveres |
+| `archiveUser` | `string` | `false` | `postgres` | databasebrukeren jobben kobler til med |
+| `serviceAccount` | `string` | `false` | `dummyaccount@iam.gserviceaccount.com` | GCP service account for Workload Identity |
+| `cloudsqlInstanceConnectionName` | `string` | `true` | - | Cloud SQL connection name |
+| `port` | `number` | `false` | `5432` | databaseport |
+| `S3Host` | `string` | `false` | `s3-rin.statkart.no` | S3-endepunkt |
+| `S3DestinationPath` | `string` | `true` | - | S3-sti der dumpen skal lagres |
+| `fullDump` | `boolean` | `false` | `false` | om jobben også skal dumpe roller |
+
+Eksempel: [examples/dbArchive.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/dbArchive.jsonnet)
+
 ## Application-hjelpere
 
 ### `argokit.appAndObjects.application.withReplicas()`
