@@ -30,10 +30,12 @@ local v = import '../internal/validation.libsonnet';
   Variables:
    - host: string - the hostname of the postgres instance
    - ip: string - the ip address of the postgres instance
+   - port: number (optional) - port the postgres instance listens on. Defaults to 5432.
   */
-  withOutboundPostgres(host, ip)::
+  withOutboundPostgres(host, ip, port=5432)::
     v.string(host, 'host') +
     v.string(ip, 'ip') +
+    v.number(port, 'port') +
     {
       application+: {
         spec+: {
@@ -43,7 +45,7 @@ local v = import '../internal/validation.libsonnet';
                 {
                   host: host,
                   ip: ip,
-                } + ports('postgres-port', 5432, 'TCP'),
+                } + ports('postgres-port', port, 'TCP'),
               ],
             },
           },

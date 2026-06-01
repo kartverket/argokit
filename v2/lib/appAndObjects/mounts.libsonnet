@@ -6,18 +6,21 @@ local v = import '../../internal/validation.libsonnet';
   Parameters:
     - secretName: string - The name of the secret to mount.
     - mountPath: string - The path to the mount.
+    - defaultMode: number (optional) - Unix file permission bits for mounted files, e.g. 384 (0600 octal).
   */
-  withSecretAsMount(secretName, mountPath)::
+  withSecretAsMount(secretName, mountPath, defaultMode=null)::
     v.string(secretName, 'secretName') +
     v.string(mountPath, 'mountPath') +
+    v.optionalNumber(defaultMode, 'defaultMode') +
     {
       application+: {
         spec+: {
           filesFrom+: [
-            {
+            std.prune({
               mountPath: mountPath,
               secret: secretName,
-            },
+              defaultMode: defaultMode,
+            }),
           ],
         },
       },

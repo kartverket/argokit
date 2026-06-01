@@ -60,8 +60,8 @@ test.new(std.thisFile)
       ],
       cron: {
         schedule: '0 1 * * *',
-        suspend: false,
         startingDeadlineSeconds: 10,
+        timeZone: 'Europe/Oslo',
       },
       serviceAccount: 'archive-sa@project.iam.gserviceaccount.com',
     },
@@ -70,25 +70,25 @@ test.new(std.thisFile)
 + test.case.new(
   name='dbArchiveJob sets env and secret refs',
   test=test.expect.eqDiff(
-    actual={
-      database: archiveJob.spec.env[0],
-      user: archiveJob.spec.env[1],
-      passwordSecret: archiveJob.spec.env[2].valueFrom.secretKeyRef,
-      s3AccessKeySecret: archiveJob.spec.env[3].valueFrom.secretKeyRef,
-      port: archiveJob.spec.env[10],
-      destination: archiveJob.spec.env[11],
-      endpoint: archiveJob.spec.env[12],
-      fullDump: archiveJob.spec.env[13],
+    actual=
+    local byEnvName(name) = std.filter(function(e) e.name == name, archiveJob.spec.env)[0];
+    {
+      database: byEnvName('PGDATABASE').value,
+      user: byEnvName('PGUSER').value,
+      port: byEnvName('PGPORT').value,
+      destination: byEnvName('S3_DESTINATION_PATH').value,
+      endpoint: byEnvName('S3_ENDPOINT_URL').value,
+      fullDump: byEnvName('PG_DUMP_ROLES').value,
+      passwordSecret: byEnvName('PGPASSWORD').valueFrom.secretKeyRef,
+      s3AccessKeySecret: byEnvName('AWS_ACCESS_KEY_ID').valueFrom.secretKeyRef,
     },
     expected={
-      database: {
-        name: 'PGDATABASE',
-        value: 'my-db',
-      },
-      user: {
-        name: 'PGUSER',
-        value: 'readonly',
-      },
+      database: 'my-db',
+      user: 'readonly',
+      port: '5433',
+      destination: 's3://bucket/archive',
+      endpoint: 'https://s3.example.com',
+      fullDump: 'true',
       passwordSecret: {
         name: 'cloudsql-pg-01-readonly',
         key: 'password',
@@ -96,22 +96,6 @@ test.new(std.thisFile)
       s3AccessKeySecret: {
         name: 's3-creds',
         key: 'AWS_ACCESS_KEY_ID',
-      },
-      port: {
-        name: 'PGPORT',
-        value: '5433',
-      },
-      destination: {
-        name: 'S3_DESTINATION_PATH',
-        value: 's3://bucket/archive',
-      },
-      endpoint: {
-        name: 'S3_ENDPOINT_URL',
-        value: 'https://s3.example.com',
-      },
-      fullDump: {
-        name: 'PG_DUMP_ROLES',
-        value: 'true',
       },
     },
   ),
@@ -130,7 +114,7 @@ test.new(std.thisFile)
           ip: '10.0.0.1',
           ports: [
             {
-              name: 'sql',
+              name: 'postgres-port',
               port: 5433,
               protocol: 'TCP',
             },
@@ -138,13 +122,6 @@ test.new(std.thisFile)
         },
         {
           host: 's3.example.com',
-          ports: [
-            {
-              name: 'scality-s3',
-              port: 443,
-              protocol: 'HTTPS',
-            },
-          ],
         },
       ],
       filesFrom: [

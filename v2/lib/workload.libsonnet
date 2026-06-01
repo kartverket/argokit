@@ -1,18 +1,10 @@
 local v = import '../internal/validation.libsonnet';
 
-local optionalNumber(value, label) =
-  v.number(value, label, true);
-
-local optionalBoolean(value, label) =
-  if value == null then {} else v.boolean(value, label);
-
-local enum(value, label, allowed) =
-  if std.member(allowed, value) then {}
-  else error label + ' must be one of: ' + std.join(', ', allowed);
-
 {
   /**
-  Sets the command for the workload container.
+  Sets the command for the workload container, overriding the image's default entrypoint.
+  Parameters:
+    - command: array - command and arguments, e.g. ['sh', '-c', 'migrate && serve'].
   */
   withCommand(command)::
     v.array(command, 'command') +
@@ -25,7 +17,9 @@ local enum(value, label, allowed) =
     },
 
   /**
-  Adds labels propagated by Skiperator to generated resources.
+  Adds labels propagated by Skiperator to all generated resources (Deployment, Service, etc.).
+  Parameters:
+    - labels: object - key/value pairs to merge into the resource labels.
   */
   withLabels(labels)::
     v.object(labels, 'labels') +
@@ -38,7 +32,9 @@ local enum(value, label, allowed) =
     },
 
   /**
-  Sets the owning team for the workload.
+  Sets the owning team for the workload. Used by Skiperator for labelling and tracking ownership.
+  Parameters:
+    - team: string - team identifier.
   */
   withTeam(team)::
     v.string(team, 'team') +
@@ -51,10 +47,12 @@ local enum(value, label, allowed) =
     },
 
   /**
-  Sets SKIP resource priority.
+  Sets SKIP resource priority, which controls scheduling preference under resource pressure.
+  Parameters:
+    - priority: string - low, medium, or high.
   */
   withPriority(priority)::
-    enum(priority, 'priority', ['low', 'medium', 'high']) +
+    v.enum(priority, 'priority', ['low', 'medium', 'high']) +
     {
       application+: {
         spec+: {
@@ -64,12 +62,16 @@ local enum(value, label, allowed) =
     },
 
   /**
-  Adds an additional container port.
+  Exposes an additional container port alongside the main port (e.g. a metrics scrape port).
+  Parameters:
+    - name: string - port name, used as the key in Service and NetworkPolicy.
+    - port: number - port number.
+    - protocol: string - TCP (default), UDP, or SCTP.
   */
   withAdditionalPort(name, port, protocol='TCP')::
     v.string(name, 'name') +
     v.number(port, 'port') +
-    enum(protocol, 'protocol', ['TCP', 'UDP', 'SCTP']) +
+    v.enum(protocol, 'protocol', ['TCP', 'UDP', 'SCTP']) +
     {
       application+: {
         spec+: {
@@ -86,11 +88,15 @@ local enum(value, label, allowed) =
 
   /**
   Configures pod-level settings for pods created by Skiperator.
+  Parameters:
+    - annotations: object (optional) - annotations added to every pod.
+    - disablePodSpreadTopologyConstraints: boolean (optional) - opt out of Skiperator's default topology spread constraints.
+    - terminationGracePeriodSeconds: number (optional) - seconds to wait for graceful shutdown before SIGKILL.
   */
-  withPodSettings(annotations={}, disablePodSpreadTopologyConstraints=null, terminationGracePeriodSeconds=null)::
-    v.object(annotations, 'annotations', allowEmpty=true) +
-    optionalBoolean(disablePodSpreadTopologyConstraints, 'disablePodSpreadTopologyConstraints') +
-    optionalNumber(terminationGracePeriodSeconds, 'terminationGracePeriodSeconds') +
+  withPodSettings(annotations=null, disablePodSpreadTopologyConstraints=null, terminationGracePeriodSeconds=null)::
+    (if annotations != null then v.object(annotations, 'annotations', allowEmpty=true) else {}) +
+    v.optionalBoolean(disablePodSpreadTopologyConstraints, 'disablePodSpreadTopologyConstraints') +
+    v.optionalNumber(terminationGracePeriodSeconds, 'terminationGracePeriodSeconds') +
     {
       application+: {
         spec+: {
@@ -104,7 +110,9 @@ local enum(value, label, allowed) =
     },
 
   /**
-  Sets Istio tracing sampling percentage. Use 0 to disable tracing.
+  Sets Istio distributed tracing sampling rate.
+  Parameters:
+    - randomSamplingPercentage: number - percentage of requests to trace, 0–100. Use 0 to disable tracing.
   */
   withTracing(randomSamplingPercentage)::
     v.number(randomSamplingPercentage, 'randomSamplingPercentage') +

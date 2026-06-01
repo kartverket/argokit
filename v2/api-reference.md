@@ -45,7 +45,7 @@ Gjør SKIPJob periodisk ved å sette `spec.cron`. Se Kubernetes cron-syntaks [he
 | `allowConcurrency` | `string` | `false` | - | `Allow`, `Forbid` eller `Replace` |
 | `startingDeadlineSeconds` | `number` | `false` | - | frist i sekunder for å starte en forsinket jobb |
 | `suspend` | `boolean` | `false` | - | suspenderer cronjobben |
-| `timeZone` | `string` | `false` | - | IANA-tidssone, f.eks. `Europe/Oslo` |
+| `timeZone` | `string` | `false` | `Europe/Oslo` | IANA-tidssone, f.eks. `Etc/UTC` |
 
 ### `argokit.appAndObjects.skipjob.withSettings()`
 Setter Kubernetes Job-innstillinger under `spec.job`.
