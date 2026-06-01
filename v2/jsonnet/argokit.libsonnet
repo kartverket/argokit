@@ -8,6 +8,8 @@ local replicas = import '../lib/replicas.libsonnet';
 
 local appAndObjects = import '../lib/appAndObjects/appAndObjects.libsonnet';
 local resources = import '../lib/resources/resources.libsonnet';
+local dbArchive = import './dbArchive.libsonnet';
 {
   appAndObjects: appAndObjects,
+  dbArchiveJob: dbArchive.dbArchiveJob,
 } + resources
