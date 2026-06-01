@@ -1,6 +1,6 @@
 local accessPolicies = import '../lib/accessPolicies.libsonnet';
-local utils = import '../v2/internal/utils.libsonnet';
 local environment = import '../lib/environment.libsonnet';
+local utils = import '../v2/internal/utils.libsonnet';
 
 {
   Env: environment,

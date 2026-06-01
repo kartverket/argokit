@@ -3,19 +3,19 @@ local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
 local application = argokit.appAndObjects.application;
 
 test.new(std.thisFile)
- + test.case.new(
++ test.case.new(
   name='prometheus with allowAllMetrics false (explicit)',
   test=test.expect.eqDiff(
     actual=(application.withPrometheus(path='/metrics', port=8080, allowAllMetrics=false)).application.spec,
-     expected={
-       prometheus: {
-         path: '/metrics',
-         port: 8080,
-         scrapeInterval: '60s',
-       },
-     },
-   ),
- )
+    expected={
+      prometheus: {
+        path: '/metrics',
+        port: 8080,
+        scrapeInterval: '60s',
+      },
+    },
+  ),
+)
 + test.case.new(
   name='prometheus basic configuration',
   test=test.expect.eqDiff(
@@ -60,15 +60,15 @@ test.new(std.thisFile)
   name='prometheus with direct object syntax',
   test=test.expect.eqDiff(
     actual=(application.new('test', 'test:1.0', 8080) + {
-      application+: {
-        spec+: {
-          prometheus: {
-            path: '/metrics',
-            port: 8080,
-          },
-        },
-      },
-    }).application.spec,
+              application+: {
+                spec+: {
+                  prometheus: {
+                    path: '/metrics',
+                    port: 8080,
+                  },
+                },
+              },
+            }).application.spec,
     expected={
       image: 'test:1.0',
       port: 8080,
@@ -156,4 +156,3 @@ test.new(std.thisFile)
     },
   ),
 )
-

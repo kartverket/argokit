@@ -1,6 +1,6 @@
+local utils = import '../internal/utils.libsonnet';
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
-local utils = import '../internal/utils.libsonnet';
 
 local expected = {
   apiVersion: 'skiperator.kartverket.no/v1alpha1',
@@ -86,7 +86,7 @@ test.new(std.thisFile)
 + test.case.new(
   name='Routing has deprecated label when marked as deprecated',
   test=(
-    local deprecatedRouting = 
+    local deprecatedRouting =
       argokit.routing.new('myapp-routing', 'myhostname')
       + utils.withArgokitVersionLabel(versionDeprecated=true, flavor='v2');
     test.expect.eq(
