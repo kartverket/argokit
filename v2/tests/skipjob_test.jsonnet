@@ -61,6 +61,44 @@ test.new(std.thisFile)
   ),
 )
 + test.case.new(
+  name='cron supports vixie steps ranges lists question mark and macros',
+  test=test.expect.eqDiff(
+    actual=[
+      (skipjob.withCron(schedule='*/5 0-23/2 1,15 * 1-5')).application.spec.cron.schedule,
+      (skipjob.withCron(schedule='0 0 ? * 0')).application.spec.cron.schedule,
+      (skipjob.withCron(schedule='@daily')).application.spec.cron.schedule,
+    ],
+    expected=[
+      '*/5 0-23/2 1,15 * 1-5',
+      '0 0 ? * 0',
+      '@daily',
+    ],
+  ),
+)
++ test.case.new(
+  name='cron validation rejects invalid schedules',
+  test=test.expect.eqDiff(
+    actual=[
+      skipjob._cronScheduleIsValid('0 0 * * 7'),
+      skipjob._cronScheduleIsValid('0 0 * * 1-7'),
+      skipjob._cronScheduleIsValid('*/0 * * * *'),
+      skipjob._cronScheduleIsValid('60 * * * *'),
+      skipjob._cronScheduleIsValid('0 24 * * *'),
+      skipjob._cronScheduleIsValid('0 0 * 13 *'),
+      skipjob._cronScheduleIsValid('* * * *'),
+    ],
+    expected=[
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ],
+  ),
+)
++ test.case.new(
   name='settings backoff zero is preserved',
   test=test.expect.eqDiff(
     actual=(skipjob.withSettings(backoffLimit=0)).application.spec,
