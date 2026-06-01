@@ -13,20 +13,6 @@ local mounts = import './mounts.libsonnet';
 local templates = import './templates.libsonnet';
 local utils = import './utils.libsonnet';
 
-local optionalString(value, label) =
-  if value == null then {} else v.string(value, label);
-
-local optionalNumber(value, label) =
-  v.number(value, label, true);
-
-local optionalBoolean(value, label) =
-  if value == null then {} else v.boolean(value, label);
-
-local enum(value, label, allowed, allowNull=false) =
-  if allowNull && value == null then {}
-  else if std.member(allowed, value) then {}
-  else error label + ' must be one of: ' + std.join(', ', allowed);
-
 local cronSyntaxError =
   'schedule must use Kubernetes cron syntax: five fields with minute 0-59, hour 0-23, day-of-month 1-31, month 1-12, and day-of-week 0-6; lists, ranges, ?, macros, and positive Vixie steps are supported';
 
@@ -40,38 +26,29 @@ local cronMacros = [
   '@hourly',
 ];
 
-local digits = [
-  '0',
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-];
-
 local isInteger(value) =
   std.length(value) > 0
-  && std.length([char for char in std.stringChars(value) if !std.member(digits, char)]) == 0;
+  && std.all([
+    local cp = std.codepoint(char);
+    cp >= 48 && cp <= 57
+    for char in std.stringChars(value)
+  ]);
 
 local inRange(value, min, max) =
   isInteger(value)
-  && std.parseInt(value) >= min
-  && std.parseInt(value) <= max;
+  && (local n = std.parseInt(value); n >= min && n <= max);
 
 local validCronBase(value, min, max) =
   if value == '*' || value == '?' then true
   else
-    local rangeParts = std.split(value, '-');
-    if std.length(rangeParts) == 1 then inRange(value, min, max)
-    else if std.length(rangeParts) == 2 then
-      inRange(rangeParts[0], min, max)
-      && inRange(rangeParts[1], min, max)
-      && std.parseInt(rangeParts[0]) <= std.parseInt(rangeParts[1])
-    else false;
+    local parts = std.split(value, '-');
+    local len = std.length(parts);
+    (len == 1 || len == 2)
+    && inRange(parts[0], min, max)
+    && (len == 1 || (
+          inRange(parts[1], min, max)
+          && std.parseInt(parts[0]) <= std.parseInt(parts[1])
+        ));
 
 local validCronPart(value, min, max) =
   local stepParts = std.split(value, '/');
@@ -85,7 +62,7 @@ local validCronPart(value, min, max) =
 
 local validCronField(value, min, max) =
   std.length(value) > 0
-  && std.length([part for part in std.split(value, ',') if !validCronPart(part, min, max)]) == 0;
+  && std.all([validCronPart(part, min, max) for part in std.split(value, ',')]);
 
 local validCronSchedule(schedule) =
   local fields = [field for field in std.split(schedule, ' ') if field != ''];
@@ -125,14 +102,20 @@ local validateCronSchedule(schedule) =
 
   /**
   Configures the SKIPJob as a scheduled job.
+  Parameters:
+    - schedule: string - cron expression (five fields) or macro such as @daily. Validated at render time.
+    - allowConcurrency: string (optional) - how to handle overlapping runs: Allow, Forbid, or Replace.
+    - startingDeadlineSeconds: number (optional) - seconds after a missed start before the run is skipped.
+    - suspend: boolean (optional) - suspend the resource without deleting it.
+    - timeZone: string - IANA time zone for the schedule, e.g. Etc/UTC. Defaults to Europe/Oslo.
   */
-  withCron(schedule, allowConcurrency=null, startingDeadlineSeconds=null, suspend=null, timeZone=null)::
+  withCron(schedule, allowConcurrency=null, startingDeadlineSeconds=null, suspend=null, timeZone='Europe/Oslo')::
     v.string(schedule, 'schedule') +
     validateCronSchedule(schedule) +
-    enum(allowConcurrency, 'allowConcurrency', ['Allow', 'Forbid', 'Replace'], allowNull=true) +
-    optionalNumber(startingDeadlineSeconds, 'startingDeadlineSeconds') +
-    optionalBoolean(suspend, 'suspend') +
-    optionalString(timeZone, 'timeZone') +
+    v.enum(allowConcurrency, 'allowConcurrency', ['Allow', 'Forbid', 'Replace'], allowNull=true) +
+    v.optionalNumber(startingDeadlineSeconds, 'startingDeadlineSeconds') +
+    v.optionalBoolean(suspend, 'suspend') +
+    v.optionalString(timeZone, 'timeZone') +
     {
       application+: {
         spec+: {
@@ -149,12 +132,17 @@ local validateCronSchedule(schedule) =
 
   /**
   Configures Kubernetes Job settings.
+  Parameters:
+    - activeDeadlineSeconds: number (optional) - hard time limit in seconds for the entire job.
+    - backoffLimit: number (optional) - number of retries before the job is marked failed. 0 means no retries.
+    - suspend: boolean (optional) - suspend the resource without deleting it.
+    - ttlSecondsAfterFinished: number (optional) - seconds to keep the finished job before garbage collection.
   */
   withSettings(activeDeadlineSeconds=null, backoffLimit=null, suspend=null, ttlSecondsAfterFinished=null)::
-    optionalNumber(activeDeadlineSeconds, 'activeDeadlineSeconds') +
-    optionalNumber(backoffLimit, 'backoffLimit') +
-    optionalBoolean(suspend, 'suspend') +
-    optionalNumber(ttlSecondsAfterFinished, 'ttlSecondsAfterFinished') +
+    v.optionalNumber(activeDeadlineSeconds, 'activeDeadlineSeconds') +
+    v.optionalNumber(backoffLimit, 'backoffLimit') +
+    v.optionalBoolean(suspend, 'suspend') +
+    v.optionalNumber(ttlSecondsAfterFinished, 'ttlSecondsAfterFinished') +
     {
       application+: {
         spec+: {
@@ -169,10 +157,12 @@ local validateCronSchedule(schedule) =
     },
 
   /**
-  Sets the job restart policy.
+  Sets the job restart policy. OnFailure restarts the container in-place; Never leaves the pod for inspection.
+  Parameters:
+    - restartPolicy: string - OnFailure or Never.
   */
   withRestartPolicy(restartPolicy)::
-    enum(restartPolicy, 'restartPolicy', ['OnFailure', 'Never']) +
+    v.enum(restartPolicy, 'restartPolicy', ['OnFailure', 'Never']) +
     {
       application+: {
         spec+: {
