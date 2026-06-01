@@ -64,6 +64,16 @@ application.new('foo-backend', "backend-image", 8080)
  + application.withInboundSkipApp('foo-frontend')
 ```
 
+For SKIPJob v1beta1 resources, use `argokit.appAndObjects.skipjob`:
+
+```jsonnet
+local argokit = import 'github.com/kartverket/argokit/v2/jsonnet/argokit.libsonnet';
+local skipjob = argokit.appAndObjects.skipjob;
+skipjob.new('daily-report', 'ghcr.io/kartverket/daily-report:latest')
+ + skipjob.withCommand(['sh', '-c', 'run-report'])
+ + skipjob.withCron(schedule='0 6 * * *', timeZone='Europe/Oslo')
+```
+
 ## API Reference
 
 [Read the full ArgoKit V2 API Reference here](./api-reference.md)

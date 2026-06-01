@@ -15,3 +15,28 @@ test.new(std.thisFile)
     },
   ),
 )
++ test.case.new(
+  name='Cloud SQL proxy can be combined with service account',
+  test=test.expect.eqDiff(
+    actual=(
+      application.withGcpServiceAccount('something@google.com')
+      + application.withCloudSqlProxy(
+        connectionName='project:europe-north1:instance',
+        serviceAccount='cloudsql@google.com',
+        ip='10.0.0.1',
+      )
+    ).application.spec,
+    expected={
+      gcp: {
+        auth: {
+          serviceAccount: 'something@google.com',
+        },
+        cloudSqlProxy: {
+          connectionName: 'project:europe-north1:instance',
+          serviceAccount: 'cloudsql@google.com',
+          ip: '10.0.0.1',
+        },
+      },
+    },
+  ),
+)
