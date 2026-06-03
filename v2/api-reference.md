@@ -447,10 +447,11 @@ Legg til en `AzureADApplication`-ressurs og konfigurerer applikasjonen.
 ### `argokit.appAndObjects.application.withSecretAsMount()`
 Monter en eksisterende hemmelighet som filer på angitt sti.
 
-|navn|type|obligatorisk|standardverdi|beskrivelse|
-|-|-|-|-|-|
-|`secretName`|`string`|`true`| - |navn på hemmeligheten som skal monteres|
-|`mountPath`|`string`|`true`| - |stien hvor hemmeligheten skal monteres|
+| navn               | type     | obligatorisk | standardverdi | beskrivelse                                                      |
+|--------------------|----------|--------------|---------------|------------------------------------------------------------------|
+| `secretName`       | `string` | `true`       | -             | navn på hemmeligheten som skal monteres                          |
+| `mountPath`        | `string` | `true`       | -             | stien hvor hemmeligheten skal monteres                           |
+| `limitPermissions` | `bool`   | `false`      | `false`       | begrens filrettigheter til `600` i stedet for `644` som standard |
 
 **Eksempel:** [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
 
