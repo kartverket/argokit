@@ -10,6 +10,7 @@ local combinedMountApp =
   app
   + application.withSecretAsMount('secret-1', '/path/1')
   + application.withPersistentVolumeClaimAsMount('pvc-1', '/path/2');
+local secretMountWithDefaultModeApp = app + application.withSecretAsMount('my-secret', '/var/run/secrets/my-secret', true);
 
 test.new(std.thisFile)
 
@@ -49,5 +50,17 @@ test.new(std.thisFile)
         persistentVolumeClaim: 'pvc-1',
       },
     ]
+  )
+)
+
++ test.case.new(
+  name='withSecretAsMount overrides file permissions',
+  test=test.expect.eqDiff(
+    actual=secretMountWithDefaultModeApp.items[0].spec.filesFrom[0],
+    expected={
+      mountPath: '/var/run/secrets/my-secret',
+      secret: 'my-secret',
+      defaultMode: std.parseOctal('0600'),
+    }
   )
 )
