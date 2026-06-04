@@ -6,8 +6,9 @@ local v = import '../../internal/validation.libsonnet';
   Parameters:
     - secretName: string - The name of the secret to mount.
     - mountPath: string - The path to the mount.
+    - limitPermissions: bool - Limit file permissions to '600' (optional, default is false and '644')
   */
-  withSecretAsMount(secretName, mountPath)::
+  withSecretAsMount(secretName, mountPath, limitPermissions=false)::
     v.string(secretName, 'secretName') +
     v.string(mountPath, 'mountPath') +
     {
@@ -17,6 +18,7 @@ local v = import '../../internal/validation.libsonnet';
             {
               mountPath: mountPath,
               secret: secretName,
+              [if limitPermissions then 'defaultMode']: std.parseOctal('0600'),
             },
           ],
         },
