@@ -1,5 +1,4 @@
 local internalUtils = import '../../internal/utils.libsonnet';
-local hooks = import './configHooks.libsonnet';
 
 {
   AppAndObjects:: {
