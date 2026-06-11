@@ -242,7 +242,7 @@ Konfigurer hvordan Prometheus‑kompatible metrics skal hentes (scraped).
 |navn|type|obligatorisk|standardverdi|beskrivelse|
 |-|-|-|-|-|
 |`path`|`string`|`true`| - |sti hvor metrics er eksponert (f.eks. `/metrics`, `/actuator/prometheus`)|
-|`port`|`number`|`true`| - |portnummer hvor metrics er eksponert|
+|`port`|`number` eller `string`|`true`| - |port hvor metrics er eksponert (portnummer eller navngitt port)|
 |`allowAllMetrics`|`boolean`|`false`|false|hvis `true`, vil alle eksponerte metrics bli skrapet. Ellers vil en forhåndsdefinert liste med metrics bli droppet. Ref: https://github.com/kartverket/skiperator/blob/main/pkg/util/constants.go#L19-L23 |
 
 **Eksempel:** [examples/application-with-prometheus.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/application-with-prometheus.jsonnet)
