@@ -57,6 +57,19 @@ test.new(std.thisFile)
   ),
 )
 + test.case.new(
+  name='prometheus with string port (named port)',
+  test=test.expect.eqDiff(
+    actual=(application.withPrometheus(path='/metrics', port='metrics')).application.spec,
+    expected={
+      prometheus: {
+        path: '/metrics',
+        port: 'metrics',
+        scrapeInterval: '60s',
+      },
+    },
+  ),
+)
++ test.case.new(
   name='prometheus with direct object syntax',
   test=test.expect.eqDiff(
     actual=(application.new('test', 'test:1.0', 8080) + {

@@ -6,12 +6,18 @@ local v = import '../internal/validation.libsonnet';
       error 'scrapeInterval must end with "s" (seconds) or "m" (minutes)'
     else {},
 
+  local validatePort(port) =
+    if std.isNumber(port) then {}
+    else if std.isString(port) then
+      if port == '' then error 'port must be a non-empty string' else {}
+    else error 'port must be a string or number',
+
   /**
    * Configure Prometheus metrics scraping for the application. After configuring an endpoint that exposes metrics, the platform itself will collect the metrics on the application's behalf.
    *
    * Variables:
    *  - path: string - The path where metrics are exposed (e.g., '/metrics' or '/actuator/prometheus')
-   *  - port: int - The port number where metrics are exposed
+   *  - port: string or number - The port where metrics are exposed (port number or named port)
    *  - allowAllMetrics: bool (optional, default=false) - If true, all exposed metrics are scraped.
    *                                                       Otherwise, a predefined list of metrics will be dropped.
    * See DefaultMetricDropList here: https://github.com/kartverket/skiperator/blob/main/pkg/util/constants.go#L19-L23
@@ -19,7 +25,7 @@ local v = import '../internal/validation.libsonnet';
    */
   withPrometheus(path, port, allowAllMetrics=false, scrapeInterval='60s')::
     v.string(path, 'path') +
-    v.number(port, 'port') +
+    validatePort(port) +
     v.boolean(allowAllMetrics, 'allowAllMetrics') +
     v.string(scrapeInterval, 'scrapeInterval', allowEmpty=true) +
     validateScrapeInterval(scrapeInterval) +
