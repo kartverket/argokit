@@ -25,7 +25,7 @@ jobs:
           identity: version_updater
 
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0  # Fetch all history for tags
           token: ${{ steps.octo-sts.outputs.token }}
