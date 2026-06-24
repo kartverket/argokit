@@ -11,7 +11,7 @@ questions, please reach out to the #gen-argocd channel in Slack.
 
 ## Installation
 
-Assuming you have followed the [Getting Started](https://kartverket.atlassian.net/wiki/spaces/SKIPDOK/pages/554827836/Komme+i+gang+med+Argo+CD)
+Assuming you have followed the [Getting Started](https://skip.kartverket.no/docs/applikasjon-utrulling/argo-cd/komme-i-gang-med-argocd)
 guide, you can use ArgoKit in your apps-repo. The first step is to include the
 ArgoKit library by running the following command:
 
