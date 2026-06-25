@@ -1,2 +1,3 @@
 * @kartverket/skip
-
+/v2/lib/resources/db/ @kartverket/dba
+/v2/examples/dbOnprem.jsonnet @kartverket/dba
