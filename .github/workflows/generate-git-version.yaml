@@ -1,6 +1,7 @@
 name: Generate Git Version
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - '*'
