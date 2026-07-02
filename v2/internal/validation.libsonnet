@@ -36,4 +36,19 @@
       then error label + ' object must not be empty'
       else {}
     else error label + ' must be object',
+
+  optionalString(value, label):
+    if value == null then {} else self.string(value, label),
+
+  optionalNumber(value, label):
+    self.number(value, label, allowNull=true),
+
+  optionalBoolean(value, label):
+    if value == null then {} else self.boolean(value, label),
+
+  // validate that value is one of the allowed strings; set allowNull=true to also permit null
+  enum(value, label, allowed, allowNull=false):
+    if allowNull && value == null then {}
+    else if std.member(allowed, value) then {}
+    else error label + ' must be one of: ' + std.join(', ', allowed),
 }
