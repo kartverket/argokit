@@ -125,6 +125,31 @@ Legger til en `AzureADApplication`-ressurs og konfigurerer applikasjonen til å 
 
 Eksempel: [examples/withAzureAdApplication.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withAzureAdApplication.jsonnet)
 
+### `argokit.appAndObjects.application.withExtraContainer()`
+Legger til en ekstra container i podden for en `Application`.
+
+| navn | type | obligatorisk | standardverdi | beskrivelse |
+|-|-|-|-|-|
+| `name` | `string` | `true` | - | container-navn |
+| `image` | `string` | `true` | - | container-image |
+| `type` | `string` | `false` | `standard` | `standard` for vanlig sidecar, eller `init` for native sidecar init-container |
+| `command` | `array` | `false` | - | overstyrer container command |
+| `args` | `array` | `false` | - | argumenter til entrypoint |
+| `env` | `array` | `false` | - | miljøvariabler for containeren |
+| `envFrom` | `array` | `false` | - | miljøvariabler fra Secret eller ConfigMap |
+| `filesFrom` | `array` | `false` | - | filmonteringer for containeren |
+| `additionalPorts` | `array` | `false` | `[]` | porter eksponert av containeren |
+| `resources` | `object` | `false` | - | ressurskrav og -grenser |
+| `liveness` | `object` | `false` | - | liveness probe |
+| `readiness` | `object` | `false` | - | readiness probe |
+| `startup` | `object` | `false` | - | startup probe |
+| `ingressPort` | `number` | `false` | - | gjør at ingress-trafikk går til denne container-porten. Porten må også finnes i `additionalPorts` |
+
+Eksempel: [examples/extraContainers.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/extraContainers.jsonnet)
+
+### `argokit.appAndObjects.application.extraContainer()`
+Bygger en ekstra container-spec uten å legge den til i applikasjonen. Nyttig sammen med `withExtraContainers(containers)`.
+
 ## Felles workload-hjelpere
 
 Disse hjelperne finnes på både `argokit.appAndObjects.application` og `argokit.appAndObjects.skipjob`.
