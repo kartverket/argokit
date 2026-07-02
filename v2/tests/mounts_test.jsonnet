@@ -10,7 +10,7 @@ local combinedMountApp =
   app
   + application.withSecretAsMount('secret-1', '/path/1')
   + application.withPersistentVolumeClaimAsMount('pvc-1', '/path/2');
-local secretMountWithDefaultModeApp = app + application.withSecretAsMount('my-secret', '/var/run/secrets/my-secret', true);
+local secretMountWithDefaultModeApp = app + application.withSecretAsMount('my-secret', '/var/run/secrets/my-secret', std.parseOctal('0600'));
 
 test.new(std.thisFile)
 
