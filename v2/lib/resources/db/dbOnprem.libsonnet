@@ -231,6 +231,16 @@
         },
         },
       },
+      s3BarmanSA: {
+        apiVersion: 'v1',
+        kind: 'ServiceAccount',
+        metadata: {
+          annotations: {
+            'prometheus.io/scrape': 'false',
+          },
+          name: 's3-barman-cloud',
+        },
+      },
       cluster: {
         apiVersion: 'postgresql.cnpg.io/v1',
         kind: 'Cluster',
