@@ -4,11 +4,11 @@
     local rolebinding = import '../k8s/rolebinding.libsonnet';
     local defaults = {
       databaseName: 'eksempel',
-      environment: 'atkv3-dev',
+      environment: 'dev',
 
-      instances: 1,
+      instances: 2,
       enablePDB: false,
-      imageName: 'ghcr.io/cloudnative-pg/postgis:18.3-3.6.2-system-trixie',
+      imageName: 'ghcr.io/cloudnative-pg/postgis:18.4-3.6.4-system-trixie',
       storageSizeGi: 1,
 
       // Note: 'extensions' is fully replaced when overridden, not merged.
@@ -21,7 +21,7 @@
         {
           ensure: 'present',
           name: 'postgis',
-          version: '3.6.2',
+          version: '3.6.4',
         },
       ],
 
@@ -94,16 +94,38 @@
     };
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
-    assert std.member(['atkv3-sandbox', 'atkv3-dev'], p.environment) : 'Environment must be either "atkv3-sandbox" or "atkv3-dev"'; // In the future there will be dedicated stateful/DB clusters
+    assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"'; // In the future there will be dedicated stateful/DB clusters
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3'; // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
 
     local clusterName = '%s-cluster' % p.databaseName;
+    local environmentConfig = {
+      dev: {
+        k8sCluster: 'atkv3-dev',
+        gsmProject: 'dba-dev-b03a',
+      },
+      sandbox: {
+        k8sCluster: 'atkv3-sandbox-stateful',
+        gsmProject: 'dba-sandbox-67ca',
+      },
+      // prod: {
+      //   k8sCluster: 'atkv3-prod-stateful',
+      //   gsmProject: 'dba-prod-6849',
+      // },
+    };
+    
+    assert std.objectHas(environmentConfig, p.environment) :
+      'Unsupported environment: ' + p.environment;
+    
+    local env = environmentConfig[p.environment];
+    local k8sCluster = env.k8sCluster;
+    local gsmProject = env.gsmProject;
+    
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
-    local writeHost = '%s-write.pg.%s.kartverket-intern.cloud' % [p.databaseName, p.environment];
-    local readHost = '%s-read.pg.%s.kartverket-intern.cloud' % [p.databaseName, p.environment];
+    local writeHost = '%s-write.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
+    local readHost = '%s-read.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
 
     local headlessServices = {
       ['%s-%d-hs' % [clusterName, instanceNumber]]: {
@@ -174,7 +196,7 @@
         spec: {
           provider: {
             gcpsm: {
-              projectID: 'dba-dev-b03a',
+              projectID: gsmProject,
             },
           },
         },
