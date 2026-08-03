@@ -94,8 +94,8 @@
     };
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
-    assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"'; // In the future there will be dedicated stateful/DB clusters
-    assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3'; // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
+    assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"';  // In the future there will be dedicated stateful/DB clusters
+    assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
 
@@ -114,14 +114,14 @@
       //   gsmProject: 'dba-prod-6849',
       // },
     };
-    
+
     assert std.objectHas(environmentConfig, p.environment) :
-      'Unsupported environment: ' + p.environment;
-    
+           'Unsupported environment: ' + p.environment;
+
     local env = environmentConfig[p.environment];
     local k8sCluster = env.k8sCluster;
     local gsmProject = env.gsmProject;
-    
+
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
     local writeHost = '%s-write.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
@@ -247,10 +247,10 @@
               },
             },
           ],
-        refreshInterval: '1h',
-        target: {
-          name: 's3-bucket-creds',
-        },
+          refreshInterval: '1h',
+          target: {
+            name: 's3-bucket-creds',
+          },
         },
       },
       s3BarmanSA: {
@@ -277,7 +277,7 @@
               owner: p.databaseName,
             },
           },
-          enablePDB: if p.instances > 1 then p.enablePDB else false, // PDB doesn't make sense for single instance clusters
+          enablePDB: if p.instances > 1 then p.enablePDB else false,  // PDB doesn't make sense for single instance clusters
           imageName: p.imageName,
           storage: {
             size: p.storageSizeGi + 'Gi',
@@ -290,8 +290,8 @@
             parameters: p.postgresqlParameters,
           },
         } + (if std.length(p.plugins) > 0 then {
-          plugins: p.plugins,
-      } else {}),
+               plugins: p.plugins,
+             } else {}),
       },
       database: {
         apiVersion: 'postgresql.cnpg.io/v1',
@@ -350,7 +350,7 @@
             },
           },
         },
-      },        
+      },
       podMonitor: {
         apiVersion: 'monitoring.coreos.com/v1',
         kind: 'PodMonitor',
@@ -457,7 +457,7 @@
           ],
           policyTypes: ['Ingress'],
         },
-      },      
+      },
       networkPolicyMetricsScraping: {
         apiVersion: 'networking.k8s.io/v1',
         kind: 'NetworkPolicy',
@@ -671,5 +671,5 @@
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
     } + headlessServices;
     // Return all objects as a list
-    std.objectValues(objects)
+    std.objectValues(objects),
 }
