@@ -246,7 +246,7 @@ Eksempel: [examples/application-with-prometheus.jsonnet](https://github.com/kart
 | funksjon | beskrivelse |
 |-|-|
 | `withConfigMapAsEnv(name, data, addHashToName=false)` | oppretter en ConfigMap og legger den til via `spec.envFrom` |
-| `withConfigMapAsMount(name, mountPath, data, addHashToName=false)` | oppretter en ConfigMap og monterer den som filer |
+| `withConfigMapAsMount(name, mountPath, data, addHashToName=false, defaultMode=null, subPath=null)` | oppretter en ConfigMap og monterer den som filer |
 
 Eksempel: [examples/withConfigMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withConfigMap.jsonnet)
 
@@ -262,9 +262,9 @@ Eksempel: [examples/withExternalSecret.jsonnet](https://github.com/kartverket/ar
 
 | funksjon | beskrivelse |
 |-|-|
-| `withSecretAsMount(secretName, mountPath)` | monterer en eksisterende Secret som filer |
-| `withPersistentVolumeClaimAsMount(pvcName, mountPath)` | monterer en PVC |
-| `withEmptyDirAsMount(mountPath, emptyDir)` | monterer et emptyDir-volum |
+| `withSecretAsMount(secretName, mountPath, defaultMode=null, subPath=null)` | monterer en eksisterende Secret som filer |
+| `withPersistentVolumeClaimAsMount(pvcName, mountPath, subPath=null)` | monterer en PVC |
+| `withEmptyDirAsMount(mountPath, emptyDir, subPath=null)` | monterer et emptyDir-volum |
 
 Eksempel: [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
 

@@ -7,11 +7,13 @@ local v = import '../../internal/validation.libsonnet';
     - secretName: string - The name of the secret to mount.
     - mountPath: string - The path to the mount.
     - defaultMode: number (optional) - Unix file permission bits for mounted files, e.g. 384 (0600 octal).
+    - subPath: string (optional) - The sub-path inside the volume to mount.
   */
-  withSecretAsMount(secretName, mountPath, defaultMode=null)::
+  withSecretAsMount(secretName, mountPath, defaultMode=null, subPath=null)::
     v.string(secretName, 'secretName') +
     v.string(mountPath, 'mountPath') +
     v.optionalNumber(defaultMode, 'defaultMode') +
+    v.optionalString(subPath, 'subPath') +
     {
       application+: {
         spec+: {
@@ -20,6 +22,7 @@ local v = import '../../internal/validation.libsonnet';
               mountPath: mountPath,
               secret: secretName,
               defaultMode: defaultMode,
+              subPath: subPath,
             }),
           ],
         },
@@ -31,18 +34,21 @@ local v = import '../../internal/validation.libsonnet';
   Parameters:
     - pvcName: string - The name of the Persistent Volume Claim (PVC) to mount.
     - mountPath: string - The path to the mount.
+    - subPath: string (optional) - The sub-path inside the volume to mount.
   */
-  withPersistentVolumeClaimAsMount(pvcName, mountPath)::
+  withPersistentVolumeClaimAsMount(pvcName, mountPath, subPath=null)::
     v.string(pvcName, 'pvcName') +
     v.string(mountPath, 'mountPath') +
+    v.optionalString(subPath, 'subPath') +
     {
       application+: {
         spec+: {
           filesFrom+: [
-            {
+            std.prune({
               mountPath: mountPath,
               persistentVolumeClaim: pvcName,
-            },
+              subPath: subPath,
+            }),
           ],
         },
       },
@@ -60,18 +66,21 @@ local v = import '../../internal/validation.libsonnet';
   Parameters:
     - mountPath: string - The path to the mount.
     - emptyDir: string - Name of the volume
+    - subPath: string (optional) - The sub-path inside the volume to mount.
   */
-  withEmptyDirAsMount(mountPath, emptyDir)::
+  withEmptyDirAsMount(mountPath, emptyDir, subPath=null)::
     v.string(mountPath, 'mountPath') +
     v.string(emptyDir, 'emptyDir') +
+    v.optionalString(subPath, 'subPath') +
     {
       application+: {
         spec+: {
           filesFrom+: [
-            {
+            std.prune({
               mountPath: mountPath,
               emptyDir: validateEmptyDirName(emptyDir),
-            },
+              subPath: subPath,
+            }),
           ],
         },
       },

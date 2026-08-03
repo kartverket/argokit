@@ -11,6 +11,11 @@ local combinedMountApp =
   + application.withSecretAsMount('secret-1', '/path/1')
   + application.withPersistentVolumeClaimAsMount('pvc-1', '/path/2');
 local secretMountWithDefaultModeApp = app + application.withSecretAsMount('my-secret', '/var/run/secrets/my-secret', std.parseOctal('0600'));
+local mountsWithSubPathApp =
+  app
+  + application.withSecretAsMount('secret-1', '/secret-file', subPath='secret.txt')
+  + application.withPersistentVolumeClaimAsMount('pvc-1', '/pvc-file', subPath='data/file.txt')
+  + application.withEmptyDirAsMount('/emptydir-file', 'emptydir-1', subPath='scratch/file.txt');
 
 test.new(std.thisFile)
 
@@ -62,5 +67,29 @@ test.new(std.thisFile)
       secret: 'my-secret',
       defaultMode: std.parseOctal('0600'),
     }
+  )
+)
+
++ test.case.new(
+  name='mount helpers set subPath',
+  test=test.expect.eqDiff(
+    actual=mountsWithSubPathApp.items[0].spec.filesFrom,
+    expected=[
+      {
+        mountPath: '/secret-file',
+        secret: 'secret-1',
+        subPath: 'secret.txt',
+      },
+      {
+        mountPath: '/pvc-file',
+        persistentVolumeClaim: 'pvc-1',
+        subPath: 'data/file.txt',
+      },
+      {
+        mountPath: '/emptydir-file',
+        emptyDir: 'emptydir-1',
+        subPath: 'scratch/file.txt',
+      },
+    ]
   )
 )

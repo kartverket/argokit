@@ -27,7 +27,13 @@ local appAndObjectsconfigMapAsEnv =
 
 local appAndObjectsconfigMapAsMount =
   application.new('application', 'foo.io/image', 8080)
-  + application.withConfigMapAsMount(name='port', mountPath='port-as-file', data={ PORT: 3333 });
+  + application.withConfigMapAsMount(
+    name='port',
+    mountPath='port-as-file',
+    data={ PORT: 3333 },
+    defaultMode=std.parseOctal('0600'),
+    subPath='PORT'
+  );
 
 
 local label = 'Test ConfigMaps ';
@@ -115,6 +121,8 @@ test.new(std.thisFile)
     expected={
       configMap: appAndObjectsconfigMapAsEnv.items[1].metadata.name,
       mountPath: 'port-as-file',
+      defaultMode: std.parseOctal('0600'),
+      subPath: 'PORT',
     }
   )
 )
