@@ -15,14 +15,21 @@ local argokit = import '../../jsonnet/argokit.libsonnet';
       objects+:: [cm],
     },
 
-  withConfigMapAsMount(name, mountPath, data, addHashToName=false):
+  withConfigMapAsMount(name, mountPath, data, addHashToName=false, defaultMode=null, subPath=null):
+    v.optionalNumber(defaultMode, 'defaultMode') +
+    v.optionalString(subPath, 'subPath') +
     v.string(mountPath, 'mountPath') +
     {
       local cm = argokit.k8s.configMap.new(name, data, addHashToName),
       application+: {
         spec+: {
           filesFrom+: [
-            { configMap: cm.metadata.name, mountPath: mountPath },
+            std.prune({
+              configMap: cm.metadata.name,
+              mountPath: mountPath,
+              defaultMode: defaultMode,
+              subPath: subPath,
+            }),
           ],
         },
       },

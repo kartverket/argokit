@@ -11,7 +11,7 @@ Denne referansen er organisert etter hvor API-et brukes:
 
 I seksjoner for felles hjelpere betyr `<workload>` enten `application` eller `skipjob`.
 
-## Konstruktører
+## Constructors
 
 ### `argokit.appAndObjects.application.new()`
 Oppretter en Skiperator `Application` ved å bruke `appAndObjects`-konvensjonen.
@@ -64,28 +64,6 @@ Setter restart policy for jobben.
 |-|-|-|-|-|
 | `restartPolicy` | `string` | `true` | - | `OnFailure` eller `Never` |
 
-## Sammensatte maler
-
-### `argokit.dbArchiveJob()`
-Oppretter en `SKIPJob` v1beta1 som tar PostgreSQL-dump og lagrer den i S3, sammen med ExternalSecrets for database- og S3-hemmeligheter.
-
-| navn | type | obligatorisk | standardverdi | beskrivelse |
-|-|-|-|-|-|
-| `instanceName` | `string` | `true` | - | navn på databaseinstansen og SKIPJob-ressursen |
-| `schedule` | `string` | `true` | - | cron-uttrykk for arkiveringsjobben |
-| `databaseIP` | `string` | `true` | - | IP-adresse til databasen |
-| `gcpS3CredentialsSecret` | `string` | `true` | - | navn på hemmelighet med S3-credentials |
-| `databaseName` | `string` | `true` | - | databasen som skal arkiveres |
-| `archiveUser` | `string` | `false` | `postgres` | databasebrukeren jobben kobler til med |
-| `serviceAccount` | `string` | `false` | `dummyaccount@iam.gserviceaccount.com` | GCP service account for Workload Identity |
-| `cloudsqlInstanceConnectionName` | `string` | `true` | - | Cloud SQL connection name |
-| `port` | `number` | `false` | `5432` | databaseport |
-| `S3Host` | `string` | `false` | `s3-rin.statkart.no` | S3-endepunkt |
-| `S3DestinationPath` | `string` | `true` | - | S3-sti der dumpen skal lagres |
-| `fullDump` | `boolean` | `false` | `false` | om jobben også skal dumpe roller |
-
-Eksempel: [examples/dbArchive.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/dbArchive.jsonnet)
-
 ## Application-hjelpere
 
 ### `argokit.appAndObjects.application.withReplicas()`
@@ -128,22 +106,22 @@ Eksempel: [examples/withAzureAdApplication.jsonnet](https://github.com/kartverke
 ### `argokit.appAndObjects.application.withExtraContainer()`
 Legger til en ekstra container i podden for en `Application`.
 
-| navn | type | obligatorisk | standardverdi | beskrivelse |
-|-|-|-|-|-|
-| `name` | `string` | `true` | - | container-navn |
-| `image` | `string` | `true` | - | container-image |
-| `type` | `string` | `false` | `standard` | `standard` for vanlig sidecar, eller `init` for native sidecar init-container |
-| `command` | `array` | `false` | - | overstyrer container command |
-| `args` | `array` | `false` | - | argumenter til entrypoint |
-| `env` | `array` | `false` | - | miljøvariabler for containeren |
-| `envFrom` | `array` | `false` | - | miljøvariabler fra Secret eller ConfigMap |
-| `filesFrom` | `array` | `false` | - | filmonteringer for containeren |
-| `additionalPorts` | `array` | `false` | `[]` | porter eksponert av containeren |
-| `resources` | `object` | `false` | - | ressurskrav og -grenser |
-| `liveness` | `object` | `false` | - | liveness probe |
-| `readiness` | `object` | `false` | - | readiness probe |
-| `startup` | `object` | `false` | - | startup probe |
-| `ingressPort` | `number` | `false` | - | gjør at ingress-trafikk går til denne container-porten. Porten må også finnes i `additionalPorts` |
+| navn              | type     | obligatorisk | standardverdi | beskrivelse                                                                                       |
+|-------------------|----------|--------------|---------------|---------------------------------------------------------------------------------------------------|
+| `name`            | `string` | `true`       | -             | container-navn                                                                                    |
+| `image`           | `string` | `true`       | -             | container-image                                                                                   |
+| `type`            | `string` | `false`      | `standard`    | `standard` for vanlig sidecar, eller `init` for native sidecar init-container                     |
+| `command`         | `array`  | `false`      | -             | overstyrer container command                                                                      |
+| `args`            | `array`  | `false`      | -             | argumenter til entrypoint                                                                         |
+| `env`             | `array`  | `false`      | -             | miljøvariabler for containeren                                                                    |
+| `envFrom`         | `array`  | `false`      | -             | miljøvariabler fra Secret eller ConfigMap                                                         |
+| `filesFrom`       | `array`  | `false`      | -             | filmounts for containeren                                                                         |
+| `additionalPorts` | `array`  | `false`      | `[]`          | porter eksponert av containeren                                                                   |
+| `resources`       | `object` | `false`      | -             | ressurskrav og -grenser                                                                           |
+| `liveness`        | `object` | `false`      | -             | liveness probe                                                                                    |
+| `readiness`       | `object` | `false`      | -             | readiness probe                                                                                   |
+| `startup`         | `object` | `false`      | -             | startup probe                                                                                     |
+| `ingressPort`     | `number` | `false`      | -             | gjør at ingress-trafikk går til denne container-porten. Porten må også finnes i `additionalPorts` |
 
 Eksempel: [examples/extraContainers.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/extraContainers.jsonnet)
 
@@ -246,7 +224,7 @@ Eksempel: [examples/application-with-prometheus.jsonnet](https://github.com/kart
 | funksjon | beskrivelse |
 |-|-|
 | `withConfigMapAsEnv(name, data, addHashToName=false)` | oppretter en ConfigMap og legger den til via `spec.envFrom` |
-| `withConfigMapAsMount(name, mountPath, data, addHashToName=false)` | oppretter en ConfigMap og monterer den som filer |
+| `withConfigMapAsMount(name, mountPath, data, addHashToName=false, defaultMode=null, subPath=null)` | oppretter en ConfigMap og monterer den som filer |
 
 Eksempel: [examples/withConfigMap.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withConfigMap.jsonnet)
 
@@ -258,13 +236,13 @@ Eksempel: [examples/withConfigMap.jsonnet](https://github.com/kartverket/argokit
 
 Eksempel: [examples/withExternalSecret.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/withExternalSecret.jsonnet)
 
-### Monteringer
+### Mounts
 
 | funksjon | beskrivelse |
 |-|-|
-| `withSecretAsMount(secretName, mountPath)` | monterer en eksisterende Secret som filer |
-| `withPersistentVolumeClaimAsMount(pvcName, mountPath)` | monterer en PVC |
-| `withEmptyDirAsMount(mountPath, emptyDir)` | monterer et emptyDir-volum |
+| `withSecretAsMount(secretName, mountPath, defaultMode=null, subPath=null)` | monterer en eksisterende Secret som filer |
+| `withPersistentVolumeClaimAsMount(pvcName, mountPath, subPath=null)` | monterer en PVC |
+| `withEmptyDirAsMount(mountPath, emptyDir, subPath=null)` | monterer et emptyDir-volum |
 
 Eksempel: [examples/mounts.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/mounts.jsonnet)
 
@@ -367,3 +345,25 @@ Oppretter en frittstående `AzureADApplication`-ressurs.
 | `preAuthorizedApplications` | `array` | `false` | `[]` | forhåndsautoriserte applikasjoner |
 
 Eksempel: [examples/newAzureAdApplication.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/newAzureAdApplication.jsonnet)
+
+## Ferdige komponenter
+
+### `argokit.dbArchiveJob()`
+Oppretter en `SKIPJob` v1beta1 som tar PostgreSQL-dump og lagrer den i S3, sammen med ExternalSecrets for database- og S3-hemmeligheter.
+
+| navn                             | type      | obligatorisk | standardverdi                          | beskrivelse                                    |
+|----------------------------------|-----------|--------------|----------------------------------------|------------------------------------------------|
+| `instanceName`                   | `string`  | `true`       | -                                      | navn på databaseinstansen og SKIPJob-ressursen |
+| `schedule`                       | `string`  | `true`       | -                                      | cron-uttrykk for arkiveringsjobben             |
+| `databaseIP`                     | `string`  | `true`       | -                                      | IP-adresse til databasen                       |
+| `gcpS3CredentialsSecret`         | `string`  | `true`       | -                                      | navn på hemmelighet med S3-credentials         |
+| `databaseName`                   | `string`  | `true`       | -                                      | databasen som skal arkiveres                   |
+| `archiveUser`                    | `string`  | `false`      | `postgres`                             | databasebrukeren jobben kobler til med         |
+| `serviceAccount`                 | `string`  | `false`      | `dummyaccount@iam.gserviceaccount.com` | GCP service account for Workload Identity      |
+| `cloudsqlInstanceConnectionName` | `string`  | `true`       | -                                      | Cloud SQL connection name                      |
+| `port`                           | `number`  | `false`      | `5432`                                 | databaseport                                   |
+| `S3Host`                         | `string`  | `false`      | `s3-rin.statkart.no`                   | S3-endepunkt                                   |
+| `S3DestinationPath`              | `string`  | `true`       | -                                      | S3-sti der dumpen skal lagres                  |
+| `fullDump`                       | `boolean` | `false`      | `false`                                | om jobben også skal dumpe roller               |
+
+Eksempel: [examples/dbArchive.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/dbArchive.jsonnet)
