@@ -187,20 +187,6 @@
           },
         },
       },
-      secretStore: {
-        apiVersion: 'external-secrets.io/v1',
-        kind: 'SecretStore',
-        metadata: {
-          name: 'gsm',
-        },
-        spec: {
-          provider: {
-            gcpsm: {
-              projectID: gsmProject,
-            },
-          },
-        },
-      },
       serviceEntryS3: {
         apiVersion: 'networking.istio.io/v1',
         kind: 'ServiceEntry',
@@ -218,49 +204,6 @@
             },
           ],
           resolution: 'DNS',
-        },
-      },
-      externalSecret: {
-        apiVersion: 'external-secrets.io/v1',
-        kind: 'ExternalSecret',
-        metadata: {
-          name: 's3-scality-barman',
-        },
-        spec: {
-          secretStoreRef: {
-            kind: 'SecretStore',
-            name: 'gsm',
-          },
-          data: [
-            {
-              secretKey: 'ACCESS_KEY_ID',
-              remoteRef: {
-                key: 'AWS_ACCESS_KEY_ID',
-                metadataPolicy: 'None',
-              },
-            },
-            {
-              secretKey: 'ACCESS_SECRET_KEY',
-              remoteRef: {
-                key: 'AWS_SECRET_ACCESS_KEY',
-                metadataPolicy: 'None',
-              },
-            },
-          ],
-          refreshInterval: '1h',
-          target: {
-            name: 's3-bucket-creds',
-          },
-        },
-      },
-      s3BarmanSA: {
-        apiVersion: 'v1',
-        kind: 'ServiceAccount',
-        metadata: {
-          annotations: {
-            'prometheus.io/scrape': 'false',
-          },
-          name: 's3-barman-cloud',
         },
       },
       cluster: {
