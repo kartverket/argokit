@@ -73,9 +73,9 @@
         -----END CERTIFICATE-----
       |||,
 
-      gatewayName: 'dba-pg-internal',
+      gatewayName: 'istio-internal',
       gatewayNamespace: 'istio-gateways',
-      gatewaySectionName: 'pg',
+      gatewaySectionName: 'internal-pgdb',
 
       cnpgOperatorNamespace: 'dba-cnpg',
       metricsNamespace: 'grafana-alloy',
@@ -213,6 +213,9 @@
           name: clusterName,
         },
         spec: {
+          imagePullSecrets: [
+            { name: 'github-auth' },
+          ],
           instances: p.instances,
           bootstrap: {
             initdb: {
@@ -545,6 +548,58 @@
           ],
         },
       },
+      networkPolicyAmbientMesh: {
+        apiVersion: 'networking.k8s.io/v1',
+        kind: 'NetworkPolicy',
+        metadata: {
+          name: 'accept-ambient-traffic',
+        },
+        spec: {
+          policyTypes: [
+            'Ingress',
+            'Egress',
+          ],
+          podSelector: {
+            matchLabels: {
+              'cnpg.io/cluster': clusterName,
+            },
+          },
+          ingress: [
+            {
+              ports: [
+                {
+                  protocol: 'TCP',
+                  port: 15008,
+                },
+              ],
+            },
+          ],
+          egress: [
+            {
+              to: [
+                {
+                  namespaceSelector: {
+                    matchLabels: {
+                      'kubernetes.io/metadata.name': 'istio-system',
+                    },
+                  },
+                  podSelector: {
+                    matchLabels: {
+                      app: 'ztunnel',
+                    },
+                  },
+                },
+              ],
+              ports: [
+                {
+                  protocol: 'TCP',
+                  port: 15008,
+                },
+              ],
+            },
+          ],
+        },
+      },
       tlsRouteWrite: {
         apiVersion: 'gateway.networking.k8s.io/v1',
         kind: 'TLSRoute',
@@ -614,5 +669,9 @@
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
     } + headlessServices;
     // Return all objects as a list
-    std.objectValues(objects),
+    {
+      apiVersion: 'v1',
+      kind: 'List',
+      items: std.objectValues(objects),
+    },
 }
