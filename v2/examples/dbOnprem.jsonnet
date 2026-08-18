@@ -4,4 +4,8 @@ argokit.db.dbOnprem.new({
   environment: 'dev',
   instances: 2,
   storageSizeGi: 2,
+  extensions: [
+    'plpgsql',
+    'postgis',
+  ],
 })
