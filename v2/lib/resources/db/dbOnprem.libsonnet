@@ -73,10 +73,7 @@
         -----END CERTIFICATE-----
       |||,
 
-      gatewayName: 'istio-internal',
-      gatewayNamespace: 'istio-gateways',
-      gatewaySectionName: 'internal-pgdb',
-
+      gatewayNS: 'istio-gateways',
       cnpgOperatorNamespace: 'dba-cnpg',
       metricsNamespace: 'grafana-alloy',
       metricsAppInstance: 'alloy',
@@ -104,14 +101,20 @@
       dev: {
         k8sCluster: 'atkv3-dev',
         gsmProject: 'dba-dev-b03a',
+        gatewayName: 'dba-pg-internal',
+        gatewaySectionName: 'pg',
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
         gsmProject: 'dba-sandbox-67ca',
+        gatewayName: 'istio-internal',
+        gatewaySectionName: 'internal-pgdb',
       },
       // prod: {
       //   k8sCluster: 'atkv3-prod-stateful',
       //   gsmProject: 'dba-prod-6849',
+      //  gatewayName: 'istio-internal',
+      //  gatewaySectionName: 'internal-pgdb',
       // },
     };
 
@@ -121,6 +124,8 @@
     local env = environmentConfig[p.environment];
     local k8sCluster = env.k8sCluster;
     local gsmProject = env.gsmProject;
+    local gatewayName = env.gatewayName;
+    local gatewaySectionName = env.gatewaySectionName;
 
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
@@ -528,12 +533,12 @@
                 {
                   namespaceSelector: {
                     matchLabels: {
-                      'kubernetes.io/metadata.name': p.gatewayNamespace,
+                      'kubernetes.io/metadata.name': p.gatewayNS,
                     },
                   },
                   podSelector: {
                     matchLabels: {
-                      'gateway.networking.k8s.io/gateway-name': p.gatewayName,
+                      'gateway.networking.k8s.io/gateway-name': env.gatewayName,
                     },
                   },
                 },
@@ -611,9 +616,9 @@
             {
               group: 'gateway.networking.k8s.io',
               kind: 'Gateway',
-              name: p.gatewayName,
-              namespace: p.gatewayNamespace,
-              sectionName: p.gatewaySectionName,
+              name: env.gatewayName,
+              namespace: p.gatewayNS,
+              sectionName: env.gatewaySectionName,
             },
           ],
           hostnames: [writeHost],
@@ -643,9 +648,9 @@
             {
               group: 'gateway.networking.k8s.io',
               kind: 'Gateway',
-              name: p.gatewayName,
-              namespace: p.gatewayNamespace,
-              sectionName: p.gatewaySectionName,
+              name: env.gatewayName,
+              namespace: p.gatewayNS,
+              sectionName: env.gatewaySectionName,
             },
           ],
           hostnames: [readHost],
