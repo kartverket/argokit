@@ -112,7 +112,7 @@
 
     local clusterName = '%s-cluster' % p.databaseName;
     local backupSourceClusterFullName = '%s-cluster' % p.backupSourceClusterName;
-
+    local environmentConfig = {
       dev: {
         k8sCluster: 'atkv3-dev',
         gsmProject: 'dba-dev-b03a',
