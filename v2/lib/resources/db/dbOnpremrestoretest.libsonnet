@@ -111,7 +111,8 @@
 
 
     local clusterName = '%s-cluster' % p.databaseName;
-    local environmentConfig = {
+    local backupSourceClusterFullName = '%s-cluster' % p.backupSourceClusterName;
+
       dev: {
         k8sCluster: 'atkv3-dev',
         gsmProject: 'dba-dev-b03a',
@@ -228,7 +229,7 @@
           bootstrap:
             if isRestore then {
               recovery: {
-                source: p.backupSourceClusterName,
+                source: backupSourceClusterFullName,
               } + (if p.recoveryTargetTime != null then {
                 recoveryTarget: {
                   targetTime: p.recoveryTargetTime,
@@ -242,12 +243,12 @@
             },
           [if isRestore then 'externalClusters']: [
             {
-              name: p.backupSourceClusterName,
+              name: backupSourceClusterFullName,
               plugin: {
                 name: 'barman-cloud.cloudnative-pg.io',
                 parameters: {
                   barmanObjectName: 's3-store-restore-source',
-                  serverName: p.backupSourceClusterName,
+                  serverName: backupSourceClusterFullName,
                 },
               },
             },
