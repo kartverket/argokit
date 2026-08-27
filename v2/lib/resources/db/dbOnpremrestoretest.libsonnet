@@ -353,7 +353,7 @@
           },
           retentionPolicy: '7d',
           configuration: {
-            destinationPath: 's3://dbabucket/%s' % backupSourceClusterFullName,
+            destinationPath: 's3://dbabucket/%s' % p.backupSourceClusterName,
             endpointURL: 'https://s3-rin.statkart.no',
             s3Credentials: {
               accessKeyId: {
