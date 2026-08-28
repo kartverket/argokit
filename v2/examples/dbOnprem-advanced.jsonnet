@@ -14,6 +14,10 @@ argokit.db.dbOnprem.new({
       name: 'postgis',
       env: [
         {
+          name: 'GDAL_DATA',
+          value: '${image_root}/share/gdal',
+        },
+        {
           name: 'PROJ_DATA',
           value: '${image_root}/share/proj',
         },

@@ -15,7 +15,7 @@
       defaultImageCatalogRef: {
         apiGroup: 'postgresql.cnpg.io',
         kind: 'ClusterImageCatalog',
-        name: 'postgresql-minimal-trixie',
+        name: 'cnpg-psql-std',
         major: 18,
       },
 
@@ -30,7 +30,6 @@
         {
           ensure: 'present',
           name: 'postgis',
-          version: '3.6.4',
         },
       ],
 
