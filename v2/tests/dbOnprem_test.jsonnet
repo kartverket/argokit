@@ -61,7 +61,6 @@ test.new(std.thisFile)
           'plpgsql',
           {
             name: 'postgis',
-            version: '3.6.4',
           },
         ],
         imageExtensions: [],
@@ -72,7 +71,6 @@ test.new(std.thisFile)
           'plpgsql',
           {
             name: 'postgis',
-            version: '3.6.4',
           },
         ],
         imageExtensions: [],
@@ -82,7 +80,7 @@ test.new(std.thisFile)
       imageCatalogRef: {
         apiGroup: 'postgresql.cnpg.io',
         kind: 'ClusterImageCatalog',
-        name: 'postgresql-minimal-trixie',
+        name: 'cnpg-psql-std',
         major: 18,
       },
       databaseExtensions: [
@@ -93,7 +91,6 @@ test.new(std.thisFile)
         {
           ensure: 'present',
           name: 'postgis',
-          version: '3.6.4',
         },
       ],
     },
@@ -113,6 +110,10 @@ test.new(std.thisFile)
           name: 'postgis',
           env: [
             {
+              name: 'GDAL_DATA',
+              value: '${image_root}/share/gdal',
+            },
+            {
               name: 'PROJ_DATA',
               value: '${image_root}/share/proj',
             },
@@ -120,7 +121,7 @@ test.new(std.thisFile)
           image: {
             reference: 'ghcr.io/kartverket/nrl-postgis-extension-test:3.6.2-18-trixie',
           },
-          ld_library_path: ['system'],
+          ld_library_path: ['standard'],
         },
       ],
     }).postgresql.extensions,
@@ -132,6 +133,10 @@ test.new(std.thisFile)
         name: 'postgis',
         env: [
           {
+            name: 'GDAL_DATA',
+            value: '${image_root}/share/gdal',
+          },
+          {
             name: 'PROJ_DATA',
             value: '${image_root}/share/proj',
           },
@@ -139,7 +144,7 @@ test.new(std.thisFile)
         image: {
           reference: 'ghcr.io/kartverket/nrl-postgis-extension-test:3.6.2-18-trixie',
         },
-        ld_library_path: ['system'],
+        ld_library_path: ['standard'],
       },
     ],
   ),
