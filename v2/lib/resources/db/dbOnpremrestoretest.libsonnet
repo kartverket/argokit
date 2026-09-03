@@ -8,20 +8,11 @@
 
       instances: 2,
       enablePDB: false,
-      imageName: 'ghcr.io/cloudnative-pg/postgresql:18.4-standard-trixie',
-      imageCatalogRef: null,
+      imageName: 'ghcr.io/cloudnative-pg/postgis:18.4-3.6.4-system-trixie',
       storageSizeGi: 1,
 
-      defaultImageCatalogRef: {
-        apiGroup: 'postgresql.cnpg.io',
-        kind: 'ClusterImageCatalog',
-        name: 'cnpg-psql-std',
-        major: 18,
-      },
-
-      // Database-side extensions are fully replaced when overridden, not merged.
-      // Use plain names for normal CREATE EXTENSION installs, or objects for versioned installs.
-      // These entries also derive Cluster.spec.postgresql.extensions names unless imageExtensions overrides them.
+      // Note: 'extensions' is fully replaced when overridden, not merged.
+      // Specify the complete list of extensions you want when overriding this.
       extensions: [
         {
           ensure: 'present',
@@ -30,13 +21,9 @@
         {
           ensure: 'present',
           name: 'postgis',
+          version: '3.6.4',
         },
       ],
-
-      // Cluster-side extension images.
-      // Use strings when resolving from an ImageCatalog, or full objects for direct overrides.
-      // Entries override any derived extension with the same name from extensions.
-      imageExtensions: [],
 
       plugins: [
         {
@@ -86,11 +73,19 @@
         -----END CERTIFICATE-----
       |||,
 
-      gatewayNS: 'istio-gateways',
+      gatewayName: 'dba-pg-internal',
+      gatewayNamespace: 'istio-gateways',
+      gatewaySectionName: 'pg',
+
       cnpgOperatorNamespace: 'dba-cnpg',
       metricsNamespace: 'grafana-alloy',
       metricsAppInstance: 'alloy',
       metricsAppName: 'alloy',
+
+      // Restore source cluster name from S3 backup (Barman serverName).
+      backupSourceClusterName: null,
+      // Optional point-in-time-recovery timestamp, for example: '2026-06-01 12:00:00+00'.
+      recoveryTargetTime: null,
 
       postgresqlParameters: {
         max_connections: '200',
@@ -99,91 +94,37 @@
         'auto_explain.log_min_duration': '20s',
       },
     };
-
     local p = defaults + config + {
       postgresqlParameters: defaults.postgresqlParameters + (if 'postgresqlParameters' in config then config.postgresqlParameters else {}),
     };
-
-    local isString(x) = std.type(x) == 'string';
-
-    local uniqueStrings(values) = std.objectFields({ [value]: true for value in values });
-
-    local hasImageReference(ext) =
-      std.type(ext) == 'object' &&
-      std.objectHas(ext, 'image') &&
-      std.type(ext.image) == 'object' &&
-      std.objectHas(ext.image, 'reference');
-
-    local normalizeDatabaseExtension(ext) =
-      if isString(ext) then {
-        ensure: 'present',
-        name: ext,
-      } else {
-               ensure: 'present',
-               name: ext.name,
-             } + (if std.objectHas(ext, 'ensure') then { ensure: ext.ensure } else {}) +
-             (if std.objectHas(ext, 'version') then { version: ext.version } else {});
-
-    local normalizeClusterExtension(ext) =
-      if isString(ext) then {
-        name: ext,
-      } else ext;
-
-    local databaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
-    local derivedClusterExtensions = [{ name: ext.name } for ext in databaseExtensions];
-    local explicitClusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
-    local databaseExtensionNames = [ext.name for ext in databaseExtensions];
-    local explicitClusterExtensionNames = [ext.name for ext in explicitClusterExtensions];
-    local mergedClusterExtensions =
-      [ext for ext in derivedClusterExtensions if !std.member(explicitClusterExtensionNames, ext.name)] +
-      explicitClusterExtensions;
-    local mergedClusterExtensionsNeedCatalog =
-      [ext for ext in mergedClusterExtensions if !hasImageReference(ext)];
-    local effectiveImageCatalogRef =
-      if p.imageCatalogRef != null then p.imageCatalogRef
-      else if std.length(mergedClusterExtensionsNeedCatalog) > 0 then p.defaultImageCatalogRef
-      else null;
-
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
     assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"';  // In the future there will be dedicated stateful/DB clusters
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
-    assert std.type(p.extensions) == 'array' : 'extensions must be an array';
-    assert std.type(p.imageExtensions) == 'array' : 'imageExtensions must be an array';
-    assert p.defaultImageCatalogRef == null || std.type(p.defaultImageCatalogRef) == 'object' : 'defaultImageCatalogRef must be an object when set';
-    assert p.imageCatalogRef == null || std.type(p.imageCatalogRef) == 'object' : 'imageCatalogRef must be an object when set';
-    assert std.length([ext for ext in p.extensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
-           'extensions object entries must define name';
-    assert std.length([ext for ext in p.imageExtensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
-           'imageExtensions object entries must define name';
-    assert std.length(uniqueStrings(databaseExtensionNames)) == std.length(databaseExtensionNames) :
-           'extensions must not contain duplicate names';
-    assert std.length(uniqueStrings(explicitClusterExtensionNames)) == std.length(explicitClusterExtensionNames) :
-           'imageExtensions must not contain duplicate names';
-    assert effectiveImageCatalogRef != null || std.length(mergedClusterExtensionsNeedCatalog) == 0 :
-           'Cluster extensions without imageCatalogRef must define image.reference or be overridden by imageExtensions entries that do';
+    assert p.backupSourceClusterName == null || (std.type(p.backupSourceClusterName) == 'string' && std.length(p.backupSourceClusterName) > 0) : 'backupSourceClusterName must be null or a non-empty string';
+    assert p.recoveryTargetTime == null || (std.type(p.recoveryTargetTime) == 'string' && std.length(p.recoveryTargetTime) > 0) : 'recoveryTargetTime must be null or a non-empty string';
+
+    local isRestore = p.backupSourceClusterName != null;
+    assert isRestore || p.recoveryTargetTime == null : 'recoveryTargetTime can only be set when backupSourceClusterName is set';
+
 
     local clusterName = '%s-cluster' % p.databaseName;
+    local backupSourceClusterFullName = '%s-cluster' % p.backupSourceClusterName;
+
     local environmentConfig = {
       dev: {
         k8sCluster: 'atkv3-dev',
         gsmProject: 'dba-dev-b03a',
-        gatewayName: 'dba-pg-internal',
-        gatewaySectionName: 'pg',
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
         gsmProject: 'dba-sandbox-67ca',
-        gatewayName: 'istio-internal',
-        gatewaySectionName: 'internal-pgdb',
       },
       // prod: {
       //   k8sCluster: 'atkv3-prod-stateful',
       //   gsmProject: 'dba-prod-6849',
-      //  gatewayName: 'istio-internal',
-      //  gatewaySectionName: 'internal-pgdb',
       // },
     };
 
@@ -193,8 +134,6 @@
     local env = environmentConfig[p.environment];
     local k8sCluster = env.k8sCluster;
     local gsmProject = env.gsmProject;
-    local gatewayName = env.gatewayName;
-    local gatewaySectionName = env.gatewaySectionName;
 
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
@@ -287,19 +226,36 @@
           name: clusterName,
         },
         spec: {
-          imagePullSecrets: [
-            { name: 'github-auth' },
-          ],
           instances: p.instances,
-          [if effectiveImageCatalogRef != null then 'imageCatalogRef']: effectiveImageCatalogRef,
-          bootstrap: {
-            initdb: {
-              database: p.databaseName,
-              owner: p.databaseName,
+          bootstrap:
+            if isRestore then {
+              recovery: {
+                source: backupSourceClusterFullName,
+              } + (if p.recoveryTargetTime != null then {
+                recoveryTarget: {
+                  targetTime: p.recoveryTargetTime,
+                },
+              } else {}),
+            } else {
+              initdb: {
+                database: p.databaseName,
+                owner: p.databaseName,
+              },
             },
-          },
+          [if isRestore then 'externalClusters']: [
+            {
+              name: backupSourceClusterFullName,
+              plugin: {
+                name: 'barman-cloud.cloudnative-pg.io',
+                parameters: {
+                  barmanObjectName: 's3-store-restore-source',
+                  serverName: backupSourceClusterFullName,
+                },
+              },
+            },
+          ],
           enablePDB: if p.instances > 1 then p.enablePDB else false,  // PDB doesn't make sense for single instance clusters
-          [if effectiveImageCatalogRef == null then 'imageName']: p.imageName,
+          imageName: p.imageName,
           storage: {
             size: p.storageSizeGi + 'Gi',
           },
@@ -309,13 +265,12 @@
           },
           postgresql: {
             parameters: p.postgresqlParameters,
-            [if std.length(mergedClusterExtensions) > 0 then 'extensions']: mergedClusterExtensions,
           },
         } + (if std.length(p.plugins) > 0 then {
                plugins: p.plugins,
              } else {}),
       },
-      database: {
+      [if !isRestore then 'database']: {
         apiVersion: 'postgresql.cnpg.io/v1',
         kind: 'Database',
         metadata: {
@@ -327,7 +282,7 @@
           },
           name: p.databaseName,
           owner: p.databaseName,
-          extensions: databaseExtensions,
+          extensions: p.extensions,
         },
       },
       objectStore: {
@@ -356,6 +311,49 @@
           retentionPolicy: '7d',
           configuration: {
             destinationPath: 's3://dbabucket/%s' % p.databaseName,
+            endpointURL: 'https://s3-rin.statkart.no',
+            s3Credentials: {
+              accessKeyId: {
+                name: 's3-bucket-creds',
+                key: 'ACCESS_KEY_ID',
+              },
+              secretAccessKey: {
+                name: 's3-bucket-creds',
+                key: 'ACCESS_SECRET_KEY',
+              },
+            },
+            wal: {
+              compression: 'gzip',
+            },
+          },
+        },
+      },
+      [if isRestore then 'ObjectStore']: {
+        apiVersion: 'barmancloud.cnpg.io/v1',
+        kind: 'ObjectStore',
+        metadata: {
+          name: 's3-store-restore-source',
+        },
+        spec: {
+          instanceSidecarConfiguration: {
+            env: [
+              {
+                name: 'AWS_REQUEST_CHECKSUM_CALCULATION',
+                value: 'when_required',
+              },
+              {
+                name: 'AWS_RESPONSE_CHECKSUM_VALIDATION',
+                value: 'when_supported',
+              },
+              {
+                name: 'AWS_SKIP_MD5_VALIDATION',
+                value: 'true',
+              },
+            ],
+          },
+          retentionPolicy: '7d',
+          configuration: {
+            destinationPath: 's3://dbabucket/%s' % p.backupSourceClusterName,
             endpointURL: 'https://s3-rin.statkart.no',
             s3Credentials: {
               accessKeyId: {
@@ -604,12 +602,12 @@
                 {
                   namespaceSelector: {
                     matchLabels: {
-                      'kubernetes.io/metadata.name': p.gatewayNS,
+                      'kubernetes.io/metadata.name': p.gatewayNamespace,
                     },
                   },
                   podSelector: {
                     matchLabels: {
-                      'gateway.networking.k8s.io/gateway-name': env.gatewayName,
+                      'gateway.networking.k8s.io/gateway-name': p.gatewayName,
                     },
                   },
                 },
@@ -618,58 +616,6 @@
                 {
                   protocol: 'TCP',
                   port: 5432,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      networkPolicyAmbientMesh: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'accept-ambient-traffic',
-        },
-        spec: {
-          policyTypes: [
-            'Ingress',
-            'Egress',
-          ],
-          podSelector: {
-            matchLabels: {
-              'cnpg.io/cluster': clusterName,
-            },
-          },
-          ingress: [
-            {
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 15008,
-                },
-              ],
-            },
-          ],
-          egress: [
-            {
-              to: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': 'istio-system',
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      app: 'ztunnel',
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 15008,
                 },
               ],
             },
@@ -687,9 +633,9 @@
             {
               group: 'gateway.networking.k8s.io',
               kind: 'Gateway',
-              name: env.gatewayName,
-              namespace: p.gatewayNS,
-              sectionName: env.gatewaySectionName,
+              name: p.gatewayName,
+              namespace: p.gatewayNamespace,
+              sectionName: p.gatewaySectionName,
             },
           ],
           hostnames: [writeHost],
@@ -719,9 +665,9 @@
             {
               group: 'gateway.networking.k8s.io',
               kind: 'Gateway',
-              name: env.gatewayName,
-              namespace: p.gatewayNS,
-              sectionName: env.gatewaySectionName,
+              name: p.gatewayName,
+              namespace: p.gatewayNamespace,
+              sectionName: p.gatewaySectionName,
             },
           ],
           hostnames: [readHost],
@@ -744,11 +690,6 @@
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
     } + headlessServices;
-
     // Return all objects as a list
-    {
-      apiVersion: 'v1',
-      kind: 'List',
-      items: std.objectValues(objects),
-    },
+    std.objectValues(objects),
 }
