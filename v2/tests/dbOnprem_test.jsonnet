@@ -4,8 +4,8 @@ local dbOnprem = argokit.db.dbOnprem;
 
 local findObject(objects, kind) = std.filter(function(obj) obj.kind == kind, objects)[0];
 
-local clusterSpec(config) = findObject(dbOnprem.new(config), 'Cluster').spec;
-local databaseSpec(config) = findObject(dbOnprem.new(config), 'Database').spec;
+local clusterSpec(config) = findObject(dbOnprem.new(config).items, 'Cluster').spec;
+local databaseSpec(config) = findObject(dbOnprem.new(config).items, 'Database').spec;
 
 test.new(std.thisFile)
 + test.case.new(
