@@ -19,14 +19,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install jsonnet
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jsonnet
+      - name: Install go-Jsonnet
+        uses: actions/setup-go@v7
+      - run: go install github.com/google/go-jsonnet/cmd/jsonnet@latest
 
       - name: Install jsonnet-bundler
         run: |
-          JB_VERSION="0.5.1"
+          JB_VERSION="0.6.0"
           curl -sLo jb "https://github.com/jsonnet-bundler/jsonnet-bundler/releases/download/v${JB_VERSION}/jb-linux-amd64"
           chmod +x jb
           sudo mv jb /usr/local/bin/
