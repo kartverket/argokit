@@ -11,6 +11,8 @@ local expected = {
   spec: {
     hostname: 'myhostname',
     redirectToHTTPS: true,
+    routingProvider: 'Legacy',
+    ownership: 'Standalone',
     routes: [
       {
         pathPrefix: '/web',
@@ -92,6 +94,30 @@ test.new(std.thisFile)
     test.expect.eq(
       actual=deprecatedRouting.metadata.labels['skip.kartverket.no/argokit-deprecated-version'],
       expected='true'
+    )
+  ),
+)
++ test.case.new(
+  name='Routing supports Standard provider with shared ownership',
+  test=(
+    local shared =
+      argokit.routing.new('myapp-routing', 'myhostname', routingProvider='Standard', ownership='Shared')
+      + argokit.routing.withRoute(pathPrefix='/web', targetApp='myapp-web', rewriteUri=false);
+    test.expect.eqDiff(
+      actual=shared.spec,
+      expected={
+        hostname: 'myhostname',
+        redirectToHTTPS: true,
+        routingProvider: 'Standard',
+        ownership: 'Shared',
+        routes: [
+          {
+            pathPrefix: '/web',
+            rewriteUri: false,
+            targetApp: 'myapp-web',
+          },
+        ],
+      }
     )
   ),
 )
