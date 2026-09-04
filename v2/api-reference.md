@@ -85,7 +85,24 @@ Oppretter ingress-oppføringer for en `Application`.
 |-|-|-|-|-|
 | `ingress` | `array`, `string` eller `object` | `true` | - | hostname som string, liste med hostnames/objekter, eller `{ hostname, customCert }` |
 
+`customCert` er navnet på et TLS-secret i namespacet `istio-gateways`. Denne secreten må provisjoneres opp av SKIP-teamet på forhånd.
+
 Eksempel: [examples/ingress.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/ingress.jsonnet)
+
+### `argokit.appAndObjects.application.withRoutingProvider()`
+Velger hvilket routing-API Skiperator bruker for ingressene til en `Application`.
+
+| navn              | type     | obligatorisk | standardverdi | beskrivelse                                                             |
+|-------------------|----------|--------------|---------------|-------------------------------------------------------------------------|
+| `routingProvider` | `string` | `false`      | `Legacy`      | hvilken måte som brukes for å konfigurere trafikk inn til applikasjonen |
+
+Bruk helst `Standard`. `Legacy` kommer til å bli deprecated og fjernet på et senere tidspunkt.
+
+`application.new()` setter alltid `routingProvider` i manifestet. Verdien er `Legacy` hvis du ikke kaller denne funksjonen.
+
+NB: `Standard` støtter ikke `spec.istioSettings.retries`.
+
+Eksempel: [examples/routingProvider.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routingProvider.jsonnet)
 
 ### `argokit.appAndObjects.application.withAzureAdApplication()`
 Legger til en `AzureADApplication`-ressurs og konfigurerer applikasjonen til å bruke den.
@@ -259,11 +276,21 @@ Eksempel: [examples/additionalObjects.jsonnet](https://github.com/kartverket/arg
 ### `argokit.routing.new()`
 Bygger et `Routing`-objekt.
 
-| navn | type | obligatorisk | standardverdi | beskrivelse |
-|-|-|-|-|-|
-| `name` | `string` | `true` | - | navn på routing-objektet |
-| `hostname` | `string` | `true` | - | hostname |
-| `redirectToHTTPS` | `boolean` | `false` | `true` | om trafikk skal videresendes til HTTPS |
+| navn | type | obligatorisk | standardverdi | beskrivelse                                                                                                                                   |
+|-|-|-|-|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| `name` | `string` | `true` | - | navn på routing-objektet                                                                                                                      |
+| `hostname` | `string` | `true` | - | hostname                                                                                                                                      |
+| `redirectToHTTPS` | `boolean` | `false` | `true` | om trafikk skal videresendes til HTTPS                                                                                                        |
+| `routingProvider` | `string` | `false` | `Legacy` | `Standard` (anbefalt) bruker Kubernetes Gateway API. `Legacy` bruker Istio Gateway og VirtualService, og blir fjernet senere                  |
+| `ownership` | `string` | `false` | `Standalone` | `Standalone` eier hele hostnavnet. `Shared` legger til paths på et hostnavn som andre `Routing`-objekter kan bruke, f.eks. `api.example.com`. |
+
+For `routingProvider`, bruk helst `Standard`, da `Legacy` vil bli deprecated og fjernet på et senere tidspunkt.
+
+`ownership=Shared` krever `routingProvider` lik `Standard`. `Shared` kan ikke bruke et eget sertifikat i hostnavnet.
+
+`ownership=Standalone` kan bruke et custom sertifikat. Skriv det som `hostnavn+secret-navn`. Secreten må provisjoneres opp manuelt av SKIP.
+
+Eksempel: [examples/routingShared.jsonnet](https://github.com/kartverket/argokit/blob/main/v2/examples/routingShared.jsonnet)
 
 ### `argokit.routing.withRoute()`
 Legger til en route i et `Routing`-objekt.

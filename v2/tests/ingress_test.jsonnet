@@ -48,3 +48,27 @@ test.new(std.thisFile)
     }
   ),
 )
++ test.case.new(
+  name='Routing provider defaults to Legacy',
+  test=test.expect.eqDiff(
+    actual=application.withRoutingProvider().application.spec,
+    expected={
+      routingProvider: 'Legacy',
+    }
+  ),
+)
++ test.case.new(
+  name='Routing provider can be set to Standard',
+  test=test.expect.eqDiff(
+    actual=(
+      application.forHostnames('hostName.kartverket.no')
+      + application.withRoutingProvider('Standard')
+    ).application.spec,
+    expected={
+      ingresses: [
+        'hostName.kartverket.no',
+      ],
+      routingProvider: 'Standard',
+    }
+  ),
+)
