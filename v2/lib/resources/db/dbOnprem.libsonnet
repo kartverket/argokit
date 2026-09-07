@@ -8,11 +8,20 @@
 
       instances: 2,
       enablePDB: false,
-      imageName: 'ghcr.io/cloudnative-pg/postgis:18.4-3.6.4-system-trixie',
+      imageName: 'ghcr.io/cloudnative-pg/postgresql:18.4-standard-trixie',
+      imageCatalogRef: null,
       storageSizeGi: 1,
 
-      // Note: 'extensions' is fully replaced when overridden, not merged.
-      // Specify the complete list of extensions you want when overriding this.
+      defaultImageCatalogRef: {
+        apiGroup: 'postgresql.cnpg.io',
+        kind: 'ClusterImageCatalog',
+        name: 'cnpg-psql-std',
+        major: 18,
+      },
+
+      // Database-side extensions are fully replaced when overridden, not merged.
+      // Use plain names for normal CREATE EXTENSION installs, or objects for versioned installs.
+      // These entries also derive Cluster.spec.postgresql.extensions names unless imageExtensions overrides them.
       extensions: [
         {
           ensure: 'present',
@@ -21,9 +30,13 @@
         {
           ensure: 'present',
           name: 'postgis',
-          version: '3.6.4',
         },
       ],
+
+      // Cluster-side extension images.
+      // Use strings when resolving from an ImageCatalog, or full objects for direct overrides.
+      // Entries override any derived extension with the same name from extensions.
+      imageExtensions: [],
 
       plugins: [
         {
@@ -86,15 +99,71 @@
         'auto_explain.log_min_duration': '20s',
       },
     };
+
     local p = defaults + config + {
       postgresqlParameters: defaults.postgresqlParameters + (if 'postgresqlParameters' in config then config.postgresqlParameters else {}),
     };
+
+    local isString(x) = std.type(x) == 'string';
+
+    local uniqueStrings(values) = std.objectFields({ [value]: true for value in values });
+
+    local hasImageReference(ext) =
+      std.type(ext) == 'object' &&
+      std.objectHas(ext, 'image') &&
+      std.type(ext.image) == 'object' &&
+      std.objectHas(ext.image, 'reference');
+
+    local normalizeDatabaseExtension(ext) =
+      if isString(ext) then {
+        ensure: 'present',
+        name: ext,
+      } else {
+               ensure: 'present',
+               name: ext.name,
+             } + (if std.objectHas(ext, 'ensure') then { ensure: ext.ensure } else {}) +
+             (if std.objectHas(ext, 'version') then { version: ext.version } else {});
+
+    local normalizeClusterExtension(ext) =
+      if isString(ext) then {
+        name: ext,
+      } else ext;
+
+    local databaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
+    local derivedClusterExtensions = [{ name: ext.name } for ext in databaseExtensions];
+    local explicitClusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
+    local databaseExtensionNames = [ext.name for ext in databaseExtensions];
+    local explicitClusterExtensionNames = [ext.name for ext in explicitClusterExtensions];
+    local mergedClusterExtensions =
+      [ext for ext in derivedClusterExtensions if !std.member(explicitClusterExtensionNames, ext.name)] +
+      explicitClusterExtensions;
+    local mergedClusterExtensionsNeedCatalog =
+      [ext for ext in mergedClusterExtensions if !hasImageReference(ext)];
+    local effectiveImageCatalogRef =
+      if p.imageCatalogRef != null then p.imageCatalogRef
+      else if std.length(mergedClusterExtensionsNeedCatalog) > 0 then p.defaultImageCatalogRef
+      else null;
+
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
     assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"';  // In the future there will be dedicated stateful/DB clusters
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
+    assert std.type(p.extensions) == 'array' : 'extensions must be an array';
+    assert std.type(p.imageExtensions) == 'array' : 'imageExtensions must be an array';
+    assert p.defaultImageCatalogRef == null || std.type(p.defaultImageCatalogRef) == 'object' : 'defaultImageCatalogRef must be an object when set';
+    assert p.imageCatalogRef == null || std.type(p.imageCatalogRef) == 'object' : 'imageCatalogRef must be an object when set';
+    assert std.length([ext for ext in p.extensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
+           'extensions object entries must define name';
+    assert std.length([ext for ext in p.imageExtensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
+           'imageExtensions object entries must define name';
+    assert std.length(uniqueStrings(databaseExtensionNames)) == std.length(databaseExtensionNames) :
+           'extensions must not contain duplicate names';
+    assert std.length(uniqueStrings(explicitClusterExtensionNames)) == std.length(explicitClusterExtensionNames) :
+           'imageExtensions must not contain duplicate names';
+    assert effectiveImageCatalogRef != null || std.length(mergedClusterExtensionsNeedCatalog) == 0 :
+           'Cluster extensions without imageCatalogRef must define image.reference or be overridden by imageExtensions entries that do';
 
     local clusterName = '%s-cluster' % p.databaseName;
     local environmentConfig = {
@@ -222,6 +291,7 @@
             { name: 'github-auth' },
           ],
           instances: p.instances,
+          [if effectiveImageCatalogRef != null then 'imageCatalogRef']: effectiveImageCatalogRef,
           bootstrap: {
             initdb: {
               database: p.databaseName,
@@ -229,7 +299,7 @@
             },
           },
           enablePDB: if p.instances > 1 then p.enablePDB else false,  // PDB doesn't make sense for single instance clusters
-          imageName: p.imageName,
+          [if effectiveImageCatalogRef == null then 'imageName']: p.imageName,
           storage: {
             size: p.storageSizeGi + 'Gi',
           },
@@ -239,6 +309,7 @@
           },
           postgresql: {
             parameters: p.postgresqlParameters,
+            [if std.length(mergedClusterExtensions) > 0 then 'extensions']: mergedClusterExtensions,
           },
         } + (if std.length(p.plugins) > 0 then {
                plugins: p.plugins,
@@ -256,7 +327,7 @@
           },
           name: p.databaseName,
           owner: p.databaseName,
-          extensions: p.extensions,
+          extensions: databaseExtensions,
         },
       },
       objectStore: {
@@ -673,6 +744,7 @@
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
     } + headlessServices;
+
     // Return all objects as a list
     {
       apiVersion: 'v1',

@@ -4,4 +4,9 @@ argokit.db.dbOnprem.new({
   environment: 'dev',
   instances: 2,
   storageSizeGi: 2,
+  // For a list of available extensions, check the docs at skip.kartverket.no
+  extensions: [
+    'plpgsql',
+    'postgis',
+  ],
 })
