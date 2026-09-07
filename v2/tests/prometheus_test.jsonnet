@@ -85,6 +85,7 @@ test.new(std.thisFile)
     expected={
       image: 'test:1.0',
       port: 8080,
+      routingProvider: 'Legacy',
       prometheus: {
         path: '/metrics',
         port: 8080,

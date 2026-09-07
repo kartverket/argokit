@@ -232,10 +232,10 @@
               recovery: {
                 source: backupSourceClusterFullName,
               } + (if p.recoveryTargetTime != null then {
-                recoveryTarget: {
-                  targetTime: p.recoveryTargetTime,
-                },
-              } else {}),
+                     recoveryTarget: {
+                       targetTime: p.recoveryTargetTime,
+                     },
+                   } else {}),
             } else {
               initdb: {
                 database: p.databaseName,

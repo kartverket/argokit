@@ -40,7 +40,7 @@ local extraContainer(
   readiness=null,
   startup=null,
   ingressPort=null
-) =
+      ) =
   v.string(name, 'name') +
   v.string(image, 'image') +
   v.enum(type, 'type', ['standard', 'init']) +
@@ -88,6 +88,7 @@ local extraContainer(
         spec+: std.prune({
           image: image,
           port: port,
+          routingProvider: 'Legacy',
         },),
       },
       objects:: [],

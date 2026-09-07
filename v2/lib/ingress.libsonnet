@@ -17,4 +17,21 @@ local v = import '../internal/validation.libsonnet';
         },
       },
     },
+
+  /**
+  Selects the routing API Skiperator uses for the ingresses of the Application.
+  Parameters:
+  - routingProvider: string - Standard (recommended) uses the Kubernetes Gateway API. Legacy (default) uses Istio Gateway and VirtualService.
+  Legacy is removed at a later date, so we encourage users to move to Standard.
+  Note: spec.istioSettings.retries is not supported with Standard.
+  */
+  withRoutingProvider(routingProvider='Legacy'):
+    v.enum(routingProvider, 'routingProvider', ['Legacy', 'Standard']) +
+    {
+      application+: {
+        spec+: {
+          routingProvider: routingProvider,
+        },
+      },
+    },
 }
