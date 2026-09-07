@@ -4,9 +4,11 @@ argokit.db.dbOnprem.new({
   environment: 'dev',
   instances: 2,
   storageSizeGi: 2,
-  // For a list of available extensions, check the docs at skip.kartverket.no
-  extensions: [
-    'plpgsql',
-    'postgis',
+  // Database-side extensions are installed in the database.
+  extensions: ['postgis'],
+  // Cluster-side image extensions are resolved from the image catalog.
+  // image.reference is meaningful only inside imageExtensions objects.
+  imageExtensions: [
+    'pgmq',
   ],
 })
