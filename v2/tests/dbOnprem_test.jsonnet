@@ -9,71 +9,63 @@ local databaseSpec(config) = findObject(dbOnprem.new(config).items, 'Database').
 
 test.new(std.thisFile)
 + test.case.new(
-  name='dbOnprem derives cluster extensions from extensions names',
+  name='dbOnprem keeps database extensions independent from cluster image extensions',
   test=test.expect.eqDiff(
     actual={
-      clusterExtensions: clusterSpec({
+      clusterExtensions: if std.objectHas(clusterSpec({
         databaseName: 'simple',
-        extensions: [
-          'plpgsql',
-          'postgis',
-        ],
+        extensions: ['plpgsql'],
         imageExtensions: [],
-      }).postgresql.extensions,
+      }).postgresql, 'extensions') then clusterSpec({
+        databaseName: 'simple',
+        extensions: ['plpgsql'],
+        imageExtensions: [],
+      }).postgresql.extensions else null,
       databaseExtensions: databaseSpec({
         databaseName: 'simple',
-        extensions: [
-          'plpgsql',
-          'postgis',
-        ],
+        extensions: ['plpgsql'],
         imageExtensions: [],
       }).extensions,
     },
     expected={
-      clusterExtensions: [
-        {
-          name: 'plpgsql',
-        },
-        {
-          name: 'postgis',
-        },
-      ],
+      clusterExtensions: null,
       databaseExtensions: [
         {
           ensure: 'present',
           name: 'plpgsql',
-        },
-        {
-          ensure: 'present',
-          name: 'postgis',
         },
       ],
     },
   ),
 )
 + test.case.new(
-  name='dbOnprem preserves versioned database extensions and defaults catalog when needed',
+  name='dbOnprem renders catalog-backed image extensions independently',
   test=test.expect.eqDiff(
     actual={
       imageCatalogRef: clusterSpec({
         databaseName: 'catalog-default',
         extensions: [
-          'plpgsql',
           {
             name: 'postgis',
+            version: '3.6.2',
           },
         ],
-        imageExtensions: [],
+        imageExtensions: ['postgis'],
       }).imageCatalogRef,
-      databaseExtensions: databaseSpec({
+      clusterExtensions: clusterSpec({
         databaseName: 'catalog-default',
         extensions: [
-          'plpgsql',
           {
             name: 'postgis',
+            version: '3.6.2',
           },
         ],
-        imageExtensions: [],
+        imageExtensions: ['postgis'],
+      }).postgresql.extensions,
+      databaseExtensions: databaseSpec({
+        databaseName: 'catalog-default',
+        extensions: [{ name: 'postgis', version: '3.6.2' }],
+        imageExtensions: ['postgis'],
       }).extensions,
     },
     expected={
@@ -83,21 +75,13 @@ test.new(std.thisFile)
         name: 'cnpg-psql-std',
         major: 18,
       },
-      databaseExtensions: [
-        {
-          ensure: 'present',
-          name: 'plpgsql',
-        },
-        {
-          ensure: 'present',
-          name: 'postgis',
-        },
-      ],
+      clusterExtensions: [{ name: 'postgis' }],
+      databaseExtensions: [{ ensure: 'present', name: 'postgis', version: '3.6.2' }],
     },
   ),
 )
 + test.case.new(
-  name='dbOnprem advanced imageExtensions override derived cluster entries',
+  name='dbOnprem preserves explicit direct imageExtensions objects',
   test=test.expect.eqDiff(
     actual=clusterSpec({
       databaseName: 'advanced',
@@ -127,9 +111,6 @@ test.new(std.thisFile)
     }).postgresql.extensions,
     expected=[
       {
-        name: 'plpgsql',
-      },
-      {
         name: 'postgis',
         env: [
           {
@@ -147,6 +128,74 @@ test.new(std.thisFile)
         ld_library_path: ['standard'],
       },
     ],
+  ),
+)
++ test.case.new(
+  name='dbOnprem ignores image references in database extensions',
+  test=test.expect.eqDiff(
+    actual={
+      databaseExtensions: databaseSpec({
+        databaseName: 'database-image-ignored',
+        extensions: [
+          {
+            name: 'postgis',
+            version: '3.6.2',
+            image: { reference: 'ignored.example/postgis:3.6.2' },
+          },
+        ],
+        imageExtensions: [],
+      }).extensions,
+      clusterFields: local spec = clusterSpec({
+        databaseName: 'database-image-ignored',
+        extensions: [
+          {
+            name: 'postgis',
+            version: '3.6.2',
+            image: { reference: 'ignored.example/postgis:3.6.2' },
+          },
+        ],
+        imageExtensions: [],
+      }); {
+        imageCatalogRef: if std.objectHas(spec, 'imageCatalogRef') then spec.imageCatalogRef else null,
+        imageName: if std.objectHas(spec, 'imageName') then spec.imageName else null,
+        extensions: if std.objectHas(spec.postgresql, 'extensions') then spec.postgresql.extensions else null,
+      },
+    },
+    expected={
+      databaseExtensions: [
+        {
+          ensure: 'present',
+          name: 'postgis',
+          version: '3.6.2',
+        },
+      ],
+      clusterFields: {
+        imageCatalogRef: null,
+        imageName: 'ghcr.io/cloudnative-pg/postgresql:18.4-standard-trixie',
+        extensions: null,
+      },
+    },
+  ),
+)
++ test.case.new(
+  name='dbOnprem keeps different database and image extension names separate',
+  test=test.expect.eqDiff(
+    actual={
+      databaseExtensions: databaseSpec({
+        databaseName: 'different-extension-names',
+        extensions: ['postgis'],
+        imageExtensions: ['pgmq'],
+      }).extensions,
+      clusterExtensions: clusterSpec({
+        databaseName: 'different-extension-names',
+        extensions: ['postgis'],
+        imageExtensions: ['pgmq'],
+      }).postgresql.extensions,
+    },
+    expected={
+      databaseExtensions: [{ ensure: 'present', name: 'postgis' }],
+      clusterExtensions: [{ name: 'pgmq' }],
+    },
   ),
 )
 + test.case.new(

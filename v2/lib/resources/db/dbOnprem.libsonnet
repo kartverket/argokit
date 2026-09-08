@@ -21,21 +21,16 @@
 
       // Database-side extensions are fully replaced when overridden, not merged.
       // Use plain names for normal CREATE EXTENSION installs, or objects for versioned installs.
-      // These entries also derive Cluster.spec.postgresql.extensions names unless imageExtensions overrides them.
       extensions: [
         {
           ensure: 'present',
           name: 'plpgsql',
         },
-        {
-          ensure: 'present',
-          name: 'postgis',
-        },
       ],
 
       // Cluster-side extension images.
       // Use strings when resolving from an ImageCatalog, or full objects for direct overrides.
-      // Entries override any derived extension with the same name from extensions.
+      // image.reference is meaningful only in these entries.
       imageExtensions: [],
 
       plugins: [
@@ -130,18 +125,17 @@
       } else ext;
 
     local databaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
-    local derivedClusterExtensions = [{ name: ext.name } for ext in databaseExtensions];
-    local explicitClusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
+    local clusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
+
+    local clusterExtensionsNeedCatalog =
+      [ext for ext in clusterExtensions if !hasImageReference(ext)];
+
     local databaseExtensionNames = [ext.name for ext in databaseExtensions];
-    local explicitClusterExtensionNames = [ext.name for ext in explicitClusterExtensions];
-    local mergedClusterExtensions =
-      [ext for ext in derivedClusterExtensions if !std.member(explicitClusterExtensionNames, ext.name)] +
-      explicitClusterExtensions;
-    local mergedClusterExtensionsNeedCatalog =
-      [ext for ext in mergedClusterExtensions if !hasImageReference(ext)];
+    local clusterExtensionNames = [ext.name for ext in clusterExtensions];
+
     local effectiveImageCatalogRef =
       if p.imageCatalogRef != null then p.imageCatalogRef
-      else if std.length(mergedClusterExtensionsNeedCatalog) > 0 then p.defaultImageCatalogRef
+      else if std.length(clusterExtensionsNeedCatalog) > 0 then p.defaultImageCatalogRef
       else null;
 
     // Input validation
@@ -160,9 +154,9 @@
            'imageExtensions object entries must define name';
     assert std.length(uniqueStrings(databaseExtensionNames)) == std.length(databaseExtensionNames) :
            'extensions must not contain duplicate names';
-    assert std.length(uniqueStrings(explicitClusterExtensionNames)) == std.length(explicitClusterExtensionNames) :
+    assert std.length(uniqueStrings(clusterExtensionNames)) == std.length(clusterExtensionNames) :
            'imageExtensions must not contain duplicate names';
-    assert effectiveImageCatalogRef != null || std.length(mergedClusterExtensionsNeedCatalog) == 0 :
+    assert effectiveImageCatalogRef != null || std.length(clusterExtensionsNeedCatalog) == 0 :
            'Cluster extensions without imageCatalogRef must define image.reference or be overridden by imageExtensions entries that do';
 
     local clusterName = '%s-cluster' % p.databaseName;
@@ -309,7 +303,7 @@
           },
           postgresql: {
             parameters: p.postgresqlParameters,
-            [if std.length(mergedClusterExtensions) > 0 then 'extensions']: mergedClusterExtensions,
+            [if std.length(clusterExtensions) > 0 then 'extensions']: clusterExtensions,
           },
         } + (if std.length(p.plugins) > 0 then {
                plugins: p.plugins,
