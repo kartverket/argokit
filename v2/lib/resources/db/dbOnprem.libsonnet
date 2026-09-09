@@ -8,10 +8,9 @@
 
       instances: 2,
       enablePDB: false,
-      imageName: 'ghcr.io/cloudnative-pg/postgresql:18.4-standard-trixie',
-      imageCatalogRef: null,
       storageSizeGi: 1,
 
+      imageCatalogRef: null,
       defaultImageCatalogRef: {
         apiGroup: 'postgresql.cnpg.io',
         kind: 'ClusterImageCatalog',
@@ -19,18 +18,13 @@
         major: 18,
       },
 
-      // Database-side extensions are fully replaced when overridden, not merged.
-      // Use plain names for normal CREATE EXTENSION installs, or objects for versioned installs.
-      extensions: [
-        {
-          ensure: 'present',
-          name: 'plpgsql',
-        },
-      ],
+      // Compatibility input for extensions present in the base image.
+      // New configurations should use imageExtensions for activation and image-volume wiring.
+      // TODO: add support for pgaudit, vector and pg_failover_slots
+      extensions: [],
 
-      // Cluster-side extension images.
+      // Extensions activated in the Database and mounted from the ImageCatalog or direct images.
       // Use strings when resolving from an ImageCatalog, or full objects for direct overrides.
-      // image.reference is meaningful only in these entries.
       imageExtensions: [],
 
       plugins: [
@@ -124,19 +118,24 @@
         name: ext,
       } else ext;
 
-    local databaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
+    local compatibilityDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
     local clusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
+    local imageDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.imageExtensions];
+    local databaseExtensions = compatibilityDatabaseExtensions + imageDatabaseExtensions;
 
     local clusterExtensionsNeedCatalog =
       [ext for ext in clusterExtensions if !hasImageReference(ext)];
 
-    local databaseExtensionNames = [ext.name for ext in databaseExtensions];
+    local compatibilityExtensionNames = [ext.name for ext in compatibilityDatabaseExtensions];
     local clusterExtensionNames = [ext.name for ext in clusterExtensions];
+    local duplicateExtensionNames = std.setInter(
+      std.set(compatibilityExtensionNames),
+      std.set(clusterExtensionNames)
+    );
 
     local effectiveImageCatalogRef =
       if p.imageCatalogRef != null then p.imageCatalogRef
-      else if std.length(clusterExtensionsNeedCatalog) > 0 then p.defaultImageCatalogRef
-      else null;
+      else p.defaultImageCatalogRef;
 
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
@@ -146,18 +145,21 @@
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
     assert std.type(p.extensions) == 'array' : 'extensions must be an array';
     assert std.type(p.imageExtensions) == 'array' : 'imageExtensions must be an array';
-    assert p.defaultImageCatalogRef == null || std.type(p.defaultImageCatalogRef) == 'object' : 'defaultImageCatalogRef must be an object when set';
-    assert p.imageCatalogRef == null || std.type(p.imageCatalogRef) == 'object' : 'imageCatalogRef must be an object when set';
+    assert std.type(p.defaultImageCatalogRef) == 'object' : 'defaultImageCatalogRef must be an object';
     assert std.length([ext for ext in p.extensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
            'extensions object entries must define name';
     assert std.length([ext for ext in p.imageExtensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
            'imageExtensions object entries must define name';
-    assert std.length(uniqueStrings(databaseExtensionNames)) == std.length(databaseExtensionNames) :
+    assert std.length(uniqueStrings(compatibilityExtensionNames)) == std.length(compatibilityExtensionNames) :
            'extensions must not contain duplicate names';
     assert std.length(uniqueStrings(clusterExtensionNames)) == std.length(clusterExtensionNames) :
            'imageExtensions must not contain duplicate names';
+    assert std.length(duplicateExtensionNames) == 0 :
+           'extensions and imageExtensions must not contain the same names: ' + std.join(', ', duplicateExtensionNames);
     assert effectiveImageCatalogRef != null || std.length(clusterExtensionsNeedCatalog) == 0 :
            'Cluster extensions without imageCatalogRef must define image.reference or be overridden by imageExtensions entries that do';
+    assert p.imageCatalogRef == null || std.type(p.imageCatalogRef) == 'object' :
+           'imageCatalogRef must be an object when set';
 
     local clusterName = '%s-cluster' % p.databaseName;
     local environmentConfig = {

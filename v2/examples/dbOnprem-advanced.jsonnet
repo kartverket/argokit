@@ -5,14 +5,8 @@ argokit.db.dbOnprem.new({
   environment: 'dev',
   instances: 2,
   storageSizeGi: 2,
-  // Database-side extension configuration is independent from imageExtensions.
-  extensions: [
-    {
-      name: 'postgis',
-      version: '3.6.2',
-    },
-  ],
-  // Direct image overrides belong only to Cluster-side imageExtensions.
+  // imageExtensions wires the full object on the Cluster and activates it by name in the Database.
+  // Direct image overrides and image-volume paths remain Cluster-only fields.
   imageExtensions: [
     {
       name: 'postgis',
