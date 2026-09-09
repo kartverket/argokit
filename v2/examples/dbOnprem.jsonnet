@@ -4,11 +4,11 @@ argokit.db.dbOnprem.new({
   environment: 'dev',
   instances: 2,
   storageSizeGi: 2,
-  // Database-side extensions are installed in the database.
-  extensions: ['postgis'],
-  // Cluster-side image extensions are resolved from the image catalog.
-  // image.reference is meaningful only inside imageExtensions objects.
+  // imageExtensions wires image volumes on the Cluster and activates each extension in the Database.
+  // Strings resolve from the image catalog; image.reference is supported in full objects.
+  // For a full list of supported extension check docs at skip.kartverket.no
   imageExtensions: [
-    'pgmq',
+    'postgis',
+    'wal2json',
   ],
 })
