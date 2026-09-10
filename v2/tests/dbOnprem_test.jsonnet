@@ -140,3 +140,10 @@ test.new(std.thisFile)
     },
   ),
 )
++ test.case.new(
+  name='dbOnprem omits database extensions when none are configured',
+  test=test.expect.eqDiff(
+    actual=std.objectHas(databaseSpec({ databaseName: 'no-extensions' }), 'extensions'),
+    expected=false,
+  ),
+)
