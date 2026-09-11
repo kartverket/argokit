@@ -94,7 +94,7 @@
       postgresqlParameters: defaults.postgresqlParameters + (if 'postgresqlParameters' in config then config.postgresqlParameters else {}),
     };
     local isString(x) = std.type(x) == 'string';
-    local uniqeStings(values) = std.objectFields({ [value]: true for value in values});
+    local uniqeStrings(values) = std.objectFields({ [value]: true for value in values});
     local hasImageReference(ext) = 
       std.type(ext) == 'object' && 
       std.objectHas(ext, 'image') &&
@@ -136,6 +136,23 @@
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
     assert p.backupSourceClusterName == null || (std.type(p.backupSourceClusterName) == 'string' && std.length(p.backupSourceClusterName) > 0) : 'backupSourceClusterName must be null or a non-empty string';
     assert p.recoveryTargetTime == null || (std.type(p.recoveryTargetTime) == 'string' && std.length(p.recoveryTargetTime) > 0) : 'recoveryTargetTime must be null or a non-empty string';
+    assert std.type(p.extensions) == 'array' : 'extensions must be an array';
+    assert std.type(p.imageExtensions) == 'array' : 'imageExtensions must be an array';
+    assert std.type(p.defaultImageCatalogRef) == 'object' : 'defaultImageCatalogRef must be an object';
+    assert std.length([ext for ext in p.extensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
+           'extensions object entries must define name';
+    assert std.length([ext for ext in p.imageExtensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
+           'imageExtensions object entries must define name';
+    assert std.length(uniqeStrings(compatibilityExtensionNames)) == std.length(compatibilityExtensionNames) :
+           'extensions must not contain duplicate names';
+    assert std.length(uniqeStrings(clusterExtensionNames)) == std.length(clusterExtensionNames) :
+           'imageExtensions must not contain duplicate names';
+    assert std.length(duplicateExtensionNames) == 0 :
+           'extensions and imageExtensions must not contain the same names: ' + std.join(', ', duplicateExtensionNames);
+    assert effectiveImageCatalogRef != null || std.length(clusterExtensionsNeedCatalog) == 0 :
+           'Cluster extensions without imageCatalogRef must define image.reference or be overridden by imageExtensions entries that do';
+    assert p.imageCatalogRef == null || std.type(p.imageCatalogRef) == 'object' :
+           'imageCatalogRef must be an object when set';
 
     local isRestore = p.backupSourceClusterName != null;
     assert isRestore || p.recoveryTargetTime == null : 'recoveryTargetTime can only be set when backupSourceClusterName is set';
