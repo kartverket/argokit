@@ -8,22 +8,21 @@
 
       instances: 2,
       enablePDB: false,
-      imageName: 'ghcr.io/cloudnative-pg/postgis:18.4-3.6.4-system-trixie',
+      //imageName: 'ghcr.io/cloudnative-pg/postgis:18.4-3.6.4-system-trixie',
       storageSizeGi: 1,
 
-      // Note: 'extensions' is fully replaced when overridden, not merged.
-      // Specify the complete list of extensions you want when overriding this.
-      extensions: [
-        {
-          ensure: 'present',
-          name: 'plpgsql',
-        },
-        {
-          ensure: 'present',
-          name: 'postgis',
-          version: '3.6.4',
-        },
-      ],
+      imageCatalogRef: null,
+      defaultImageCatalogRef: {
+        apiGroup: 'postgresql.cnpg.io',
+        kind: 'ClusterImageCatalog',
+        name: 'cnpg-psql-std',
+        major: 18,
+      },
+
+      //Compatibility input for extensions present in the base image
+      extensions: [],
+      //Extensions resolved from the ImageCatalog
+      imageExtensions: [],
 
       plugins: [
         {
@@ -73,10 +72,7 @@
         -----END CERTIFICATE-----
       |||,
 
-      gatewayName: 'dba-pg-internal',
-      gatewayNamespace: 'istio-gateways',
-      gatewaySectionName: 'pg',
-
+      gatewayNS: 'istio-gateways',
       cnpgOperatorNamespace: 'dba-cnpg',
       metricsNamespace: 'grafana-alloy',
       metricsAppInstance: 'alloy',
@@ -97,6 +93,41 @@
     local p = defaults + config + {
       postgresqlParameters: defaults.postgresqlParameters + (if 'postgresqlParameters' in config then config.postgresqlParameters else {}),
     };
+    local isString(x) = std.type(x) == 'string';
+    local uniqeStings(values) = std.objectFields({ [value]: true for value in values});
+    local hasImageReference(ext) = 
+      std.type(ext) == 'object' && 
+      std.objectHas(ext, 'image') &&
+      std.type(ext.image) == 'object' &&
+      std.objectHas(ext.image, 'reference');
+
+    local normalizeDatabaseExtension(ext) = if isString(ext) then {
+      ensure: 'present',
+      name: ext,
+      } else {
+        ensure: 'present',
+        name: ext.name,
+        } + (
+        if std.objectHas(ext, 'ensure') then {ensure: ext.ensure} else {}
+        ) + (
+        if std.objectHas(ext, 'version') then {version: ext.version} else {}
+        );
+    
+    local normalizeClusterExtension(ext) = if isString(ext) then { name: ext,
+    } else ext;
+
+    local compatibilityDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
+    local clusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
+    local imageDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.imageExtensions];
+    local databaseExtensions = compatibilityDatabaseExtensions + imageDatabaseExtensions;
+
+    local clusterExtensionsNeedCatalog = [ext for ext in clusterExtensions if !hasImageReference(ext)];
+    local compatibilityExtensionNames = [ext.name for ext in compatibilityDatabaseExtensions];
+    local clusterExtensionNames = [ext.name for ext in clusterExtensions];
+    local duplicateExtensionNames = std.setInter(std.set(compatibilityExtensionNames), std.set(clusterExtensionNames));
+
+    local effectiveImageCatalogRef = if p.imageCatalogRef != null then p.imageCatalogRef else p.defaultImageCatalogRef;
+
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
     assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"';  // In the future there will be dedicated stateful/DB clusters
@@ -167,6 +198,33 @@
         },
       }
       for instanceNumber in std.range(1, p.instances)
+    };
+
+    local roles = {
+      ['databaserole-%s' % [name]]: {
+        apiVersion: 'postgresql.cnpg.io/v1',
+        kind: 'DatabaseRole',
+        metadata: {
+          name: 'role-' + name,
+        },
+        spec: {
+          cluster: {
+            name: clusterName,
+          },
+          name: name,
+          comment: p.managedRoles[name].comment,    // if no set basic comment 
+          login: p.managedRoles[name].login,        // required 
+          superuser: false,                         //p.managedRoles[name].superuser. This is set to false not changeable.   
+          createdb: p.managedRoles[name].createdb,  // defaults to false 
+          databaseRoleReclaimPolicy: 'retain',      // defaults to retain
+          bypassrls: false,                         // Also set to false so the user 
+          inRoles: p.managedRoles[name].inRoles,    // default to blank or pg_read_all_data
+          passwordSecret: {
+            name: 'pg-role-' + name,                //Eksplisitt navn (Forhåpemtligvis enklere å administrere i GSM) 
+          },
+        },        
+      }
+      for name in std.objectFields(p.managedRoles)
     };
 
     local objects = {
@@ -689,7 +747,7 @@
       dbaNamespaceAdmins:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
-    } + headlessServices;
+    } + headlessServices + roles;
     // Return all objects as a list
     std.objectValues(objects),
 }
