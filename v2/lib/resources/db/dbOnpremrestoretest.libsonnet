@@ -224,7 +224,7 @@
       }
       for instanceNumber in std.range(1, p.instances)
     };
-
+    // TODO: Fix, input validation for role config.
     local roles = {
       ['databaserole-%s' % [name]]: {
         apiVersion: 'postgresql.cnpg.io/v1',
