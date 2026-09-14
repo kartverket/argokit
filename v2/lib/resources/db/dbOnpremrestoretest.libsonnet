@@ -230,18 +230,19 @@
         apiVersion: 'postgresql.cnpg.io/v1',
         kind: 'DatabaseRole',
         metadata: {
-          name: 'role-' + name,
+          name: 'pg-role-' + name,
         },
         spec: {
           cluster: {
             name: clusterName,
           },
+          //Define evry option here so the user can't create something they should not be able to create
           name: name,
           comment: p.managedRoles[name].comment,    // if no set basic comment 
           login: p.managedRoles[name].login,        // required 
           superuser: false,                         //p.managedRoles[name].superuser. This is set to false not changeable.   
           createdb: p.managedRoles[name].createdb,  // defaults to false 
-          databaseRoleReclaimPolicy: 'retain',      // defaults to retain
+          databaseRoleReclaimPolicy: p.managedRoles[name].databaseRoleReclaimPolicy,  // defaults to retain,
           bypassrls: false,                         // Also set to false so the user 
           inRoles: p.managedRoles[name].inRoles,    // default to blank or pg_read_all_data
           passwordSecret: {
