@@ -323,8 +323,9 @@
           },
           name: p.databaseName,
           owner: p.databaseName,
-          extensions: databaseExtensions,
-        },
+        } + (if std.length(databaseExtensions) > 0 then {
+               extensions: databaseExtensions,
+             } else {}),
       },
       objectStore: {
         apiVersion: 'barmancloud.cnpg.io/v1',
@@ -658,6 +659,14 @@
                   podSelector: {
                     matchLabels: {
                       app: 'ztunnel',
+                    },
+                  },
+                },
+                {
+                  // No namespaceSelector means the NetworkPolicy's own namespace.
+                  podSelector: {
+                    matchLabels: {
+                      'cnpg.io/cluster': clusterName,
                     },
                   },
                 },
