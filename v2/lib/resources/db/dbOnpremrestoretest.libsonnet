@@ -368,7 +368,9 @@
           name: p.databaseName,
           owner: p.databaseName,
           extensions: p.extensions,
-        },
+        } + (if std.length(databaseExtensions) > 0 then {
+          extensions:databaseExtensions,
+        } else {}),
       },
       objectStore: {
         apiVersion: 'barmancloud.cnpg.io/v1',
