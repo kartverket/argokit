@@ -750,6 +750,13 @@
                     },
                   },
                 },
+                {
+                  podSelector: {
+                    matchLabels: {
+                      'cnpg.io/cluster': clusterName,
+                    },
+                  },
+                },
               ],
               ports: [
                 {
