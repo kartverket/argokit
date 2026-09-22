@@ -49,7 +49,7 @@ test.new(std.thisFile)
       },
       clusterExtensions: [
         { name: 'postgis' },
-        { name: 'pgmq', ensure: 'absent', version: '1.5.0' },
+        { name: 'pgmq', version: '1.5.0' },
       ],
       databaseExtensions: [
         { ensure: 'absent', name: 'plpgsql', version: '1.0' },
@@ -98,7 +98,6 @@ test.new(std.thisFile)
       clusterExtensions: [
         {
           name: 'postgis',
-          ensure: 'present',
           version: '3.6.2',
           env: [
             { name: 'GDAL_DATA', value: '${image_root}/share/gdal' },

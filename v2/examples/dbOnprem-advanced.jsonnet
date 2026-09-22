@@ -4,6 +4,8 @@ argokit.db.dbOnprem.new({
   databaseName: 'eksempel-advanced',
   environment: 'dev',
   instances: 2,
+  // To allow Kubernetes-access to namespace for DBA's, set this to `true`. Needed for superuser access to databases.
+  dbaAccess: false,
   storageSizeGi: 2,
   // imageExtensions wires the full object on the Cluster and activates it by name in the Database.
   // Direct image overrides and image-volume paths remain Cluster-only fields.

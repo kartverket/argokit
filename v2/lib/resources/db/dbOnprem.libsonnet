@@ -8,6 +8,9 @@
 
       instances: 2,
       enablePDB: false,
+      dbaAccess: false,
+      resourceSize: 'S',
+
       storageSizeGi: 1,
 
       imageCatalogRef: null,
@@ -89,8 +92,45 @@
       },
     };
 
+    local configuredEnvironment =
+      if std.objectHas(config, 'environment')
+      then config.environment
+      else defaults.environment;
+
+    local resSize = {
+      S: {
+        reqMem: 1,
+        reqCpu: 0.5,
+        limMem: 2,
+      },
+      M: {
+        reqMem: 2,
+        reqCpu: 1,
+        limMem: 4,
+      },
+      L: {
+        reqMem: 8,
+        reqCpu: 1.5,
+        limMem: 16,
+      },
+      XL: {
+        reqMem: 16,
+        reqCpu: 2,
+        limMem: 32,
+      },
+    };
+
     local p = defaults + config + {
-      postgresqlParameters: defaults.postgresqlParameters + (if 'postgresqlParameters' in config then config.postgresqlParameters else {}),
+      dbaAccess:
+        if std.objectHas(config, 'dbaAccess')
+        then config.dbaAccess
+        else configuredEnvironment == 'sandbox',
+
+      postgresqlParameters:
+        defaults.postgresqlParameters
+        + (if 'postgresqlParameters' in config
+           then config.postgresqlParameters
+           else {}),
     };
 
     local isString(x) = std.type(x) == 'string';
@@ -116,7 +156,11 @@
     local normalizeClusterExtension(ext) =
       if isString(ext) then {
         name: ext,
-      } else ext;
+      } else {
+        [field]: ext[field]
+        for field in std.objectFields(ext)
+        if field != 'ensure'
+      };
 
     local compatibilityDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
     local clusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
@@ -160,6 +204,8 @@
            'Cluster extensions without imageCatalogRef must define image.reference or be overridden by imageExtensions entries that do';
     assert p.imageCatalogRef == null || std.type(p.imageCatalogRef) == 'object' :
            'imageCatalogRef must be an object when set';
+    assert std.isBoolean(p.dbaAccess) :
+           'dbaAccess must be set and a boolean';
 
     local clusterName = '%s-cluster' % p.databaseName;
     local environmentConfig = {
@@ -191,6 +237,15 @@
     local gsmProject = env.gsmProject;
     local gatewayName = env.gatewayName;
     local gatewaySectionName = env.gatewaySectionName;
+
+    assert std.objectHas(resSize, p.resourceSize) :
+           'Invalid t-shirt size: ' + p.resourceSize;
+
+    local k8sRes = resSize[p.resourceSize];
+    local reqMem = k8sRes.reqMem;
+    local reqCpu = k8sRes.reqCpu;
+    local limMem = k8sRes.limMem;
+
 
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
@@ -294,8 +349,10 @@
               owner: p.databaseName,
             },
           },
+          primaryUpdateMethod: 'switchover',
           enablePDB: if p.instances > 1 then p.enablePDB else false,  // PDB doesn't make sense for single instance clusters
-          [if effectiveImageCatalogRef == null then 'imageName']: p.imageName,
+          // Remove for now, needs refcator if allowing teams to set their own base image.
+          //[if effectiveImageCatalogRef == null then 'imageName']: p.imageName,
           storage: {
             size: p.storageSizeGi + 'Gi',
           },
@@ -304,8 +361,19 @@
             serverTLSSecret: certSecretName,
           },
           postgresql: {
-            parameters: p.postgresqlParameters,
+            parameters: p.postgresqlParameters {
+              shared_buffers: std.toString(reqMem * 1024 / 4 + 128) + 'MB',
+            },
             [if std.length(clusterExtensions) > 0 then 'extensions']: clusterExtensions,
+          },
+          resources: {
+            requests: {
+              memory: reqMem + 'Gi',
+              cpu: reqCpu,
+            },
+            limits: {
+              memory: limMem + 'Gi',
+            },
           },
         } + (if std.length(p.plugins) > 0 then {
                plugins: p.plugins,
@@ -745,7 +813,7 @@
           ],
         },
       },
-      dbaNamespaceAdmins:
+      [if p.dbaAccess then 'dbaNamespaceAdmins']:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
     } + headlessServices;
