@@ -343,6 +343,9 @@
           storage: {
             size: p.storageSizeGi + 'Gi',
           },
+          walstorage: {
+            size: 2 + 'Gi',
+          },
           certificates: {
             serverCASecret: p.caSecretName,
             serverTLSSecret: certSecretName,
