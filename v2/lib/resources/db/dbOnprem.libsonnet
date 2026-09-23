@@ -100,22 +100,22 @@
     local resSize = {
       S: {
         reqMem: 1,
-        reqCpu: 0.5,
+        reqCpu: 500, //defines by milicore
         limMem: 2,
       },
       M: {
         reqMem: 2,
-        reqCpu: 1,
+        reqCpu: 1000,
         limMem: 4,
       },
       L: {
         reqMem: 8,
-        reqCpu: 1.5,
+        reqCpu: 1500,
         limMem: 16,
       },
       XL: {
         reqMem: 16,
-        reqCpu: 2,
+        reqCpu: 2000,
         limMem: 32,
       },
     };
@@ -369,7 +369,7 @@
           resources: {
             requests: {
               memory: reqMem + 'Gi',
-              cpu: reqCpu,
+              cpu: reqCpu + 'm',
             },
             limits: {
               memory: limMem + 'Gi',
