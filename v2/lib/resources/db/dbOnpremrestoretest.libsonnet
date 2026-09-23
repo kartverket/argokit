@@ -343,7 +343,7 @@
           storage: {
             size: p.storageSizeGi + 'Gi',
           },
-          walstorage: {
+          walStorage: {
             size: 2 + 'Gi',
           },
           certificates: {
