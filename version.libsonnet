@@ -1,4 +1,4 @@
 {
-  sha: '2714316bb6803da0869c8324af2bdf268eb4f3e4',
-  tag: 'v2.2.0-22',
+  sha: 'c3f8fea9a12a74d03a9dd8a49537d343b0f7efc4',
+  tag: 'v2.2.0-25',
 }
