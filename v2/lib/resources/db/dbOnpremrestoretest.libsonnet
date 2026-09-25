@@ -8,7 +8,8 @@
 
       instances: 2,
       enablePDB: false,
-      //imageName: 'ghcr.io/cloudnative-pg/postgis:18.4-3.6.4-system-trixie',
+      dbaAccess: false,
+      resourceSize: 'S',
       storageSizeGi: 1,
 
       imageCatalogRef: null,
@@ -20,6 +21,7 @@
       },
 
       //Compatibility input for extensions present in the base image
+      //
       extensions: [],
       //Extensions resolved from the ImageCatalog
       imageExtensions: [],
@@ -90,7 +92,37 @@
         'auto_explain.log_min_duration': '20s',
       },
     };
+
+    local configuredEnvironment = 
+      if 'environment' in config 
+      then config.environment 
+      else defaults.environment;
+
+    local resSize = {
+      S: {
+        reqMem: 1,
+        reqCpu: 500,
+        limMem: 2,
+      },
+      M: {
+        reqMem: 2,
+        reqCpu: 1000,
+        limMem: 4,
+      },
+      L: {
+        reqMem: 8,
+        reqCpu: 1500,
+        limMem: 16,
+      },
+      XL: {
+        reqMem: 16,
+        reqCpu: 2000,
+        limMem: 32,
+      },
+    };
+
     local p = defaults + config + {
+      dbaAccess: if std.objectHas(config, 'dbaAccess') then config.dbaAccess else configuredEnvironment == 'sandbox',
       postgresqlParameters: defaults.postgresqlParameters + (if 'postgresqlParameters' in config then config.postgresqlParameters else {}),
     };
     local isString(x) = std.type(x) == 'string';
@@ -113,8 +145,14 @@
         if std.objectHas(ext, 'version') then {version: ext.version} else {}
         );
     
-    local normalizeClusterExtension(ext) = if isString(ext) then { name: ext,
-    } else ext;
+    local normalizeClusterExtension(ext) =       
+      if isString(ext) then {
+        name: ext,
+      } else {
+        [field]: ext[field]
+        for field in std.objectFields(ext)
+        if field != 'ensure'
+      };
 
     local compatibilityDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
     local clusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
@@ -153,6 +191,8 @@
            'Cluster extensions without imageCatalogRef must define image.reference or be overridden by imageExtensions entries that do';
     assert p.imageCatalogRef == null || std.type(p.imageCatalogRef) == 'object' :
            'imageCatalogRef must be an object when set';
+    assert std.isBoolean(p.dbaAccess) :
+           'dbaAccess must be set and a boolean';
 
     local isRestore = p.backupSourceClusterName != null;
     assert isRestore || p.recoveryTargetTime == null : 'recoveryTargetTime can only be set when backupSourceClusterName is set';
@@ -190,6 +230,14 @@
     local gsmProject = env.gsmProject;
     local gatewayName = env.gatewayName;
     local gatewaySectionName = env.gatewaySectionName;
+
+    assert std.objectHas(resSize, p.resourceSize) :
+           'Invalid t-shirt size: ' + p.resourceSize;
+
+    local k8sRes = resSize[p.resourceSize];
+    local reqMem = k8sRes.reqMem;
+    local reqCpu = k8sRes.reqCpu;
+    local limMem = k8sRes.limMem;
 
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
@@ -241,7 +289,7 @@
           comment: p.managedRoles[name].comment,    // if no set basic comment 
           login: p.managedRoles[name].login,        // required 
           createdb: p.managedRoles[name].createdb,  // defaults to false 
-          createRole: p.managedRoles[name].createRole,  // defaults to false
+          createrole: p.managedRoles[name].createRole,  // defaults to false
           databaseRoleReclaimPolicy: p.managedRoles[name].databaseRoleReclaimPolicy,  // defaults to retain,
           inRoles: p.managedRoles[name].inRoles,    // default to blank if not set
           passwordSecret: {
@@ -837,7 +885,7 @@
           ],
         },
       },
-      dbaNamespaceAdmins:
+      [if p.dbaAccess then 'dbaNamespaceAdmins']:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
     } + headlessServices + roles;
