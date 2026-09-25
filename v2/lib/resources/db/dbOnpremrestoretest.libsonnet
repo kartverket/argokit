@@ -240,14 +240,16 @@
           name: name,
           comment: p.managedRoles[name].comment,    // if no set basic comment 
           login: p.managedRoles[name].login,        // required 
-          superuser: false,                         //p.managedRoles[name].superuser. This is set to false not changeable.   
           createdb: p.managedRoles[name].createdb,  // defaults to false 
+          createRole: p.managedRoles[name].createRole,  // defaults to false
           databaseRoleReclaimPolicy: p.managedRoles[name].databaseRoleReclaimPolicy,  // defaults to retain,
-          bypassrls: false,                         // Also set to false so the user 
-          inRoles: p.managedRoles[name].inRoles,    // default to blank or pg_read_all_data
+          inRoles: p.managedRoles[name].inRoles,    // default to blank if not set
           passwordSecret: {
-            name: 'pg-role-' + name,                //Eksplisitt navn (Forhåpemtligvis enklere å administrere i GSM) 
+            name: 'pg-role-' + name, //Eksplisitt navn (Forhåpemtligvis enklere å administrere i GSM) 
           },
+          superuser: false,   // This is set to false not changeable.   
+          bypassrls: false,   // if the user is able to bypass row-level-security
+          replication: false, // priviliged role for replication. Not changeable.
         },        
       }
       for name in std.objectFields(p.managedRoles)
