@@ -2,9 +2,11 @@
   // Creates a full CNPG database setup from one config object.
   new(config={}):
     local rolebinding = import '../k8s/rolebinding.libsonnet';
+    local externalSecrets = import '../externalSecrets.libsonnet';
     local defaults = {
       databaseName: 'eksempel',
       environment: 'dev',
+      gcpProject: null,
 
       instances: 2,
       enablePDB: false,
@@ -169,6 +171,7 @@
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
     assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"';  // In the future there will be dedicated stateful/DB clusters
+    assert std.type(p.gcpProject) == 'string' && std.length(p.gcpProject) > 0 : 'gcpProject must be a non-empty string'; // Need to accept an external GCP project for the GSM secret store
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
@@ -302,8 +305,20 @@
       }
       for name in std.objectFields(p.managedRoles)
     };
+    local roleSecrets = {
+      ['external-secret-pg-role-%s' % name]: externalSecrets.secret.new(
+        name='pg-role-' + name,
+        secrets=[{
+          fromSecret: 'pg-role-' + name,
+          toKey: 'pg-role-' + name,
+        }],
+        secretStoreRef='gsm',
+      )
+      for name in std.objectFields(p.managedRoles)
+    };
 
     local objects = {
+      managedRoleSecretStore: externalSecrets.store.new(name='gsm', gcpProject=p.gcpProject),
       caSecret: {
         apiVersion: 'v1',
         kind: 'Secret',
@@ -888,7 +903,7 @@
       [if p.dbaAccess then 'dbaNamespaceAdmins']:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
-    } + headlessServices + roles;
+    } + headlessServices + roles + roleSecrets;
     
     // Return all objects as a list
     {
