@@ -310,7 +310,12 @@
         name='pg-role-' + name,
         secrets=[{
           fromSecret: 'pg-role-' + name,
-          toKey: 'pg-role-' + name,
+          property: 'username',
+          toKey: 'username',
+        }, {
+          fromSecret: 'pg-role-' + name,
+          property: 'password',
+          toKey: 'password',
         }],
         secretStoreRef='gsm',
       )
