@@ -207,13 +207,13 @@
     local environmentConfig = {
       dev: {
         k8sCluster: 'atkv3-dev',
-        gsmProject: 'dba-dev-b03a',
+        //gsmProject:  'dba-dev-b03a',
         gatewayName: 'dba-pg-internal',
         gatewaySectionName: 'pg',
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
-        gsmProject: 'dba-sandbox-67ca',
+        //gsmProject: gcpProject, //'dba-sandbox-67ca'
         gatewayName: 'istio-internal',
         gatewaySectionName: 'internal-pgdb',
       },
@@ -230,7 +230,7 @@
 
     local env = environmentConfig[p.environment];
     local k8sCluster = env.k8sCluster;
-    local gsmProject = env.gsmProject;
+    local gsmProject = p.gcpProject; //env.gsmProject;
     local gatewayName = env.gatewayName;
     local gatewaySectionName = env.gatewaySectionName;
 
@@ -289,15 +289,16 @@
           },
           //Define evry option here so the user can't create something they should not be able to create
           name: name,
-          comment: p.managedRoles[name].comment,    // if no set basic comment 
-          login: p.managedRoles[name].login,        // required 
-          createdb: p.managedRoles[name].createdb,  // defaults to false 
-          createrole: p.managedRoles[name].createRole,  // defaults to false
-          databaseRoleReclaimPolicy: p.managedRoles[name].databaseRoleReclaimPolicy,  // defaults to retain,
-          inRoles: p.managedRoles[name].inRoles,    // default to blank if not set
+          comment: if p.managedRoles[name].isWriteUser then 'Managed role for write user' else 'Managed role for read-only user',
+          createdb: if p.managedRoles[name].isWriteUser then true else false, 
+          createrole: if p.managedRoles[name].isWriteUser then true else false,
+          inherit: true,  // This is set to true and not changeable.
+          databaseRoleReclaimPolicy: if !p.managedRoles[name].delete then 'retain' else 'delete',  
+          inRoles: if p.managedRoles[name].isWriteUser then ['pg_write_all_data', 'pg_read_all_data'] else ['pg_read_all_data'],
           passwordSecret: {
-            name: 'pg-role-' + name, //Eksplisitt navn (Forhåpemtligvis enklere å administrere i GSM) 
+            name: 'pg-role-' + name, 
           },
+          login: true,
           superuser: false,   // This is set to false not changeable.   
           bypassrls: false,   // if the user is able to bypass row-level-security
           replication: false, // priviliged role for replication. Not changeable.
