@@ -293,7 +293,9 @@
           createdb: if p.managedRoles[name].isWriteUser then true else false, 
           createrole: if p.managedRoles[name].isWriteUser then true else false,
           inherit: true,  // This is set to true and not changeable.
-          databaseRoleReclaimPolicy: if !p.managedRoles[name].delete then 'retain' else 'delete',  
+          databaseRoleReclaimPolicy:
+					  if std.objectHas(p.managedRoles[name], 'delete') && p.managedRoles[name].delete
+					  then 'delete' else 'retain',
           inRoles: if p.managedRoles[name].isWriteUser then ['pg_write_all_data', 'pg_read_all_data'] else ['pg_read_all_data'],
           passwordSecret: {
             name: 'pg-role-' + name, 
