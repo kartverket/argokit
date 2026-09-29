@@ -306,6 +306,7 @@
       }
       for name in std.objectFields(p.managedRoles)
     } else {};
+    
     local roleSecrets = if std.objectHas(p, 'managedRoles') then  { 
       ['external-secret-pg-role-%s' % name]: externalSecrets.secret.new(
         name='pg-role-' + name,
