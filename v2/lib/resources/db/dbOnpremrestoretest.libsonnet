@@ -276,7 +276,7 @@
       for instanceNumber in std.range(1, p.instances)
     };
     // TODO: Fix, input validation for role config.
-    local roles = {
+    local roles = if std.objectHas(p, 'managedRoles') then  {
       ['databaserole-%s' % [name]]: {
         apiVersion: 'postgresql.cnpg.io/v1',
         kind: 'DatabaseRole',
@@ -305,8 +305,8 @@
         },        
       }
       for name in std.objectFields(p.managedRoles)
-    };
-    local roleSecrets = {
+    } else {};
+    local roleSecrets = if std.objectHas(p, 'managedRoles') then  { 
       ['external-secret-pg-role-%s' % name]: externalSecrets.secret.new(
         name='pg-role-' + name,
         secrets=[{
@@ -321,7 +321,7 @@
         secretStoreRef='gsm',
       )
       for name in std.objectFields(p.managedRoles)
-    };
+    } else {};
 
     local objects = {
       managedRoleSecretStore: externalSecrets.store.new(name='gsm', gcpProject=p.gcpProject),
