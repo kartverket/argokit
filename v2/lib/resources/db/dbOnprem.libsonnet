@@ -6,6 +6,7 @@
     local defaults = {
       databaseName: 'eksempel',
       environment: 'dev',
+      gcpProject: null,
 
       instances: 2,
       enablePDB: false,
@@ -207,18 +208,20 @@
            'imageCatalogRef must be an object when set';
     assert std.isBoolean(p.dbaAccess) :
            'dbaAccess must be set and a boolean';
+    assert std.isString(p.gcpProject) && std.length(p.gcpProject) > 0 :
+           'gcpProject must be set and a non-empty string';
 
     local clusterName = '%s-cluster' % p.databaseName;
     local environmentConfig = {
       dev: {
         k8sCluster: 'atkv3-dev',
-        gsmProject: 'dba-dev-b03a',
+        //gsmProject: 'dba-dev-b03a',
         gatewayName: 'dba-pg-internal',
         gatewaySectionName: 'pg',
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
-        gsmProject: 'dba-sandbox-67ca',
+        //gsmProject: 'dba-sandbox-67ca',
         gatewayName: 'istio-internal',
         gatewaySectionName: 'internal-pgdb',
       },
@@ -235,7 +238,7 @@
 
     local env = environmentConfig[p.environment];
     local k8sCluster = env.k8sCluster;
-    local gsmProject = env.gsmProject;
+    local gsmProject = p.gcpProject;
     local gatewayName = env.gatewayName;
     local gatewaySectionName = env.gatewaySectionName;
 
