@@ -4,8 +4,18 @@ local dbOnprem = argokit.db.dbOnprem;
 
 local findObject(objects, kind) = std.filter(function(obj) obj.kind == kind, objects)[0];
 
-local clusterSpec(config) = findObject(dbOnprem.new(config).items, 'Cluster').spec;
-local databaseSpec(config) = findObject(dbOnprem.new(config).items, 'Database').spec;
+local usersConfig = {
+  gcpProject: 'test-gcp-project',
+  users: {
+    testUser: {
+      isWriteUser: false,
+    },
+  },
+};
+
+local dbOnpremConfig(config) = dbOnprem.new(usersConfig + config);
+local clusterSpec(config) = findObject(dbOnpremConfig(config).items, 'Cluster').spec;
+local databaseSpec(config) = findObject(dbOnpremConfig(config).items, 'Database').spec;
 
 test.new(std.thisFile)
 + test.case.new(
