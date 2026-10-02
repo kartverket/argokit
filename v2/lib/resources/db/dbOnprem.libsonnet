@@ -285,7 +285,7 @@
       for instanceNumber in std.range(1, p.instances)
     };
     
-    assert std.objectHas(p, 'users'): 'Atleast 1 user must be defined';
+    assert std.objectHas(p, 'users'): 'users much exist and needs to contain at least one user';
     local managedRoles = p.users;
     local roles =  {
       ['databaserole-%s' % [name]]: {
