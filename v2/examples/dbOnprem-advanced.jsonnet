@@ -9,6 +9,19 @@ argokit.db.dbOnprem.new({
   storageSizeGi: 2,
   // imageExtensions wires the full object on the Cluster and activates it by name in the Database.
   // Direct image overrides and image-volume paths remain Cluster-only fields.
+  //Must define the gcpProject where the SecretStore is created. This is used to store the managed roles in GCP Secret Manager.
+  gcpProject: 'dev-gcp-project',
+  //Definition of users that will be created in the database, its required to define atleast 1.
+  users: {
+    //Username for user1
+    user1: {
+      //Define if the user needs write access to the database
+      isWriteUser: true,
+    },
+    user2: {
+      isWriteUser: false,
+    },
+  },
   imageExtensions: [
     {
       name: 'postgis',
