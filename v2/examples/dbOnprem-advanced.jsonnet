@@ -2,7 +2,7 @@ local argokit = import '../../v2/jsonnet/argokit.libsonnet';
 
 argokit.db.dbOnprem.new({
   databaseName: 'eksempel-advanced',
-  environment: 'dev',
+  environment: 'dbdev',
   instances: 2,
   // To allow Kubernetes-access to namespace for DBA's, set this to `true`. Needed for superuser access to databases.
   dbaAccess: false,
