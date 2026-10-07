@@ -1,7 +1,7 @@
 local argokit = import '../../v2/jsonnet/argokit.libsonnet';
 argokit.db.dbOnprem.new({
   databaseName: 'eksempel',
-  environment: 'dev',
+  environment: 'dbdev',
   instances: 2,
   storageSizeGi: 2,
   //Must define the gcpProject where the SecretStore is created. This is used to store the managed roles in GCP Secret Manager.

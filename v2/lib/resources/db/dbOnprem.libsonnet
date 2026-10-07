@@ -5,12 +5,13 @@
     local externalSecrets = import '../externalSecrets.libsonnet';
     local defaults = {
       databaseName: 'eksempel',
-      environment: 'dev',
+      environment: 'dbdev',
       gcpProject: null,
 
       instances: 2,
       enablePDB: false,
       dbaAccess: false,
+      enableBackup: true,
       resourceSize: 'S',
 
       storageSizeGi: 1,
@@ -102,7 +103,7 @@
     local resSize = {
       S: {
         reqMem: 1,
-        reqCpu: 500, //defines by milicore
+        reqCpu: 500,  //defines by milicore
         limMem: 2,
       },
       M: {
@@ -185,7 +186,7 @@
 
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
-    assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"';  // In the future there will be dedicated stateful/DB clusters
+    assert std.member(['sandbox', 'dev', 'dbdev'], p.environment) : 'Environment must be either "sandbox", "dev" og "dbdev"';  // In the future there will be dedicated stateful/DB clusters, dbdev is one of those
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
@@ -215,21 +216,36 @@
     local environmentConfig = {
       dev: {
         k8sCluster: 'atkv3-dev',
+        bucketName: 'dbabucket',
         //gsmProject: 'dba-dev-b03a',
         gatewayName: 'dba-pg-internal',
         gatewaySectionName: 'pg',
+        backupSchedule: '30 16 03 * * MON',
+      },
+      dbdev: {
+        k8sCluster: 'atkv3-dev-stateful',
+        bucketName: 'cnpg-dev',
+        //gsmProject: 'dba-dev-b03a',
+        gatewayName: 'istio-internal',
+        gatewaySectionName: 'internal-pgdb',
+        backupSchedule: '30 16 01 * * MON',
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
+        bucketName: 'dbabucket',
         //gsmProject: 'dba-sandbox-67ca',
         gatewayName: 'istio-internal',
         gatewaySectionName: 'internal-pgdb',
+        backupSchedule: '30 16 01 * * MON',
+        enableBackup: false,
       },
       // prod: {
       //   k8sCluster: 'atkv3-prod-stateful',
+      //   bucketName: 'cnpg-prod',
       //   gsmProject: 'dba-prod-6849',
       //  gatewayName: 'istio-internal',
       //  gatewaySectionName: 'internal-pgdb',
+      //  backupSchedule: '30 16 03 * * *',
       // },
     };
 
@@ -238,9 +254,13 @@
 
     local env = environmentConfig[p.environment];
     local k8sCluster = env.k8sCluster;
+    local bucketName = env.bucketName;
     local gsmProject = p.gcpProject;
     local gatewayName = env.gatewayName;
     local gatewaySectionName = env.gatewaySectionName;
+    local backupSchedule = env.backupSchedule;
+    local enableBackup =
+      if p.environment == 'sandbox' then env.enableBackup else p.enableBackup;
 
     assert std.objectHas(resSize, p.resourceSize) :
            'Invalid t-shirt size: ' + p.resourceSize;
@@ -284,10 +304,10 @@
       }
       for instanceNumber in std.range(1, p.instances)
     };
-    
-    assert std.objectHas(p, 'users'): 'users much exist and needs to contain at least one user';
+
+    assert std.objectHas(p, 'users') : 'users much exist and needs to contain at least one user';
     local managedRoles = p.users;
-    local roles =  {
+    local roles = {
       ['databaserole-%s' % [name]]: {
         apiVersion: 'postgresql.cnpg.io/v1',
         kind: 'DatabaseRole',
@@ -301,26 +321,26 @@
           //Define evry option here so the user can't create something they should not be able to create
           name: name,
           comment: if managedRoles[name].isWriteUser then 'Managed role for write user' else 'Managed role for read-only user',
-          createdb: if managedRoles[name].isWriteUser then true else false, 
+          createdb: if managedRoles[name].isWriteUser then true else false,
           createrole: if managedRoles[name].isWriteUser then true else false,
           inherit: true,  // This is set to true and not changeable.
           databaseRoleReclaimPolicy:
-					  if std.objectHas(managedRoles[name], 'delete') && managedRoles[name].delete
-					  then 'delete' else 'retain',
+            if std.objectHas(managedRoles[name], 'delete') && managedRoles[name].delete
+            then 'delete' else 'retain',
           inRoles: if managedRoles[name].isWriteUser then ['pg_write_all_data', 'pg_read_all_data'] else ['pg_read_all_data'],
           passwordSecret: {
-            name: 'pg-role-' + name, 
+            name: 'pg-role-' + name,
           },
           login: true,
-          superuser: false,   // This is set to false not changeable.   
-          bypassrls: false,   // if the user is able to bypass row-level-security
-          replication: false, // priviliged role for replication. Not changeable.
-        },        
+          superuser: false,  // This is set to false not changeable.
+          bypassrls: false,  // if the user is able to bypass row-level-security
+          replication: false,  // priviliged role for replication. Not changeable.
+        },
       }
       for name in std.objectFields(managedRoles)
     };
-    
-    local roleSecrets = { 
+
+    local roleSecrets = {
       ['external-secret-pg-role-%s' % name]: externalSecrets.secret.new(
         name='pg-role-' + name,
         secrets=[{
@@ -477,7 +497,7 @@
           },
           retentionPolicy: '7d',
           configuration: {
-            destinationPath: 's3://dbabucket/%s' % p.databaseName,
+            destinationPath: 's3://%s/%s' % [bucketName, p.databaseName],
             endpointURL: 'https://s3-rin.statkart.no',
             s3Credentials: {
               accessKeyId: {
@@ -870,6 +890,25 @@
           ],
         },
       },
+      [if enableBackup then 'scheduledBackupJob']:
+        {
+          apiVersion: 'postgresql.cnpg.io/v1',
+          kind: 'ScheduledBackup',
+          metadata: {
+            name: 'backup-' + clusterName,
+          },
+          spec: {
+            schedule: backupSchedule,
+            backupOwnerReference: 'self',
+            cluster: {
+              name: clusterName,
+            },
+            method: 'plugin',
+            pluginConfiguration: {
+              name: 'barman-cloud.cloudnative-pg.io',
+            },
+          },
+        },
       [if p.dbaAccess then 'dbaNamespaceAdmins']:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
