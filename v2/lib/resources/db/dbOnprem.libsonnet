@@ -186,7 +186,7 @@
 
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
-    assert std.member(['sandbox', 'dev', 'dbdev'], p.environment) : 'Environment must be either "sandbox", "dev" og "dbdev"';  // In the future there will be dedicated stateful/DB clusters, dbdev is one of those
+    assert std.member(['sandbox', 'dev', 'dbdev'], p.environment) : 'Environment must be either "sandbox", "dev" or "dbdev"';  // In the future there will be dedicated stateful/DB clusters, dbdev is one of those
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
@@ -305,7 +305,7 @@
       for instanceNumber in std.range(1, p.instances)
     };
 
-    assert std.objectHas(p, 'users') : 'users much exist and needs to contain at least one user';
+    assert std.objectHas(p, 'users') : 'users must exist and needs to contain at least one user';
     local managedRoles = p.users;
     local roles = {
       ['databaserole-%s' % [name]]: {
