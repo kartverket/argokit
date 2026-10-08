@@ -276,7 +276,7 @@
       for instanceNumber in std.range(1, p.instances)
     };
     // TODO: Fix, input validation for role config.
-    assert std.objectHas(p, 'users') && std.objectHas(p.users, 'isWriteUser') : 'Users must be defined and each user must have set isWriteUser (true/false)';
+    assert std.objectHas(p, 'users') : 'Users must be defined and each user must have set isWriteUser (true/false)';
     local managedRoles = p.users;
     local roles =  {
       ['databaserole-%s' % [name]]: {
