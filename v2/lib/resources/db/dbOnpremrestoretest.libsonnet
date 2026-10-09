@@ -932,7 +932,7 @@
       [if p.dbaAccess then 'dbaNamespaceAdmins']:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
-    } + headlessServices + roles + roleSecrets;
+    } + headlessServices + roles + roleSecrets + scheduledBackup;
     
     // Return all objects as a list
     {
