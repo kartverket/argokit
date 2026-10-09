@@ -329,7 +329,7 @@
     };
 
     local scheduledBackup = {
-      apiVersion: 'barmancloud.cnpg.io/v1',
+      apiVersion: 'postgresql.cnpg.io/v1',
       kind: 'ScheduledBackup',
       metadata: {
         name: clusterName,
@@ -338,8 +338,11 @@
         cluster: {
           name: clusterName,
         },
-        objectStoreName: 's3-store',
-        schedule: '0 2 * * *', // Every day at 02:00
+        method: 'plugin',
+        pluginConfiguration: {
+          name: 'barman-cloud.cloudnative-pg.io',
+        },
+        schedule: '0 0 2 * * *', // Every day at 02:00
       },
     };
 
@@ -469,6 +472,7 @@
           extensions:databaseExtensions,
         } else {}),
       },
+      scheduledBackup: scheduledBackup,
       objectStore: {
         apiVersion: 'barmancloud.cnpg.io/v1',
         kind: 'ObjectStore',
@@ -932,7 +936,7 @@
       [if p.dbaAccess then 'dbaNamespaceAdmins']:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
-    } + headlessServices + roles + roleSecrets + scheduledBackup;
+    } + headlessServices + roles + roleSecrets;
     
     // Return all objects as a list
     {
