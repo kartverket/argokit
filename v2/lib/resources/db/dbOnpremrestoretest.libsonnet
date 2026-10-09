@@ -328,6 +328,21 @@
       for name in std.objectFields(managedRoles)
     };
 
+    local scheduledBackup = {
+      apiVersion: 'barmancloud.cnpg.io/v1',
+      kind: 'ScheduledBackup',
+      metadata: {
+        name: clusterName,
+      },
+      spec: {
+        cluster: {
+          name: clusterName,
+        },
+        objectStoreName: 's3-store',
+        schedule: '0 2 * * *', // Every day at 02:00
+      },
+    };
+
     local objects = {
       managedRoleSecretStore: externalSecrets.store.new(name='gsm', gcpProject=p.gcpProject),
       caSecret: {
@@ -387,6 +402,9 @@
         },
         spec: {
           instances: p.instances,
+          backup:{
+            target: 'primary'
+            },
           bootstrap:
             if isRestore then {
               recovery: {
