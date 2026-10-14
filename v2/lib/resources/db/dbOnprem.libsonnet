@@ -307,6 +307,9 @@
 
     assert std.objectHas(p, 'users') : 'users must exist and needs to contain at least one user';
     local managedRoles = p.users;
+    local rolesWithWrite = [name for name in std.objectFields(p.users) if p.users[name].isWriteUser];
+    local dbOwner = if std.length(rolesWithWrite) > 0 then rolesWithWrite[0] else p.databaseName;
+
     local roles = {
       ['databaserole-%s' % [name]]: {
         apiVersion: 'postgresql.cnpg.io/v1',
@@ -423,7 +426,7 @@
           bootstrap: {
             initdb: {
               database: p.databaseName,
-              owner: p.databaseName,
+              owner: dbOwner,
             },
           },
           primaryUpdateMethod: 'switchover',
@@ -467,7 +470,7 @@
             name: clusterName,
           },
           name: p.databaseName,
-          owner: p.databaseName,
+          owner: dbOwner,
         } + (if std.length(databaseExtensions) > 0 then {
                extensions: databaseExtensions,
              } else {}),
@@ -824,6 +827,44 @@
               ],
             },
           ],
+        },
+      },
+      networkPolicyAllowEgressToKubeApi: {
+        apiVersion: 'networking.k8s.io/v1',
+        kind: 'NetworkPolicy',
+        metadata: {
+          name: 'allow-egress-to-kube-api',
+        },
+        spec: {
+          egress: [
+            {
+              ports: [
+                {
+                  port: 6443,
+                  protocol: 'TCP',
+                },
+              ],
+              to: [
+                {
+                  ipBlock: {
+                    cidr: '10.40.11.12/32',
+                  },
+                },
+                {
+                  ipBlock: {
+                    cidr: '10.40.11.13/32',
+                  },
+                },
+                {
+                  ipBlock: {
+                    cidr: '10.40.11.14/32',
+                  },
+                },
+              ],
+            },
+          ],
+          podSelector: {},
+          policyTypes: ['Egress'],
         },
       },
       tlsRouteWrite: {
