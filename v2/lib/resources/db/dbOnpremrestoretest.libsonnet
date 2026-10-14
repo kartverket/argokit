@@ -247,6 +247,10 @@
     local writeHost = '%s-write.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
     local readHost = '%s-read.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
 
+    // Determine the DB owner in the main. 
+    local rolesWithWrite = [name for name in std.objectFields(p.users) if p.users[name].isWriteUser];
+    local dbOwner = if std.length(rolesWithWrite) > 0 then rolesWithWrite[0] else p.databaseName;
+
     local headlessServices = {
       ['%s-%d-hs' % [clusterName, instanceNumber]]: {
         apiVersion: 'v1',
@@ -420,7 +424,7 @@
             } else {
               initdb: {
                 database: p.databaseName,
-                owner: p.databaseName,
+                owner: dbOwner,
               },
             },
           [if isRestore then 'externalClusters']: [
@@ -466,7 +470,7 @@
             name: clusterName,
           },
           name: p.databaseName,
-          owner: p.databaseName,
+          owner: dbOwner,
           extensions: p.extensions,
         } + (if std.length(databaseExtensions) > 0 then {
           extensions:databaseExtensions,
