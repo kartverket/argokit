@@ -221,6 +221,7 @@
         gatewayName: 'dba-pg-internal',
         gatewaySectionName: 'pg',
         backupSchedule: '30 16 03 * * MON',
+        cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ] 
       },
       dbdev: {
         k8sCluster: 'atkv3-dev-stateful',
@@ -229,6 +230,7 @@
         gatewayName: 'istio-internal',
         gatewaySectionName: 'internal-pgdb',
         backupSchedule: '30 16 01 * * MON',
+        cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ]
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
@@ -238,6 +240,7 @@
         gatewaySectionName: 'internal-pgdb',
         backupSchedule: '30 16 01 * * MON',
         enableBackup: false,
+        cidrBlockKubeApi: ['10.40.11.12/32','10.40.11.13/32','10.40.11.14/32' ]
       },
       // prod: {
       //   k8sCluster: 'atkv3-prod-stateful',
@@ -246,6 +249,7 @@
       //  gatewayName: 'istio-internal',
       //  gatewaySectionName: 'internal-pgdb',
       //  backupSchedule: '30 16 03 * * *',
+      //  cidrBlockKubeApi: ['10.40.12.3/32', '10.40.12.4/32', '10.40.12.5/32']
       // },
     };
 
@@ -847,17 +851,17 @@
               to: [
                 {
                   ipBlock: {
-                    cidr: '10.40.11.12/32',
+                    cidr: env.cidrBlockKubeApi[0],
                   },
                 },
                 {
                   ipBlock: {
-                    cidr: '10.40.11.13/32',
+                    cidr: env.cidrBlockKubeApi[1],
                   },
                 },
                 {
                   ipBlock: {
-                    cidr: '10.40.11.14/32',
+                    cidr: env.cidrBlockKubeApi[2],
                   },
                 },
               ],
