@@ -1,5 +1,6 @@
 {
   // Creates a full CNPG database setup from one config object.
+  // This is only used for restore functionality testing, and not for production use.
   new(config={}):
     local rolebinding = import '../k8s/rolebinding.libsonnet';
     local externalSecrets = import '../externalSecrets.libsonnet';
@@ -84,7 +85,7 @@
 
       // Restore source cluster name from S3 backup (Barman serverName).
       backupSourceClusterName: null,
-      // Optional point-in-time-recovery timestamp, for example: '2026-06-01 12:00:00+00'.
+      // Optional point-in-time-recovery timestamp.
       recoveryTargetTime: null,
 
       postgresqlParameters: {
@@ -158,8 +159,6 @@
 
     local compatibilityDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
     local clusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
-    local imageDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.imageExtensions];
-    local databaseExtensions = compatibilityDatabaseExtensions + imageDatabaseExtensions;
 
     local clusterExtensionsNeedCatalog = [ext for ext in clusterExtensions if !hasImageReference(ext)];
     local compatibilityExtensionNames = [ext.name for ext in compatibilityDatabaseExtensions];
@@ -175,7 +174,7 @@
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
-    assert p.backupSourceClusterName == null || (std.type(p.backupSourceClusterName) == 'string' && std.length(p.backupSourceClusterName) > 0) : 'backupSourceClusterName must be null or a non-empty string';
+    assert std.type(p.backupSourceClusterName) == 'string' && std.length(p.backupSourceClusterName) > 0 : 'backupSourceClusterName must be a non-empty string';
     assert p.recoveryTargetTime == null || (std.type(p.recoveryTargetTime) == 'string' && std.length(p.recoveryTargetTime) > 0) : 'recoveryTargetTime must be null or a non-empty string';
     assert std.type(p.extensions) == 'array' : 'extensions must be an array';
     assert std.type(p.imageExtensions) == 'array' : 'imageExtensions must be an array';
@@ -197,10 +196,6 @@
     assert std.isBoolean(p.dbaAccess) :
            'dbaAccess must be set and a boolean';
 
-    local isRestore = p.backupSourceClusterName != null;
-    assert isRestore || p.recoveryTargetTime == null : 'recoveryTargetTime can only be set when backupSourceClusterName is set';
-
-
     local clusterName = '%s-cluster' % p.databaseName;
     local backupSourceClusterFullName = '%s-cluster' % p.backupSourceClusterName;
 
@@ -210,12 +205,14 @@
         //gsmProject:  'dba-dev-b03a',
         gatewayName: 'dba-pg-internal',
         gatewaySectionName: 'pg',
+        cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ],
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
         //gsmProject: gcpProject, //'dba-sandbox-67ca'
         gatewayName: 'istio-internal',
         gatewaySectionName: 'internal-pgdb',
+        cidrBlockKubeApi: ['10.40.11.12/32','10.40.11.13/32','10.40.11.14/32' ]
       },
       // prod: {
       //   k8sCluster: 'atkv3-prod-stateful',
@@ -246,10 +243,6 @@
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
     local writeHost = '%s-write.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
     local readHost = '%s-read.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
-
-    // Determine the DB owner in the main. 
-    local rolesWithWrite = [name for name in std.objectFields(p.users) if p.users[name].isWriteUser];
-    local dbOwner = if std.length(rolesWithWrite) > 0 then rolesWithWrite[0] else p.databaseName;
 
     local headlessServices = {
       ['%s-%d-hs' % [clusterName, instanceNumber]]: {
@@ -412,22 +405,16 @@
           backup:{
             target: 'primary'
             },
-          bootstrap:
-            if isRestore then {
-              recovery: {
-                source: backupSourceClusterFullName,
-              } + (if p.recoveryTargetTime != null then {
-                     recoveryTarget: {
-                       targetTime: p.recoveryTargetTime,
-                     },
-                   } else {}),
-            } else {
-              initdb: {
-                database: p.databaseName,
-                owner: dbOwner,
+          bootstrap: {
+            recovery: {
+              source: backupSourceClusterFullName,
+            } + (if p.recoveryTargetTime != null then {
+              recoveryTarget: {
+                targetTime: p.recoveryTargetTime,
               },
-            },
-          [if isRestore then 'externalClusters']: [
+            } else {}),
+          },
+          externalClusters: [
             {
               name: backupSourceClusterFullName,
               plugin: {
@@ -458,23 +445,6 @@
         } + (if std.length(p.plugins) > 0 then {
                plugins: p.plugins,
              } else {}),
-      },
-      [if !isRestore then 'database']: {
-        apiVersion: 'postgresql.cnpg.io/v1',
-        kind: 'Database',
-        metadata: {
-          name: p.databaseName,
-        },
-        spec: {
-          cluster: {
-            name: clusterName,
-          },
-          name: p.databaseName,
-          owner: dbOwner,
-          extensions: p.extensions,
-        } + (if std.length(databaseExtensions) > 0 then {
-          extensions:databaseExtensions,
-        } else {}),
       },
       scheduledBackup: scheduledBackup,
       objectStore: {
@@ -520,7 +490,7 @@
           },
         },
       },
-      [if isRestore then 'ObjectStore']: {
+      restoreSourceObjectStore: {
         apiVersion: 'barmancloud.cnpg.io/v1',
         kind: 'ObjectStore',
         metadata: {
@@ -873,6 +843,44 @@
           ],
         },
       },
+      networkPolicyAllowEgressToKubeApi: {
+        apiVersion: 'networking.k8s.io/v1',
+        kind: 'NetworkPolicy',
+        metadata: {
+          name: 'allow-egress-to-kube-api',
+        },
+        spec: {
+          egress: [
+            {
+              ports: [
+                {
+                  port: 6443,
+                  protocol: 'TCP',
+                },
+              ],
+              to: [
+                {
+                  ipBlock: {
+                    cidr: env.cidrBlockKubeApi[0],
+                  },
+                },
+                {
+                  ipBlock: {
+                    cidr: env.cidrBlockKubeApi[1],
+                  },
+                },
+                {
+                  ipBlock: {
+                    cidr: env.cidrBlockKubeApi[2],
+                  },
+                },
+              ],
+            },
+          ],
+          podSelector: {},
+          policyTypes: ['Egress'],
+        },
+      },      
       tlsRouteWrite: {
         apiVersion: 'gateway.networking.k8s.io/v1',
         kind: 'TLSRoute',
