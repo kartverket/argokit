@@ -3,11 +3,9 @@
   // This is only used for restore functionality testing, and not for production use.
   new(config={}):
     local rolebinding = import '../k8s/rolebinding.libsonnet';
-    local externalSecrets = import '../externalSecrets.libsonnet';
     local defaults = {
       databaseName: 'eksempel',
       environment: 'dev',
-      gcpProject: null,
 
       instances: 2,
       enablePDB: false,
@@ -170,7 +168,6 @@
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
     assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"';  // In the future there will be dedicated stateful/DB clusters
-    assert std.type(p.gcpProject) == 'string' && std.length(p.gcpProject) > 0 : 'gcpProject must be a non-empty string'; // Need to accept an external GCP project for the GSM secret store
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
@@ -202,23 +199,20 @@
     local environmentConfig = {
       dev: {
         k8sCluster: 'atkv3-dev',
-        //gsmProject:  'dba-dev-b03a',
         gatewayName: 'dba-pg-internal',
         gatewaySectionName: 'pg',
         cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ],
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
-        //gsmProject: gcpProject, //'dba-sandbox-67ca'
         gatewayName: 'istio-internal',
         gatewaySectionName: 'internal-pgdb',
         cidrBlockKubeApi: ['10.40.11.12/32','10.40.11.13/32','10.40.11.14/32' ]
       },
       // prod: {
       //   k8sCluster: 'atkv3-prod-stateful',
-      //   gsmProject: 'dba-prod-6849',
-      //  gatewayName: 'istio-internal',
-      //  gatewaySectionName: 'internal-pgdb',
+      //   gatewayName: 'istio-internal',
+      //   gatewaySectionName: 'internal-pgdb',
       // },
     };
 
@@ -227,7 +221,6 @@
 
     local env = environmentConfig[p.environment];
     local k8sCluster = env.k8sCluster;
-    local gsmProject = p.gcpProject; //env.gsmProject;
     local gatewayName = env.gatewayName;
     local gatewaySectionName = env.gatewaySectionName;
 
@@ -272,59 +265,6 @@
       }
       for instanceNumber in std.range(1, p.instances)
     };
-    // TODO: Fix, input validation for role config.
-    assert std.objectHas(p, 'users') : 'Users must be defined and each user must have set isWriteUser (true/false)';
-    local managedRoles = p.users;
-    local roles =  {
-      ['databaserole-%s' % [name]]: {
-        apiVersion: 'postgresql.cnpg.io/v1',
-        kind: 'DatabaseRole',
-        metadata: {
-          name: 'pg-role-' + name,
-        },
-        spec: {
-          cluster: {
-            name: clusterName,
-          },
-          //Define evry option here so the user can't create something they should not be able to create
-          name: name,
-          comment: if managedRoles[name].isWriteUser then 'Managed role for write user' else 'Managed role for read-only user',
-          createdb: if managedRoles[name].isWriteUser then true else false, 
-          createrole: if managedRoles[name].isWriteUser then true else false,
-          inherit: true,  // This is set to true and not changeable.
-          databaseRoleReclaimPolicy:
-					  if std.objectHas(managedRoles[name], 'delete') && managedRoles[name].delete
-					  then 'delete' else 'retain',
-          inRoles: if managedRoles[name].isWriteUser then ['pg_write_all_data', 'pg_read_all_data'] else ['pg_read_all_data'],
-          passwordSecret: {
-            name: 'pg-role-' + name, 
-          },
-          login: true,
-          superuser: false,   // This is set to false not changeable.   
-          bypassrls: false,   // if the user is able to bypass row-level-security
-          replication: false, // priviliged role for replication. Not changeable.
-        },        
-      }
-      for name in std.objectFields(managedRoles)
-    };
-    
-    local roleSecrets = { 
-      ['external-secret-pg-role-%s' % name]: externalSecrets.secret.new(
-        name='pg-role-' + name,
-        secrets=[{
-          fromSecret: 'pg-role-' + name,
-          property: 'username',
-          toKey: 'username',
-        }, {
-          fromSecret: 'pg-role-' + name,
-          property: 'password',
-          toKey: 'password',
-        }],
-        secretStoreRef='gsm',
-      )
-      for name in std.objectFields(managedRoles)
-    };
-
     local scheduledBackup = {
       apiVersion: 'postgresql.cnpg.io/v1',
       kind: 'ScheduledBackup',
@@ -344,7 +284,6 @@
     };
 
     local objects = {
-      managedRoleSecretStore: externalSecrets.store.new(name='gsm', gcpProject=p.gcpProject),
       caSecret: {
         apiVersion: 'v1',
         kind: 'Secret',
@@ -948,7 +887,7 @@
       [if p.dbaAccess then 'dbaNamespaceAdmins']:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
-    } + headlessServices + roles + roleSecrets;
+    } + headlessServices;
     
     // Return all objects as a list
     {
