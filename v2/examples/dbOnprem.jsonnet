@@ -2,6 +2,7 @@ local argokit = import '../../v2/jsonnet/argokit.libsonnet';
 argokit.db.dbOnprem.new({
   databaseName: 'eksempel',
   environment: 'dbdev',
+  walDisk: true,
   instances: 2,
   storageSizeGi: 2,
   // imageExtensions wires image volumes on the Cluster and activates each extension in the Database.
@@ -9,7 +10,6 @@ argokit.db.dbOnprem.new({
   // For a full list of supported extension check docs at skip.kartverket.no
   imageExtensions: [
     'postgis',
-    'wal2json',
   ],
   //Must define the gcpProject where the SecretStore is created. This is used to store the managed roles in GCP Secret Manager.
   gcpProject: 'dev-gcp-project',
