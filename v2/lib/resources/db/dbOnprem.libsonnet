@@ -12,6 +12,7 @@
       enablePDB: false,
       dbaAccess: false,
       enableBackup: true,
+      walDisk: false,
       resourceSize: 'S',
 
       storageSizeGi: 1,
@@ -92,6 +93,10 @@
         log_statement: 'ddl',
         log_line_prefix: '%t [%p] %h ',
         'auto_explain.log_min_duration': '20s',
+        wal_keep_size: '2048MB',
+        min_wal_size: '1GB',
+        max_wal_size: '4GB',
+        wal_compression: 'lz4',
       },
     };
 
@@ -440,6 +445,9 @@
           storage: {
             size: p.storageSizeGi + 'Gi',
           },
+          [if p.walDisk then 'walStorage']: {
+              size: '5Gi',
+            },
           certificates: {
             serverCASecret: p.caSecretName,
             serverTLSSecret: certSecretName,
