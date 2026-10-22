@@ -167,7 +167,7 @@
 
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
-    assert std.member(['sandbox', 'dev'], p.environment) : 'Environment must be either "sandbox" or "dev"';  // In the future there will be dedicated stateful/DB clusters
+    assert std.member(['sandbox', 'dev', 'dbdev'], p.environment) : 'Environment must be either "sandbox", "dev" or "dbdev"';  // In the future there will be dedicated stateful/DB clusters, dbdev is one of those
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
@@ -202,6 +202,12 @@
         gatewayName: 'dba-pg-internal',
         gatewaySectionName: 'pg',
         cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ],
+      },
+       dbdev: {
+        k8sCluster: 'atkv3-dev-stateful',
+        gatewayName: 'istio-internal',
+        gatewaySectionName: 'internal-pgdb',
+        cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ]
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
