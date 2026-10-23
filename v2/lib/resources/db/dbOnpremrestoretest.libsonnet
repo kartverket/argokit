@@ -417,7 +417,7 @@
           },
           retentionPolicy: '7d',
           configuration: {
-            destinationPath: 's3://dbabucket/%s' % p.databaseName,
+            destinationPath: 's3://cnpg-dev/%s' % p.databaseName,
             endpointURL: 'https://s3-rin.statkart.no',
             s3Credentials: {
               accessKeyId: {
@@ -460,7 +460,7 @@
           },
           retentionPolicy: '7d',
           configuration: {
-            destinationPath: 's3://dbabucket/%s' % p.backupSourceClusterName,
+            destinationPath: 's3://cnpg-dev/%s' % p.backupSourceClusterName,
             endpointURL: 'https://s3-rin.statkart.no',
             s3Credentials: {
               accessKeyId: {
