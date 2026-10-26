@@ -1,7 +1,7 @@
 local dbOnprem = import './dbOnprem.libsonnet';
-local dbOnpremrestoretest = import './dbOnpremrestoretest.libsonnet';
+local dbOnpremRestore = import './dbOnpremRestore.libsonnet';
 
 {
   dbOnprem: dbOnprem,
-  dbOnpremrestoretest: dbOnpremrestoretest,
+  dbOnpremRestore: dbOnpremRestore,
 }
