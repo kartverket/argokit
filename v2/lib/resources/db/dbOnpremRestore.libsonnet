@@ -1,7 +1,8 @@
 {
   // Creates a full CNPG database setup from one config object.
   // This is only used for restore functionality testing, and not for production use.
-  new(config={}):
+  // We should add functionality for user to define what object store slash env to restore from
+  restore(config={}):
     local rolebinding = import '../k8s/rolebinding.libsonnet';
     local defaults = {
       databaseName: 'eksempel',
@@ -199,18 +200,23 @@
     local environmentConfig = {
       dev: {
         k8sCluster: 'atkv3-dev',
+        bucketName: 'dbabucket',
         gatewayName: 'dba-pg-internal',
         gatewaySectionName: 'pg',
         cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ],
+
       },
        dbdev: {
         k8sCluster: 'atkv3-dev-stateful',
+        bucketName: 'cnpg-dev',
         gatewayName: 'istio-internal',
         gatewaySectionName: 'internal-pgdb',
         cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ]
+      
       },
       sandbox: {
         k8sCluster: 'atkv3-sandbox-stateful',
+        bucketName: 'dbabucket',
         gatewayName: 'istio-internal',
         gatewaySectionName: 'internal-pgdb',
         cidrBlockKubeApi: ['10.40.11.12/32','10.40.11.13/32','10.40.11.14/32' ]
@@ -227,6 +233,7 @@
 
     local env = environmentConfig[p.environment];
     local k8sCluster = env.k8sCluster;
+    local bucketName = env.bucketName;
     local gatewayName = env.gatewayName;
     local gatewaySectionName = env.gatewaySectionName;
 
@@ -417,7 +424,7 @@
           },
           retentionPolicy: '7d',
           configuration: {
-            destinationPath: 's3://cnpg-dev/%s' % p.databaseName,
+            destinationPath: 's3://%s/%s' % [bucketName, p.databaseName],
             endpointURL: 'https://s3-rin.statkart.no',
             s3Credentials: {
               accessKeyId: {
@@ -460,7 +467,7 @@
           },
           retentionPolicy: '7d',
           configuration: {
-            destinationPath: 's3://cnpg-dev/%s' % p.backupSourceClusterName,
+            destinationPath: 's3://%s/%s' % [bucketName, p.backupSourceClusterName],
             endpointURL: 'https://s3-rin.statkart.no',
             s3Credentials: {
               accessKeyId: {
