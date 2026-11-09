@@ -1,3 +1,10 @@
+local resourceSizes = import './common/resourceSizes.libsonnet';
+local extensionsLib = import './common/extensions.libsonnet';
+local environments = import './common/onpremEnvironments.libsonnet';
+local connections = import './common/connectionResources.libsonnet';
+local networkPolicies = import './common/networkPolicies.libsonnet';
+local backupResources = import './common/backupResources.libsonnet';
+
 {
   // Creates a full CNPG database setup from one config object.
   // This is only used for restore functionality testing, and not for production use.
@@ -95,76 +102,17 @@
       },
     };
 
-    local configuredEnvironment = 
-      if 'environment' in config 
-      then config.environment 
+    local configuredEnvironment =
+      if std.objectHas(config, 'environment')
+      then config.environment
       else defaults.environment;
-
-    local resSize = {
-      S: {
-        reqMem: 1,
-        reqCpu: 500,
-        limMem: 2,
-      },
-      M: {
-        reqMem: 2,
-        reqCpu: 1000,
-        limMem: 4,
-      },
-      L: {
-        reqMem: 8,
-        reqCpu: 1500,
-        limMem: 16,
-      },
-      XL: {
-        reqMem: 16,
-        reqCpu: 2000,
-        limMem: 32,
-      },
-    };
-
     local p = defaults + config + {
       dbaAccess: if std.objectHas(config, 'dbaAccess') then config.dbaAccess else configuredEnvironment == 'sandbox',
       postgresqlParameters: defaults.postgresqlParameters + (if 'postgresqlParameters' in config then config.postgresqlParameters else {}),
     };
-    local isString(x) = std.type(x) == 'string';
-    local uniqeStrings(values) = std.objectFields({ [value]: true for value in values});
-    local hasImageReference(ext) = 
-      std.type(ext) == 'object' && 
-      std.objectHas(ext, 'image') &&
-      std.type(ext.image) == 'object' &&
-      std.objectHas(ext.image, 'reference');
-
-    local normalizeDatabaseExtension(ext) = if isString(ext) then {
-      ensure: 'present',
-      name: ext,
-      } else {
-        ensure: 'present',
-        name: ext.name,
-        } + (
-        if std.objectHas(ext, 'ensure') then {ensure: ext.ensure} else {}
-        ) + (
-        if std.objectHas(ext, 'version') then {version: ext.version} else {}
-        );
-    
-    local normalizeClusterExtension(ext) =       
-      if isString(ext) then {
-        name: ext,
-      } else {
-        [field]: ext[field]
-        for field in std.objectFields(ext)
-        if field != 'ensure'
-      };
-
-    local compatibilityDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
-    local clusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
-
-    local clusterExtensionsNeedCatalog = [ext for ext in clusterExtensions if !hasImageReference(ext)];
-    local compatibilityExtensionNames = [ext.name for ext in compatibilityDatabaseExtensions];
-    local clusterExtensionNames = [ext.name for ext in clusterExtensions];
-    local duplicateExtensionNames = std.setInter(std.set(compatibilityExtensionNames), std.set(clusterExtensionNames));
-
-    local effectiveImageCatalogRef = if p.imageCatalogRef != null then p.imageCatalogRef else p.defaultImageCatalogRef;
+    local extensionConfig = extensionsLib.resolve(p);
+    local clusterExtensions = extensionConfig.clusterExtensions;
+    local effectiveImageCatalogRef = extensionConfig.effectiveImageCatalogRef;
 
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
@@ -174,110 +122,24 @@
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
     assert std.type(p.backupSourceClusterName) == 'string' && std.length(p.backupSourceClusterName) > 0 : 'backupSourceClusterName must be a non-empty string';
     assert p.recoveryTargetTime == null || (std.type(p.recoveryTargetTime) == 'string' && std.length(p.recoveryTargetTime) > 0) : 'recoveryTargetTime must be null or a non-empty string';
-    assert std.type(p.extensions) == 'array' : 'extensions must be an array';
-    assert std.type(p.imageExtensions) == 'array' : 'imageExtensions must be an array';
-    assert std.type(p.defaultImageCatalogRef) == 'object' : 'defaultImageCatalogRef must be an object';
-    assert std.length([ext for ext in p.extensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
-           'extensions object entries must define name';
-    assert std.length([ext for ext in p.imageExtensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
-           'imageExtensions object entries must define name';
-    assert std.length(uniqeStrings(compatibilityExtensionNames)) == std.length(compatibilityExtensionNames) :
-           'extensions must not contain duplicate names';
-    assert std.length(uniqeStrings(clusterExtensionNames)) == std.length(clusterExtensionNames) :
-           'imageExtensions must not contain duplicate names';
-    assert std.length(duplicateExtensionNames) == 0 :
-           'extensions and imageExtensions must not contain the same names: ' + std.join(', ', duplicateExtensionNames);
-    assert effectiveImageCatalogRef != null || std.length(clusterExtensionsNeedCatalog) == 0 :
-           'Cluster extensions without imageCatalogRef must define image.reference or be overridden by imageExtensions entries that do';
-    assert p.imageCatalogRef == null || std.type(p.imageCatalogRef) == 'object' :
-           'imageCatalogRef must be an object when set';
     assert std.isBoolean(p.dbaAccess) :
            'dbaAccess must be set and a boolean';
+    assert resourceSizes.get(p.resourceSize, 'restore') != null;
 
     local clusterName = '%s-cluster' % p.databaseName;
     local backupSourceClusterFullName = '%s-cluster' % p.backupSourceClusterName;
 
-    local environmentConfig = {
-      dev: {
-        k8sCluster: 'atkv3-dev',
-        bucketName: 'dbabucket',
-        gatewayName: 'dba-pg-internal',
-        gatewaySectionName: 'pg',
-        cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ],
-
-      },
-       dbdev: {
-        k8sCluster: 'atkv3-dev-stateful',
-        bucketName: 'cnpg-dev',
-        gatewayName: 'istio-internal',
-        gatewaySectionName: 'internal-pgdb',
-        cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ]
-      
-      },
-      sandbox: {
-        k8sCluster: 'atkv3-sandbox-stateful',
-        bucketName: 'dbabucket',
-        gatewayName: 'istio-internal',
-        gatewaySectionName: 'internal-pgdb',
-        cidrBlockKubeApi: ['10.40.11.12/32','10.40.11.13/32','10.40.11.14/32' ]
-      },
-      // prod: {
-      //   k8sCluster: 'atkv3-prod-stateful',
-      //   gatewayName: 'istio-internal',
-      //   gatewaySectionName: 'internal-pgdb',
-      // },
-    };
-
-    assert std.objectHas(environmentConfig, p.environment) :
-           'Unsupported environment: ' + p.environment;
-
-    local env = environmentConfig[p.environment];
+    local env = environments.get(p.environment);
     local k8sCluster = env.k8sCluster;
     local bucketName = env.bucketName;
-    local gatewayName = env.gatewayName;
-    local gatewaySectionName = env.gatewaySectionName;
-
-    assert std.objectHas(resSize, p.resourceSize) :
-           'Invalid t-shirt size: ' + p.resourceSize;
-
-    local k8sRes = resSize[p.resourceSize];
-    local reqMem = k8sRes.reqMem;
-    local reqCpu = k8sRes.reqCpu;
-    local limMem = k8sRes.limMem;
 
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
-    local writeHost = '%s-write.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
-    local readHost = '%s-read.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
-
-    local headlessServices = {
-      ['%s-%d-hs' % [clusterName, instanceNumber]]: {
-        apiVersion: 'v1',
-        kind: 'Service',
-        metadata: {
-          name: '%s-%d-hs' % [clusterName, instanceNumber],
-        },
-        spec: {
-          selector: {
-            'cnpg.io/instanceName': '%s-%d' % [clusterName, instanceNumber],
-          },
-          clusterIP: 'None',
-          ports: [
-            {
-              name: 'status',
-              port: 8000,
-              targetPort: 8000,
-            },
-            {
-              name: 'postgres',
-              port: 5432,
-              targetPort: 5432,
-            },
-          ],
-        },
-      }
-      for instanceNumber in std.range(1, p.instances)
+    local connectionEnv = env + {
+      prettyUrl: 'pg.' + env.k8sCluster,
     };
+    local connectionObjects =
+      connections.new(p, clusterName, connectionEnv, certSecretName);
     local scheduledBackup = {
       apiVersion: 'postgresql.cnpg.io/v1',
       kind: 'ScheduledBackup',
@@ -295,6 +157,16 @@
         schedule: '0 0 2 * * *', // Every day at 02:00
       },
     };
+    local backupObjects = {
+      serviceEntryS3: backupResources.serviceEntryS3,
+      objectStore: backupResources.objectStore(bucketName, 's3-store', p.databaseName),
+      restoreSourceObjectStore: backupResources.objectStore(
+        bucketName,
+        's3-store-restore-source',
+        p.backupSourceClusterName
+      ),
+      scheduledBackup: scheduledBackup,
+    };
 
     local objects = {
       caSecret: {
@@ -306,44 +178,6 @@
         type: 'Opaque',
         stringData: {
           'ca.crt': p.caCrt,
-        },
-      },
-      certificate: {
-        apiVersion: 'cert-manager.io/v1',
-        kind: 'Certificate',
-        metadata: {
-          name: clusterName,
-        },
-        spec: {
-          secretName: certSecretName,
-          issuerRef: {
-            group: 'cert-manager.io',
-            kind: 'ClusterIssuer',
-            name: p.tlsIssuerName,
-          },
-          dnsNames: [writeHost, readHost],
-          privateKey: {
-            rotationPolicy: 'Always',
-          },
-        },
-      },
-      serviceEntryS3: {
-        apiVersion: 'networking.istio.io/v1',
-        kind: 'ServiceEntry',
-        metadata: {
-          name: 's3-scality-barman',
-        },
-        spec: {
-          exportTo: ['.'],
-          hosts: ['s3-rin.statkart.no'],
-          ports: [
-            {
-              number: 443,
-              name: 'https',
-              protocol: 'HTTPS',
-            },
-          ],
-          resolution: 'DNS',
         },
       },
       cluster: {
@@ -398,93 +232,6 @@
                plugins: p.plugins,
              } else {}),
       },
-      scheduledBackup: scheduledBackup,
-      objectStore: {
-        apiVersion: 'barmancloud.cnpg.io/v1',
-        kind: 'ObjectStore',
-        metadata: {
-          name: 's3-store',
-        },
-        spec: {
-          instanceSidecarConfiguration: {
-            env: [
-              {
-                name: 'AWS_REQUEST_CHECKSUM_CALCULATION',
-                value: 'when_required',
-              },
-              {
-                name: 'AWS_RESPONSE_CHECKSUM_VALIDATION',
-                value: 'when_supported',
-              },
-              {
-                name: 'AWS_SKIP_MD5_VALIDATION',
-                value: 'true',
-              },
-            ],
-          },
-          retentionPolicy: '7d',
-          configuration: {
-            destinationPath: 's3://%s/%s' % [bucketName, p.databaseName],
-            endpointURL: 'https://s3-rin.statkart.no',
-            s3Credentials: {
-              accessKeyId: {
-                name: 's3-bucket-creds',
-                key: 'ACCESS_KEY_ID',
-              },
-              secretAccessKey: {
-                name: 's3-bucket-creds',
-                key: 'ACCESS_SECRET_KEY',
-              },
-            },
-            wal: {
-              compression: 'gzip',
-            },
-          },
-        },
-      },
-      restoreSourceObjectStore: {
-        apiVersion: 'barmancloud.cnpg.io/v1',
-        kind: 'ObjectStore',
-        metadata: {
-          name: 's3-store-restore-source',
-        },
-        spec: {
-          instanceSidecarConfiguration: {
-            env: [
-              {
-                name: 'AWS_REQUEST_CHECKSUM_CALCULATION',
-                value: 'when_required',
-              },
-              {
-                name: 'AWS_RESPONSE_CHECKSUM_VALIDATION',
-                value: 'when_supported',
-              },
-              {
-                name: 'AWS_SKIP_MD5_VALIDATION',
-                value: 'true',
-              },
-            ],
-          },
-          retentionPolicy: '7d',
-          configuration: {
-            destinationPath: 's3://%s/%s' % [bucketName, p.backupSourceClusterName],
-            endpointURL: 'https://s3-rin.statkart.no',
-            s3Credentials: {
-              accessKeyId: {
-                name: 's3-bucket-creds',
-                key: 'ACCESS_KEY_ID',
-              },
-              secretAccessKey: {
-                name: 's3-bucket-creds',
-                key: 'ACCESS_SECRET_KEY',
-              },
-            },
-            wal: {
-              compression: 'gzip',
-            },
-          },
-        },
-      },
       podMonitor: {
         apiVersion: 'monitoring.coreos.com/v1',
         kind: 'PodMonitor',
@@ -504,403 +251,10 @@
           ],
         },
       },
-      networkPolicyCnpgOperator: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-dbs-to-receive-cnpg-operator-checks',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'app.kubernetes.io/component': 'database',
-              'app.kubernetes.io/managed-by': 'cloudnative-pg',
-            },
-          },
-          ingress: [
-            {
-              from: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': p.cnpgOperatorNamespace,
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/name': 'cloudnative-pg',
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  port: 8000,
-                  protocol: 'TCP',
-                },
-                {
-                  port: 9090,
-                  protocol: 'TCP',
-                },
-                {
-                  port: 5432,
-                  protocol: 'TCP',
-                },
-              ],
-            },
-          ],
-          policyTypes: ['Ingress'],
-        },
-      },
-      networkPolicyBarman: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-dbs-to-receive-barman-connections',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'app.kubernetes.io/component': 'database',
-              'app.kubernetes.io/managed-by': 'cloudnative-pg',
-            },
-          },
-          ingress: [
-            {
-              from: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': p.cnpgOperatorNamespace,
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/name': 'plugin-barman-cloud',
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  port: 9090,
-                  protocol: 'TCP',
-                },
-              ],
-            },
-          ],
-          policyTypes: ['Ingress'],
-        },
-      },
-      networkPolicyMetricsScraping: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-metrics-scraping-to-dbs',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'app.kubernetes.io/component': 'database',
-              'app.kubernetes.io/managed-by': 'cloudnative-pg',
-            },
-          },
-          ingress: [
-            {
-              from: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': p.metricsNamespace,
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/instance': p.metricsAppInstance,
-                      'app.kubernetes.io/name': p.metricsAppName,
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  port: 'metrics',
-                  protocol: 'TCP',
-                },
-              ],
-            },
-          ],
-          policyTypes: ['Ingress'],
-        },
-      },
-      networkPolicyPeerConnectivity: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-dbs-connectivity-to-peers',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'app.kubernetes.io/component': 'database',
-              'app.kubernetes.io/managed-by': 'cloudnative-pg',
-            },
-          },
-          policyTypes: ['Egress', 'Ingress'],
-          ingress: [
-            {
-              from: [
-                {
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/component': 'database',
-                      'app.kubernetes.io/managed-by': 'cloudnative-pg',
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 5432,
-                },
-                {
-                  protocol: 'TCP',
-                  port: 8000,
-                },
-              ],
-            },
-          ],
-          egress: [
-            {
-              to: [
-                {
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/component': 'database',
-                      'app.kubernetes.io/managed-by': 'cloudnative-pg',
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 5432,
-                },
-                {
-                  protocol: 'TCP',
-                  port: 8000,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      networkPolicyGateway: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-istio-pg-gateway',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'cnpg.io/cluster': clusterName,
-            },
-          },
-          policyTypes: ['Ingress'],
-          ingress: [
-            {
-              from: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': p.gatewayNS,
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      'gateway.networking.k8s.io/gateway-name': env.gatewayName,
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 5432,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      networkPolicyAmbientMesh: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'accept-ambient-traffic',
-        },
-        spec: {
-          policyTypes: [
-            'Ingress',
-            'Egress',
-          ],
-          podSelector: {
-            matchLabels: {
-              'cnpg.io/cluster': clusterName,
-            },
-          },
-          ingress: [
-            {
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 15008,
-                },
-              ],
-            },
-          ],
-          egress: [
-            {
-              to: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': 'istio-system',
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      app: 'ztunnel',
-                    },
-                  },
-                },
-                {
-                  podSelector: {
-                    matchLabels: {
-                      'cnpg.io/cluster': clusterName,
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 15008,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      networkPolicyAllowEgressToKubeApi: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-egress-to-kube-api',
-        },
-        spec: {
-          egress: [
-            {
-              ports: [
-                {
-                  port: 6443,
-                  protocol: 'TCP',
-                },
-              ],
-              to: [
-                {
-                  ipBlock: {
-                    cidr: env.cidrBlockKubeApi[0],
-                  },
-                },
-                {
-                  ipBlock: {
-                    cidr: env.cidrBlockKubeApi[1],
-                  },
-                },
-                {
-                  ipBlock: {
-                    cidr: env.cidrBlockKubeApi[2],
-                  },
-                },
-              ],
-            },
-          ],
-          podSelector: {},
-          policyTypes: ['Egress'],
-        },
-      },      
-      tlsRouteWrite: {
-        apiVersion: 'gateway.networking.k8s.io/v1',
-        kind: 'TLSRoute',
-        metadata: {
-          name: clusterName + '-write',
-        },
-        spec: {
-          parentRefs: [
-            {
-              group: 'gateway.networking.k8s.io',
-              kind: 'Gateway',
-              name: env.gatewayName,
-              namespace: p.gatewayNS,
-              sectionName: env.gatewaySectionName,
-            },
-          ],
-          hostnames: [writeHost],
-          rules: [
-            {
-              backendRefs: [
-                {
-                  group: '',
-                  kind: 'Service',
-                  name: clusterName + '-rw',
-                  port: 5432,
-                  weight: 1,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      tlsRouteRead: {
-        apiVersion: 'gateway.networking.k8s.io/v1',
-        kind: 'TLSRoute',
-        metadata: {
-          name: clusterName + '-read',
-        },
-        spec: {
-          parentRefs: [
-            {
-              group: 'gateway.networking.k8s.io',
-              kind: 'Gateway',
-              name: env.gatewayName,
-              namespace: p.gatewayNS,
-              sectionName: env.gatewaySectionName,
-            },
-          ],
-          hostnames: [readHost],
-          rules: [
-            {
-              backendRefs: [
-                {
-                  group: '',
-                  kind: 'Service',
-                  name: clusterName + '-ro',
-                  port: 5432,
-                  weight: 1,
-                },
-              ],
-            },
-          ],
-        },
-      },
       [if p.dbaAccess then 'dbaNamespaceAdmins']:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
-    } + headlessServices;
+    } + connectionObjects + backupObjects + networkPolicies.new(p, clusterName, env);
     
     // Return all objects as a list
     {

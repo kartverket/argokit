@@ -16,6 +16,11 @@ local usersConfig = {
 local dbOnpremConfig(config) = dbOnprem.new(usersConfig + config);
 local clusterSpec(config) = findObject(dbOnpremConfig(config).items, 'Cluster').spec;
 local databaseSpec(config) = findObject(dbOnpremConfig(config).items, 'Database').spec;
+local networkPolicyNames(config) = std.sort([
+  obj.metadata.name
+  for obj in dbOnpremConfig(config).items
+  if obj.kind == 'NetworkPolicy'
+]);
 
 test.new(std.thisFile)
 + test.case.new(
@@ -154,5 +159,20 @@ test.new(std.thisFile)
   test=test.expect.eqDiff(
     actual=std.objectHas(databaseSpec({ databaseName: 'no-extensions' }), 'extensions'),
     expected=false,
+  ),
+)
++ test.case.new(
+  name='dbOnprem includes its network policies',
+  test=test.expect.eqDiff(
+    actual=networkPolicyNames({ databaseName: 'network-policies' }),
+    expected=[
+      'accept-ambient-traffic',
+      'allow-dbs-connectivity-to-peers',
+      'allow-dbs-to-receive-barman-connections',
+      'allow-dbs-to-receive-cnpg-operator-checks',
+      'allow-egress-to-kube-api',
+      'allow-istio-pg-gateway',
+      'allow-metrics-scraping-to-dbs',
+    ],
   ),
 )
