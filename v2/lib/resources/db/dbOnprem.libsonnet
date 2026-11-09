@@ -1,38 +1,24 @@
+local configLib = import './postgres/config.libsonnet';
+local resourceSizes = import './common/resourceSizes.libsonnet';
+local psqlParameters = import './postgres/postgresqlParameters.libsonnet';
+local networkPolicies = import './common/networkPolicies.libsonnet';
+local extensionsLib = import './common/extensions.libsonnet';
+local managedRolesLib = import './postgres/managedRoles.libsonnet';
+local backupResourcesLib = import './common/backupResources.libsonnet';
+local connectionResourcesLib = import './common/connectionResources.libsonnet';
+local onpremEnvironments = import './common/onpremEnvironments.libsonnet';
+
 {
   // Creates a full CNPG database setup from one config object.
   new(config={}):
     local rolebinding = import '../k8s/rolebinding.libsonnet';
-    local externalSecrets = import '../externalSecrets.libsonnet';
     local defaults = {
       databaseName: 'eksempel',
       environment: 'dbdev',
       gcpProject: null,
 
-      instances: 2,
-      enablePDB: false,
-      dbaAccess: false,
       enableBackup: true,
       walDisk: false,
-      resourceSize: 'S',
-
-      storageSizeGi: 1,
-
-      imageCatalogRef: null,
-      defaultImageCatalogRef: {
-        apiGroup: 'postgresql.cnpg.io',
-        kind: 'ClusterImageCatalog',
-        name: 'cnpg-psql-std',
-        major: 18,
-      },
-
-      // Compatibility input for extensions present in the base image.
-      // New configurations should use imageExtensions for activation and image-volume wiring.
-      // TODO: add support for pgaudit, vector and pg_failover_slots
-      extensions: [],
-
-      // Extensions activated in the Database and mounted from the ImageCatalog or direct images.
-      // Use strings when resolving from an ImageCatalog, or full objects for direct overrides.
-      imageExtensions: [],
 
       plugins: [
         {
@@ -88,106 +74,14 @@
       metricsAppInstance: 'alloy',
       metricsAppName: 'alloy',
 
-      postgresqlParameters: {
-        max_connections: '200',
-        log_statement: 'ddl',
-        log_line_prefix: '%t [%p] %h ',
-        'auto_explain.log_min_duration': '20s',
-        wal_keep_size: '2048MB',
-        min_wal_size: '1GB',
-        max_wal_size: '4GB',
-        wal_compression: 'lz4',
-      },
     };
 
-    local configuredEnvironment =
-      if std.objectHas(config, 'environment')
-      then config.environment
-      else defaults.environment;
-
-    local resSize = {
-      S: {
-        reqMem: 1,
-        reqCpu: 500,  //defines by milicore
-        limMem: 2,
-      },
-      M: {
-        reqMem: 2,
-        reqCpu: 1000,
-        limMem: 4,
-      },
-      L: {
-        reqMem: 8,
-        reqCpu: 1500,
-        limMem: 16,
-      },
-      XL: {
-        reqMem: 16,
-        reqCpu: 2000,
-        limMem: 32,
-      },
-    };
-
-    local p = defaults + config + {
-      dbaAccess:
-        if std.objectHas(config, 'dbaAccess')
-        then config.dbaAccess
-        else configuredEnvironment == 'sandbox',
-
-      postgresqlParameters:
-        defaults.postgresqlParameters
-        + (if 'postgresqlParameters' in config
-           then config.postgresqlParameters
-           else {}),
-    };
-
-    local isString(x) = std.type(x) == 'string';
-
-    local uniqueStrings(values) = std.objectFields({ [value]: true for value in values });
-
-    local hasImageReference(ext) =
-      std.type(ext) == 'object' &&
-      std.objectHas(ext, 'image') &&
-      std.type(ext.image) == 'object' &&
-      std.objectHas(ext.image, 'reference');
-
-    local normalizeDatabaseExtension(ext) =
-      if isString(ext) then {
-        ensure: 'present',
-        name: ext,
-      } else {
-               ensure: 'present',
-               name: ext.name,
-             } + (if std.objectHas(ext, 'ensure') then { ensure: ext.ensure } else {}) +
-             (if std.objectHas(ext, 'version') then { version: ext.version } else {});
-
-    local normalizeClusterExtension(ext) =
-      if isString(ext) then {
-        name: ext,
-      } else {
-        [field]: ext[field]
-        for field in std.objectFields(ext)
-        if field != 'ensure'
-      };
-
-    local compatibilityDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.extensions];
-    local clusterExtensions = [normalizeClusterExtension(ext) for ext in p.imageExtensions];
-    local imageDatabaseExtensions = [normalizeDatabaseExtension(ext) for ext in p.imageExtensions];
-    local databaseExtensions = compatibilityDatabaseExtensions + imageDatabaseExtensions;
-
-    local clusterExtensionsNeedCatalog =
-      [ext for ext in clusterExtensions if !hasImageReference(ext)];
-
-    local compatibilityExtensionNames = [ext.name for ext in compatibilityDatabaseExtensions];
-    local clusterExtensionNames = [ext.name for ext in clusterExtensions];
-    local duplicateExtensionNames = std.setInter(
-      std.set(compatibilityExtensionNames),
-      std.set(clusterExtensionNames)
-    );
-
-    local effectiveImageCatalogRef =
-      if p.imageCatalogRef != null then p.imageCatalogRef
-      else p.defaultImageCatalogRef;
+    local p = configLib.resolve(config, defaults);
+    local k8sRes = resourceSizes.get(p.resourceSize);
+    local extensionConfig = extensionsLib.resolve(p);
+    local clusterExtensions = extensionConfig.clusterExtensions;
+    local databaseExtensions = extensionConfig.databaseExtensions;
+    local effectiveImageCatalogRef = extensionConfig.effectiveImageCatalogRef;
 
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
@@ -195,182 +89,28 @@
     assert p.instances >= 1 && p.instances <= 3 : 'Instances must be between 1 and 3';  // Two instances is enough for HA setup, three can make sense for load balancing and read scaling.
     assert p.storageSizeGi >= 1 : 'StorageSize must be minimum 1Gi';
     assert std.isBoolean(p.enablePDB) : 'enablePDB must be set and a boolean';
-    assert std.type(p.extensions) == 'array' : 'extensions must be an array';
-    assert std.type(p.imageExtensions) == 'array' : 'imageExtensions must be an array';
-    assert std.type(p.defaultImageCatalogRef) == 'object' : 'defaultImageCatalogRef must be an object';
-    assert std.length([ext for ext in p.extensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
-           'extensions object entries must define name';
-    assert std.length([ext for ext in p.imageExtensions if !isString(ext) && !std.objectHas(ext, 'name')]) == 0 :
-           'imageExtensions object entries must define name';
-    assert std.length(uniqueStrings(compatibilityExtensionNames)) == std.length(compatibilityExtensionNames) :
-           'extensions must not contain duplicate names';
-    assert std.length(uniqueStrings(clusterExtensionNames)) == std.length(clusterExtensionNames) :
-           'imageExtensions must not contain duplicate names';
-    assert std.length(duplicateExtensionNames) == 0 :
-           'extensions and imageExtensions must not contain the same names: ' + std.join(', ', duplicateExtensionNames);
-    assert effectiveImageCatalogRef != null || std.length(clusterExtensionsNeedCatalog) == 0 :
-           'Cluster extensions without imageCatalogRef must define image.reference or be overridden by imageExtensions entries that do';
-    assert p.imageCatalogRef == null || std.type(p.imageCatalogRef) == 'object' :
-           'imageCatalogRef must be an object when set';
     assert std.isBoolean(p.dbaAccess) :
            'dbaAccess must be set and a boolean';
     assert std.isString(p.gcpProject) && std.length(p.gcpProject) > 0 :
            'gcpProject must be set and a non-empty string';
 
     local clusterName = '%s-cluster' % p.databaseName;
-    local environmentConfig = {
-      dev: {
-        k8sCluster: 'atkv3-dev',
-        bucketName: 'dbabucket',
-        //gsmProject: 'dba-dev-b03a',
-        gatewayName: 'dba-pg-internal',
-        gatewaySectionName: 'pg',
-        backupSchedule: '30 16 03 * * MON',
-        cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ] 
-      },
-      dbdev: {
-        k8sCluster: 'atkv3-dev-stateful',
-        bucketName: 'cnpg-dev',
-        //gsmProject: 'dba-dev-b03a',
-        gatewayName: 'istio-internal',
-        gatewaySectionName: 'internal-pgdb',
-        backupSchedule: '30 16 01 * * MON',
-        cidrBlockKubeApi: ['10.40.10.12/32','10.40.10.13/32','10.40.10.14/32' ]
-      },
-      sandbox: {
-        k8sCluster: 'atkv3-sandbox-stateful',
-        bucketName: 'dbabucket',
-        //gsmProject: 'dba-sandbox-67ca',
-        gatewayName: 'istio-internal',
-        gatewaySectionName: 'internal-pgdb',
-        backupSchedule: '30 16 01 * * MON',
-        enableBackup: false,
-        cidrBlockKubeApi: ['10.40.11.12/32','10.40.11.13/32','10.40.11.14/32' ]
-      },
-      // prod: {
-      //   k8sCluster: 'atkv3-prod-stateful',
-      //   bucketName: 'cnpg-prod',
-      //   gsmProject: 'dba-prod-6849',
-      //  gatewayName: 'istio-internal',
-      //  gatewaySectionName: 'internal-pgdb',
-      //  backupSchedule: '30 16 03 * * *',
-      //  cidrBlockKubeApi: ['10.40.12.3/32', '10.40.12.4/32', '10.40.12.5/32']
-      // },
-    };
-
-    assert std.objectHas(environmentConfig, p.environment) :
-           'Unsupported environment: ' + p.environment;
-
-    local env = environmentConfig[p.environment];
+    local env = onpremEnvironments.get(p.environment);
     local k8sCluster = env.k8sCluster;
     local bucketName = env.bucketName;
-    local gsmProject = p.gcpProject;
-    local gatewayName = env.gatewayName;
-    local gatewaySectionName = env.gatewaySectionName;
     local backupSchedule = env.backupSchedule;
     local enableBackup =
       if p.environment == 'sandbox' then env.enableBackup else p.enableBackup;
-
-    assert std.objectHas(resSize, p.resourceSize) :
-           'Invalid t-shirt size: ' + p.resourceSize;
-
-    local k8sRes = resSize[p.resourceSize];
-    local reqMem = k8sRes.reqMem;
-    local reqCpu = k8sRes.reqCpu;
-    local limMem = k8sRes.limMem;
-
-
+    local roleResources = managedRolesLib.new(p, clusterName);
+    local dbOwner = roleResources.dbOwner;
+    local backupResources =
+      backupResourcesLib.new(p, clusterName, bucketName, backupSchedule, enableBackup);
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
-    local writeHost = '%s-write.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
-    local readHost = '%s-read.pg.%s.kartverket-intern.cloud' % [p.databaseName, k8sCluster];
-
-    local headlessServices = {
-      ['%s-%d-hs' % [clusterName, instanceNumber]]: {
-        apiVersion: 'v1',
-        kind: 'Service',
-        metadata: {
-          name: '%s-%d-hs' % [clusterName, instanceNumber],
-        },
-        spec: {
-          selector: {
-            'cnpg.io/instanceName': '%s-%d' % [clusterName, instanceNumber],
-          },
-          clusterIP: 'None',
-          ports: [
-            {
-              name: 'status',
-              port: 8000,
-              targetPort: 8000,
-            },
-            {
-              name: 'postgres',
-              port: 5432,
-              targetPort: 5432,
-            },
-          ],
-        },
-      }
-      for instanceNumber in std.range(1, p.instances)
-    };
-
-    assert std.objectHas(p, 'users') : 'users must exist and needs to contain at least one user';
-    local managedRoles = p.users;
-    local rolesWithWrite = [name for name in std.objectFields(p.users) if p.users[name].isWriteUser];
-    local dbOwner = if std.length(rolesWithWrite) > 0 then rolesWithWrite[0] else p.databaseName;
-
-    local roles = {
-      ['databaserole-%s' % [name]]: {
-        apiVersion: 'postgresql.cnpg.io/v1',
-        kind: 'DatabaseRole',
-        metadata: {
-          name: 'pg-role-' + name,
-        },
-        spec: {
-          cluster: {
-            name: clusterName,
-          },
-          //Define evry option here so the user can't create something they should not be able to create
-          name: name,
-          comment: if managedRoles[name].isWriteUser then 'Managed role for write user' else 'Managed role for read-only user',
-          createdb: if managedRoles[name].isWriteUser then true else false,
-          createrole: if managedRoles[name].isWriteUser then true else false,
-          inherit: true,  // This is set to true and not changeable.
-          databaseRoleReclaimPolicy:
-            if std.objectHas(managedRoles[name], 'delete') && managedRoles[name].delete
-            then 'delete' else 'retain',
-          inRoles: if managedRoles[name].isWriteUser then ['pg_write_all_data', 'pg_read_all_data'] else ['pg_read_all_data'],
-          passwordSecret: {
-            name: 'pg-role-' + name,
-          },
-          login: true,
-          superuser: false,  // This is set to false not changeable.
-          bypassrls: false,  // if the user is able to bypass row-level-security
-          replication: false,  // priviliged role for replication. Not changeable.
-        },
-      }
-      for name in std.objectFields(managedRoles)
-    };
-
-    local roleSecrets = {
-      ['external-secret-pg-role-%s' % name]: externalSecrets.secret.new(
-        name='pg-role-' + name,
-        secrets=[{
-          fromSecret: 'pg-role-' + name,
-          property: 'username',
-          toKey: 'username',
-        }, {
-          fromSecret: 'pg-role-' + name,
-          property: 'password',
-          toKey: 'password',
-        }],
-        secretStoreRef='gsm',
-      )
-      for name in std.objectFields(managedRoles)
-    };
+    local connectionResources =
+      connectionResourcesLib.new(p, clusterName, env, certSecretName);
 
     local objects = {
-      managedRoleSecretStore: externalSecrets.store.new(name='gsm', gcpProject=p.gcpProject),
       caSecret: {
         apiVersion: 'v1',
         kind: 'Secret',
@@ -380,44 +120,6 @@
         type: 'Opaque',
         stringData: {
           'ca.crt': p.caCrt,
-        },
-      },
-      certificate: {
-        apiVersion: 'cert-manager.io/v1',
-        kind: 'Certificate',
-        metadata: {
-          name: clusterName,
-        },
-        spec: {
-          secretName: certSecretName,
-          issuerRef: {
-            group: 'cert-manager.io',
-            kind: 'ClusterIssuer',
-            name: p.tlsIssuerName,
-          },
-          dnsNames: [writeHost, readHost],
-          privateKey: {
-            rotationPolicy: 'Always',
-          },
-        },
-      },
-      serviceEntryS3: {
-        apiVersion: 'networking.istio.io/v1',
-        kind: 'ServiceEntry',
-        metadata: {
-          name: 's3-scality-barman',
-        },
-        spec: {
-          exportTo: ['.'],
-          hosts: ['s3-rin.statkart.no'],
-          ports: [
-            {
-              number: 443,
-              name: 'https',
-              protocol: 'HTTPS',
-            },
-          ],
-          resolution: 'DNS',
         },
       },
       cluster: {
@@ -453,18 +155,17 @@
             serverTLSSecret: certSecretName,
           },
           postgresql: {
-            parameters: p.postgresqlParameters {
-              shared_buffers: std.toString(reqMem * 1024 / 4 + 128) + 'MB',
-            },
+            parameters:
+              p.postgresqlParameters + psqlParameters.forProfile(k8sRes),
             [if std.length(clusterExtensions) > 0 then 'extensions']: clusterExtensions,
-          },
+            },
           resources: {
             requests: {
-              memory: reqMem + 'Gi',
-              cpu: reqCpu + 'm',
+              memory: k8sRes.reqMem + 'Gi',
+              cpu: k8sRes.reqCpu + 'm',
             },
             limits: {
-              memory: limMem + 'Gi',
+              memory: k8sRes.limMem + 'Gi',
             },
           },
         } + (if std.length(p.plugins) > 0 then {
@@ -487,49 +188,6 @@
                extensions: databaseExtensions,
              } else {}),
       },
-      objectStore: {
-        apiVersion: 'barmancloud.cnpg.io/v1',
-        kind: 'ObjectStore',
-        metadata: {
-          name: 's3-store',
-        },
-        spec: {
-          instanceSidecarConfiguration: {
-            env: [
-              {
-                name: 'AWS_REQUEST_CHECKSUM_CALCULATION',
-                value: 'when_required',
-              },
-              {
-                name: 'AWS_RESPONSE_CHECKSUM_VALIDATION',
-                value: 'when_supported',
-              },
-              {
-                name: 'AWS_SKIP_MD5_VALIDATION',
-                value: 'true',
-              },
-            ],
-          },
-          retentionPolicy: '7d',
-          configuration: {
-            destinationPath: 's3://%s/%s' % [bucketName, p.databaseName],
-            endpointURL: 'https://s3-rin.statkart.no',
-            s3Credentials: {
-              accessKeyId: {
-                name: 's3-bucket-creds',
-                key: 'ACCESS_KEY_ID',
-              },
-              secretAccessKey: {
-                name: 's3-bucket-creds',
-                key: 'ACCESS_SECRET_KEY',
-              },
-            },
-            wal: {
-              compression: 'gzip',
-            },
-          },
-        },
-      },
       podMonitor: {
         apiVersion: 'monitoring.coreos.com/v1',
         kind: 'PodMonitor',
@@ -549,423 +207,11 @@
           ],
         },
       },
-      networkPolicyCnpgOperator: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-dbs-to-receive-cnpg-operator-checks',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'app.kubernetes.io/component': 'database',
-              'app.kubernetes.io/managed-by': 'cloudnative-pg',
-            },
-          },
-          ingress: [
-            {
-              from: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': p.cnpgOperatorNamespace,
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/name': 'cloudnative-pg',
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  port: 8000,
-                  protocol: 'TCP',
-                },
-                {
-                  port: 9090,
-                  protocol: 'TCP',
-                },
-                {
-                  port: 5432,
-                  protocol: 'TCP',
-                },
-              ],
-            },
-          ],
-          policyTypes: ['Ingress'],
-        },
-      },
-      networkPolicyBarman: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-dbs-to-receive-barman-connections',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'app.kubernetes.io/component': 'database',
-              'app.kubernetes.io/managed-by': 'cloudnative-pg',
-            },
-          },
-          ingress: [
-            {
-              from: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': p.cnpgOperatorNamespace,
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/name': 'plugin-barman-cloud',
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  port: 9090,
-                  protocol: 'TCP',
-                },
-              ],
-            },
-          ],
-          policyTypes: ['Ingress'],
-        },
-      },
-      networkPolicyMetricsScraping: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-metrics-scraping-to-dbs',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'app.kubernetes.io/component': 'database',
-              'app.kubernetes.io/managed-by': 'cloudnative-pg',
-            },
-          },
-          ingress: [
-            {
-              from: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': p.metricsNamespace,
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/instance': p.metricsAppInstance,
-                      'app.kubernetes.io/name': p.metricsAppName,
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  port: 'metrics',
-                  protocol: 'TCP',
-                },
-              ],
-            },
-          ],
-          policyTypes: ['Ingress'],
-        },
-      },
-      networkPolicyPeerConnectivity: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-dbs-connectivity-to-peers',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'app.kubernetes.io/component': 'database',
-              'app.kubernetes.io/managed-by': 'cloudnative-pg',
-            },
-          },
-          policyTypes: ['Egress', 'Ingress'],
-          ingress: [
-            {
-              from: [
-                {
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/component': 'database',
-                      'app.kubernetes.io/managed-by': 'cloudnative-pg',
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 5432,
-                },
-                {
-                  protocol: 'TCP',
-                  port: 8000,
-                },
-              ],
-            },
-          ],
-          egress: [
-            {
-              to: [
-                {
-                  podSelector: {
-                    matchLabels: {
-                      'app.kubernetes.io/component': 'database',
-                      'app.kubernetes.io/managed-by': 'cloudnative-pg',
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 5432,
-                },
-                {
-                  protocol: 'TCP',
-                  port: 8000,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      networkPolicyGateway: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-istio-pg-gateway',
-        },
-        spec: {
-          podSelector: {
-            matchLabels: {
-              'cnpg.io/cluster': clusterName,
-            },
-          },
-          policyTypes: ['Ingress'],
-          ingress: [
-            {
-              from: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': p.gatewayNS,
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      'gateway.networking.k8s.io/gateway-name': env.gatewayName,
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 5432,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      networkPolicyAmbientMesh: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'accept-ambient-traffic',
-        },
-        spec: {
-          policyTypes: [
-            'Ingress',
-            'Egress',
-          ],
-          podSelector: {
-            matchLabels: {
-              'cnpg.io/cluster': clusterName,
-            },
-          },
-          ingress: [
-            {
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 15008,
-                },
-              ],
-            },
-          ],
-          egress: [
-            {
-              to: [
-                {
-                  namespaceSelector: {
-                    matchLabels: {
-                      'kubernetes.io/metadata.name': 'istio-system',
-                    },
-                  },
-                  podSelector: {
-                    matchLabels: {
-                      app: 'ztunnel',
-                    },
-                  },
-                },
-                {
-                  // No namespaceSelector means the NetworkPolicy's own namespace.
-                  podSelector: {
-                    matchLabels: {
-                      'cnpg.io/cluster': clusterName,
-                    },
-                  },
-                },
-              ],
-              ports: [
-                {
-                  protocol: 'TCP',
-                  port: 15008,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      networkPolicyAllowEgressToKubeApi: {
-        apiVersion: 'networking.k8s.io/v1',
-        kind: 'NetworkPolicy',
-        metadata: {
-          name: 'allow-egress-to-kube-api',
-        },
-        spec: {
-          egress: [
-            {
-              ports: [
-                {
-                  port: 6443,
-                  protocol: 'TCP',
-                },
-              ],
-              to: [
-                {
-                  ipBlock: {
-                    cidr: env.cidrBlockKubeApi[0],
-                  },
-                },
-                {
-                  ipBlock: {
-                    cidr: env.cidrBlockKubeApi[1],
-                  },
-                },
-                {
-                  ipBlock: {
-                    cidr: env.cidrBlockKubeApi[2],
-                  },
-                },
-              ],
-            },
-          ],
-          podSelector: {},
-          policyTypes: ['Egress'],
-        },
-      },
-      tlsRouteWrite: {
-        apiVersion: 'gateway.networking.k8s.io/v1',
-        kind: 'TLSRoute',
-        metadata: {
-          name: clusterName + '-write',
-        },
-        spec: {
-          parentRefs: [
-            {
-              group: 'gateway.networking.k8s.io',
-              kind: 'Gateway',
-              name: env.gatewayName,
-              namespace: p.gatewayNS,
-              sectionName: env.gatewaySectionName,
-            },
-          ],
-          hostnames: [writeHost],
-          rules: [
-            {
-              backendRefs: [
-                {
-                  group: '',
-                  kind: 'Service',
-                  name: clusterName + '-rw',
-                  port: 5432,
-                  weight: 1,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      tlsRouteRead: {
-        apiVersion: 'gateway.networking.k8s.io/v1',
-        kind: 'TLSRoute',
-        metadata: {
-          name: clusterName + '-read',
-        },
-        spec: {
-          parentRefs: [
-            {
-              group: 'gateway.networking.k8s.io',
-              kind: 'Gateway',
-              name: env.gatewayName,
-              namespace: p.gatewayNS,
-              sectionName: env.gatewaySectionName,
-            },
-          ],
-          hostnames: [readHost],
-          rules: [
-            {
-              backendRefs: [
-                {
-                  group: '',
-                  kind: 'Service',
-                  name: clusterName + '-ro',
-                  port: 5432,
-                  weight: 1,
-                },
-              ],
-            },
-          ],
-        },
-      },
-      [if enableBackup then 'scheduledBackupJob']:
-        {
-          apiVersion: 'postgresql.cnpg.io/v1',
-          kind: 'ScheduledBackup',
-          metadata: {
-            name: 'backup-' + clusterName,
-          },
-          spec: {
-            schedule: backupSchedule,
-            backupOwnerReference: 'self',
-            cluster: {
-              name: clusterName,
-            },
-            method: 'plugin',
-            pluginConfiguration: {
-              name: 'barman-cloud.cloudnative-pg.io',
-            },
-          },
-        },
       [if p.dbaAccess then 'dbaNamespaceAdmins']:
         rolebinding.new()
         + rolebinding.withNamespaceAdminGroup('AAD-TF-TEAM-DBA@kartverket.no'),
-    } + headlessServices + roles + roleSecrets;
+    } + backupResources + connectionResources
+    + networkPolicies.new(p, clusterName, env) + roleResources.objects;
 
     // Return all objects as a list
     {
