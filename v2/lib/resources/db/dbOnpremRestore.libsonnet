@@ -4,6 +4,7 @@ local environments = import './common/onpremEnvironments.libsonnet';
 local connections = import './common/connectionResources.libsonnet';
 local networkPolicies = import './common/networkPolicies.libsonnet';
 local backupResources = import './common/backupResources.libsonnet';
+local postgresqlParameters = import './postgres/postgresqlParameters.libsonnet';
 
 {
   // Creates a full CNPG database setup from one config object.
@@ -113,6 +114,7 @@ local backupResources = import './common/backupResources.libsonnet';
     local extensionConfig = extensionsLib.resolve(p);
     local clusterExtensions = extensionConfig.clusterExtensions;
     local effectiveImageCatalogRef = extensionConfig.effectiveImageCatalogRef;
+    local resourceProfile = resourceSizes.get(p.resourceSize, 'restore');
 
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
@@ -124,7 +126,7 @@ local backupResources = import './common/backupResources.libsonnet';
     assert p.recoveryTargetTime == null || (std.type(p.recoveryTargetTime) == 'string' && std.length(p.recoveryTargetTime) > 0) : 'recoveryTargetTime must be null or a non-empty string';
     assert std.isBoolean(p.dbaAccess) :
            'dbaAccess must be set and a boolean';
-    assert resourceSizes.get(p.resourceSize, 'restore') != null;
+    assert resourceProfile != null;
 
     local clusterName = '%s-cluster' % p.databaseName;
     local backupSourceClusterFullName = '%s-cluster' % p.backupSourceClusterName;
@@ -135,11 +137,8 @@ local backupResources = import './common/backupResources.libsonnet';
 
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
-    local connectionEnv = env + {
-      prettyUrl: 'pg.' + env.k8sCluster,
-    };
     local connectionObjects =
-      connections.new(p, clusterName, connectionEnv, certSecretName);
+      connections.new(p, clusterName, env, certSecretName);
     local scheduledBackup = {
       apiVersion: 'postgresql.cnpg.io/v1',
       kind: 'ScheduledBackup',
@@ -225,7 +224,10 @@ local backupResources = import './common/backupResources.libsonnet';
             serverTLSSecret: certSecretName,
           },
           postgresql: {
-            parameters: p.postgresqlParameters,
+            parameters: postgresqlParameters.forProfile(
+              resourceProfile,
+              p.postgresqlParameters
+            ),
             [if std.length(clusterExtensions) > 0 then 'extensions']: clusterExtensions,
           },
         } + (if std.length(p.plugins) > 0 then {
