@@ -3,7 +3,7 @@ local commonDefaults = {
   enablePDB: false,
   dbaAccess: false,
   resourceSize: 'S',
-  storageSizeGi: 1,
+  storageSizeGi: 5,
 
   imageCatalogRef: null,
   defaultImageCatalogRef: {
@@ -17,7 +17,7 @@ local commonDefaults = {
   imageExtensions: [],
 
   postgresqlParameters: {
-    max_connections: '200',
+    max_connections: '100',
     log_statement: 'ddl',
     log_line_prefix: '%t [%p] %h ',
     'auto_explain.log_min_duration': '20s',
@@ -25,6 +25,11 @@ local commonDefaults = {
     min_wal_size: '1GB',
     max_wal_size: '4GB',
     wal_compression: 'lz4',
+    io_method: 'io_uring',
+    effective_io_concurrency: '100',
+    jit: 'off',
+    work_mem: '6MB',
+    huge_pages: 'try',
   },
 };
 

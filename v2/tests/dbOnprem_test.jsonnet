@@ -1,6 +1,7 @@
 local argokit = import '../jsonnet/argokit.libsonnet';
 local test = import 'github.com/jsonnet-libs/testonnet/main.libsonnet';
 local dbOnprem = argokit.db.dbOnprem;
+local dbOnpremRestore = argokit.db.dbOnpremRestore;
 
 local findObject(objects, kind) = std.filter(function(obj) obj.kind == kind, objects)[0];
 
@@ -16,6 +17,15 @@ local usersConfig = {
 local dbOnpremConfig(config) = dbOnprem.new(usersConfig + config);
 local clusterSpec(config) = findObject(dbOnpremConfig(config).items, 'Cluster').spec;
 local databaseSpec(config) = findObject(dbOnpremConfig(config).items, 'Database').spec;
+local restoreParameters(config) = findObject(
+  dbOnpremRestore.restore({
+    databaseName: 'restore-tuning',
+    environment: 'sandbox',
+    backupSourceClusterName: 'source',
+    storageSizeGi: 2,
+  } + config).items,
+  'Cluster'
+).spec.postgresql.parameters;
 local networkPolicyNames(config) = std.sort([
   obj.metadata.name
   for obj in dbOnpremConfig(config).items
@@ -174,5 +184,30 @@ test.new(std.thisFile)
       'allow-istio-pg-gateway',
       'allow-metrics-scraping-to-dbs',
     ],
+  ),
+)
++ test.case.new(
+  name='dbOnpremRestore applies resource-profile tuning and accepts overrides',
+  test=test.expect.eqDiff(
+    actual=local params = restoreParameters({ resourceSize: 'M' });
+    {
+      shared_buffers: params.shared_buffers,
+      effective_cache_size: params.effective_cache_size,
+      maintenance_work_mem: params.maintenance_work_mem,
+      autovacuum_work_mem: params.autovacuum_work_mem,
+      overriddenSharedBuffers: restoreParameters({
+        resourceSize: 'M',
+        postgresqlParameters: {
+          shared_buffers: '1024MB',
+        },
+      }).shared_buffers,
+    },
+    expected={
+      shared_buffers: '2176MB',
+      effective_cache_size: '6144MB',
+      maintenance_work_mem: '512MB',
+      autovacuum_work_mem: '128MB',
+      overriddenSharedBuffers: '1024MB',
+    },
   ),
 )
