@@ -114,7 +114,7 @@ local postgresqlParameters = import './postgres/postgresqlParameters.libsonnet';
     local extensionConfig = extensionsLib.resolve(p);
     local clusterExtensions = extensionConfig.clusterExtensions;
     local effectiveImageCatalogRef = extensionConfig.effectiveImageCatalogRef;
-    local resourceProfile = resourceSizes.get(p.resourceSize, 'restore');
+    local resourceProfile = resourceSizes.get(p.resourceSize);
 
     // Input validation
     assert std.length(p.databaseName) > 0 : 'DatabaseName must not be empty';
@@ -218,6 +218,16 @@ local postgresqlParameters = import './postgres/postgresqlParameters.libsonnet';
           },
           walStorage: {
             size: 2 + 'Gi',
+          },
+          resources: {
+            requests: {
+              memory: resourceProfile.reqMem + 'Gi',
+              cpu: resourceProfile.reqCpu + 'm',
+            },
+            limits: {
+              memory: resourceProfile.limMem + 'Gi',
+              cpu: resourceProfile.limCpu + 'm',
+            },
           },
           certificates: {
             serverCASecret: p.caSecretName,

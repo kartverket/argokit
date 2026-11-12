@@ -17,15 +17,16 @@ local usersConfig = {
 local dbOnpremConfig(config) = dbOnprem.new(usersConfig + config);
 local clusterSpec(config) = findObject(dbOnpremConfig(config).items, 'Cluster').spec;
 local databaseSpec(config) = findObject(dbOnpremConfig(config).items, 'Database').spec;
-local restoreParameters(config) = findObject(
+local restoreClusterSpec(config) = findObject(
   dbOnpremRestore.restore({
-    databaseName: 'restore-tuning',
+    databaseName: 'restore-sizing',
     environment: 'sandbox',
     backupSourceClusterName: 'source',
     storageSizeGi: 2,
   } + config).items,
   'Cluster'
-).spec.postgresql.parameters;
+).spec;
+local restoreParameters(config) = restoreClusterSpec(config).postgresql.parameters;
 local networkPolicyNames(config) = std.sort([
   obj.metadata.name
   for obj in dbOnpremConfig(config).items
@@ -184,6 +185,32 @@ test.new(std.thisFile)
       'allow-istio-pg-gateway',
       'allow-metrics-scraping-to-dbs',
     ],
+  ),
+)
++ test.case.new(
+  name='dbOnprem and dbOnpremRestore use shared resource-size profiles',
+  test=test.expect.eqDiff(
+    actual=local onpremResources = clusterSpec({
+      databaseName: 'shared-sizing',
+      resourceSize: 'S',
+    }).resources;
+    local restoreResources = restoreClusterSpec({
+      resourceSize: 'S',
+    }).resources;
+    {
+      onprem: onpremResources,
+      restore: restoreResources,
+    },
+    expected={
+      onprem: {
+        requests: { memory: '5Gi', cpu: '500m' },
+        limits: { memory: '5Gi', cpu: '500m' },
+      },
+      restore: {
+        requests: { memory: '5Gi', cpu: '500m' },
+        limits: { memory: '5Gi', cpu: '500m' },
+      },
+    },
   ),
 )
 + test.case.new(

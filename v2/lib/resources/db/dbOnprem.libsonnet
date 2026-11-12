@@ -155,8 +155,7 @@ local onpremEnvironments = import './common/onpremEnvironments.libsonnet';
             serverTLSSecret: certSecretName,
           },
           postgresql: {
-            parameters:
-              p.postgresqlParameters + psqlParameters.forProfile(k8sRes),
+            parameters: psqlParameters.forProfile(k8sRes, p.postgresqlParameters),
             [if std.length(clusterExtensions) > 0 then 'extensions']: clusterExtensions,
             },
           resources: {
@@ -166,6 +165,7 @@ local onpremEnvironments = import './common/onpremEnvironments.libsonnet';
             },
             limits: {
               memory: k8sRes.limMem + 'Gi',
+              cpu: k8sRes.limCpu + 'm',
             },
           },
         } + (if std.length(p.plugins) > 0 then {
