@@ -158,7 +158,11 @@ local postgresqlParameters = import './postgres/postgresqlParameters.libsonnet';
     };
     local backupObjects = {
       serviceEntryS3: backupResources.serviceEntryS3,
-      objectStore: backupResources.objectStore(bucketName, 's3-store', p.databaseName),
+      objectStore: backupResources.objectStore(
+        bucketName,
+        's3-store',
+        p.databaseName + '-restore'
+      ),
       restoreSourceObjectStore: backupResources.objectStore(
         bucketName,
         's3-store-restore-source',
