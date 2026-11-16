@@ -138,7 +138,7 @@ local postgresqlParameters = import './postgres/postgresqlParameters.libsonnet';
     local certSecretName =
       if p.certificateSecretName == null then clusterName else p.certificateSecretName;
     local connectionObjects =
-      connections.new(p, clusterName, env, certSecretName);
+      connections.new(p, clusterName, env, certSecretName, p.databaseName + '-restore');
     local scheduledBackup = {
       apiVersion: 'postgresql.cnpg.io/v1',
       kind: 'ScheduledBackup',
