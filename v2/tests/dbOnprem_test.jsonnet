@@ -26,6 +26,12 @@ local restoreClusterSpec(config) = findObject(
   } + config).items,
   'Cluster'
 ).spec;
+local restoreItems(config) = dbOnpremRestore.restore({
+  databaseName: 'restore-sizing',
+  environment: 'sandbox',
+  backupSourceClusterName: 'source',
+  storageSizeGi: 2,
+} + config).items;
 local restoreParameters(config) = restoreClusterSpec(config).postgresql.parameters;
 local networkPolicyNames(config) = std.sort([
   obj.metadata.name
@@ -185,6 +191,33 @@ test.new(std.thisFile)
       'allow-istio-pg-gateway',
       'allow-metrics-scraping-to-dbs',
     ],
+  ),
+)
++ test.case.new(
+  name='dbOnpremRestore uses a distinct restore hostname while routing to the restore cluster',
+  test=test.expect.eqDiff(
+    actual=local items = restoreItems({ databaseName: 'skreri-fkbtest' });
+    {
+      certificateDnsNames: findObject(items, 'Certificate').spec.dnsNames,
+      writeRouteHostnames: std.filter(
+        function(route) route.metadata.name == 'skreri-fkbtest-cluster-write',
+        items
+      )[0].spec.hostnames,
+      writeRouteBackend: std.filter(
+        function(route) route.metadata.name == 'skreri-fkbtest-cluster-write',
+        items
+      )[0].spec.rules[0].backendRefs[0].name,
+    },
+    expected={
+      certificateDnsNames: [
+        'skreri-fkbtest-restore-write.db-sandbox.kartverket-intern.cloud',
+        'skreri-fkbtest-restore-read.db-sandbox.kartverket-intern.cloud',
+      ],
+      writeRouteHostnames: [
+        'skreri-fkbtest-restore-write.db-sandbox.kartverket-intern.cloud',
+      ],
+      writeRouteBackend: 'skreri-fkbtest-cluster-rw',
+    },
   ),
 )
 + test.case.new(

@@ -60,11 +60,11 @@ local headlessServices(p, clusterName) = {
   for instanceNumber in std.range(1, p.instances)
 };
 
-local new(p, clusterName, env, certSecretName) =
+local new(p, clusterName, env, certSecretName, hostnamePrefix=p.databaseName) =
   local writeHost =
-    '%s-write.%s.kartverket-intern.cloud' % [p.databaseName, env.prettyUrl];
+    '%s-write.%s.kartverket-intern.cloud' % [hostnamePrefix, env.prettyUrl];
   local readHost =
-    '%s-read.%s.kartverket-intern.cloud' % [p.databaseName, env.prettyUrl];
+    '%s-read.%s.kartverket-intern.cloud' % [hostnamePrefix, env.prettyUrl];
   {
     certificate: {
       apiVersion: 'cert-manager.io/v1',
