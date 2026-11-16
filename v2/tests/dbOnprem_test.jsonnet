@@ -194,6 +194,29 @@ test.new(std.thisFile)
   ),
 )
 + test.case.new(
+  name='dbOnpremRestore writes archived WALs to a separate S3 destination',
+  test=test.expect.eqDiff(
+    actual=local items = restoreItems({
+      databaseName: 'skreri-fkbtest',
+      backupSourceClusterName: 'skreri-fkbtest',
+    });
+    {
+      targetDestination: std.filter(
+        function(store) store.metadata.name == 's3-store',
+        items
+      )[0].spec.configuration.destinationPath,
+      sourceDestination: std.filter(
+        function(store) store.metadata.name == 's3-store-restore-source',
+        items
+      )[0].spec.configuration.destinationPath,
+    },
+    expected={
+      targetDestination: 's3://dbabucket/skreri-fkbtest-restore',
+      sourceDestination: 's3://dbabucket/skreri-fkbtest',
+    },
+  ),
+)
++ test.case.new(
   name='dbOnpremRestore uses a distinct restore hostname while routing to the restore cluster',
   test=test.expect.eqDiff(
     actual=local items = restoreItems({ databaseName: 'skreri-fkbtest' });
