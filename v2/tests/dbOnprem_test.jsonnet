@@ -194,6 +194,36 @@ test.new(std.thisFile)
   ),
 )
 + test.case.new(
+  name='dbOnpremRestore applies its default image catalog and supports an override',
+  test=test.expect.eqDiff(
+    actual={
+      defaultRef: restoreClusterSpec({}).imageCatalogRef,
+      customRef: restoreClusterSpec({
+        imageCatalogRef: {
+          apiGroup: 'postgresql.cnpg.io',
+          kind: 'ImageCatalog',
+          name: 'team-postgresql',
+          major: 18,
+        },
+      }).imageCatalogRef,
+    },
+    expected={
+      defaultRef: {
+        apiGroup: 'postgresql.cnpg.io',
+        kind: 'ClusterImageCatalog',
+        name: 'cnpg-psql-std',
+        major: 18,
+      },
+      customRef: {
+        apiGroup: 'postgresql.cnpg.io',
+        kind: 'ImageCatalog',
+        name: 'team-postgresql',
+        major: 18,
+      },
+    },
+  ),
+)
++ test.case.new(
   name='dbOnpremRestore writes archived WALs to a separate S3 destination',
   test=test.expect.eqDiff(
     actual=local items = restoreItems({
