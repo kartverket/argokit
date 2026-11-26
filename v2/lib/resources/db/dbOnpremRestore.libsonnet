@@ -216,6 +216,7 @@ local postgresqlParameters = import './postgres/postgresqlParameters.libsonnet';
             },
           ],
           enablePDB: if p.instances > 1 then p.enablePDB else false,  // PDB doesn't make sense for single instance clusters
+          [if effectiveImageCatalogRef != null then 'imageCatalogRef']: effectiveImageCatalogRef,
           [if effectiveImageCatalogRef == null then 'imageName']: p.imageName,
           storage: {
             size: p.storageSizeGi + 'Gi',
