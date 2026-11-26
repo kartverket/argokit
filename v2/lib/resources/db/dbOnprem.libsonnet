@@ -148,7 +148,7 @@ local onpremEnvironments = import './common/onpremEnvironments.libsonnet';
             size: p.storageSizeGi + 'Gi',
           },
           [if p.walDisk then 'walStorage']: {
-              size: '5Gi',
+              size: '10Gi',
             },
           certificates: {
             serverCASecret: p.caSecretName,
